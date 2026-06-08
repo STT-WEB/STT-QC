@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>STT QC System</title>
+<title> </title>
 <style>
 :root{--stt-red:#D81E2C;--stt-red-dark:#A6121E;--stt-red-soft:#fdecee;--ink:#1f2937;--ink-soft:#6b7280;--line:#e5e7eb;--bg:#f3f4f6;--card:#fff;--ok:#16a34a;--bad:#dc2626;--warn:#f59e0b;--na:#9ca3af;--radius:14px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.04)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -48,7 +48,7 @@ h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:0 0 12px}
 .docnote{background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:14px}
 .docnote b{color:var(--stt-red-dark);font-size:17px}.docnote.pending{background:#f8fafc;border-color:var(--line);color:var(--ink-soft)}
 .stepper{display:flex;overflow-x:auto;gap:6px;padding:6px 2px 12px;margin-bottom:6px}
-.step{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;min-width:78px;text-align:center;opacity:.5}
+.step{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;min-width:78px;text-align:center;opacity:.5;cursor:pointer}
 .step.active{opacity:1}.step.done{opacity:1}
 .step .circ{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--line);background:#fff;color:var(--ink-soft);font-size:16px}
 .step.active .circ{border-color:var(--stt-red);color:var(--stt-red);background:var(--stt-red-soft)}
@@ -350,7 +350,9 @@ function NewReportView(){
   refreshDocBanner(); drawStepper(); drawStep();
 }
 function refreshDocBanner(){ const el=document.getElementById("docbanner"); if(!el)return; el.innerHTML = (DRAFT&&DRAFT.doc_no)?`<div class="docnote">📄 ${t('docNoLabel')}: <b>${esc(DRAFT.doc_no)}</b></div>`:`<div class="docnote pending">📄 ${t('docNoNone')}</div>`; }
-function drawStepper(){ $("#stepper").innerHTML=STEPS.map((s,i)=>`<div class="step ${i===CUR?'active':''} ${i<CUR?'done':''}"><div class="circ">${i<CUR?'✓':s.ic}</div><div class="lbl">${i+1}. ${t('step_'+s.key)}</div></div>`).join(""); }
+function drawStepper(){ $("#stepper").innerHTML=STEPS.map((s,i)=>`<div class="step ${i===CUR?'active':''} ${i<CUR?'done':''}" onclick="jumpStep(${i})"><div class="circ">${i<CUR?'✓':s.ic}</div><div class="lbl">${i+1}. ${t('step_'+s.key)}</div></div>`).join(""); }
+function jumpStep(i){ collectStep(); CUR=i; drawStepper(); drawStep(); window.scrollTo(0,0); }
+function camImgErr(img){ try{ img.style.display='none'; const s=document.createElement('span'); s.className='add'; s.style.fontSize='12px'; s.style.color='#16a34a'; s.textContent='✓ มีรูปแล้ว'; img.parentNode.appendChild(s); }catch(e){} }
 function curKey(){ return STEPS[CUR].key; }
 function drawStep(){
   const b=$("#stepbody"), k=curKey();
@@ -416,7 +418,7 @@ function stepSlots(target,labels,title,hint){
 }
 function slotHtml(target,a,b,label,url){
   const attr = target==="comp" ? `data-target="comp" data-ci="${a}" data-key="${b}"` : `data-target="${target}" data-idx="${b}"`;
-  return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" ${attr} onclick="openCamera(this)">${url?`<img src="${esc(imgSrc(url))}">`:`<span class="add">📷</span>`}</div>${url?`<button class="del" ${attr} data-del="1">×</button>`:''}</div>`;
+  return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" ${attr} onclick="openCamera(this)">${url?`<img src="${esc(imgSrc(url))}" onerror="camImgErr(this)">`:`<span class="add">📷</span>`}</div>${url?`<button class="del" ${attr} data-del="1">×</button>`:''}</div>`;
 }
 function stepSummary(){
   const fails=DRAFT.checklist.filter(x=>x.st==='fail').length;
@@ -628,12 +630,12 @@ function buildReportPages(r){
   if(d.remark) chkHtml+=`<div class="guide-box" style="margin-top:12px"><b>หมายเหตุ:</b> ${esc(d.remark)}</div>`;
   // การตรวจสอบโดยหัวหน้า + ประวัติ
   if(d.reviewer || (d.history&&d.history.length)){
-    chkHtml+=`<div class="no-print"><h2 style="margin-top:14px">การตรวจสอบรูปภาพ (หัวหน้า) — เฉพาะภายใน</h2>`;
+    chkHtml+=`<div class="no-print"><h2 style="margin-top:14px">การตรวจสอบ Report และกระบวนการ (หัวหน้า) — เฉพาะภายใน</h2>`;
     if(d.reviewer) chkHtml+=`<div><b>${'หัวหน้าผู้ตรวจสอบ'}:</b> ${esc(d.reviewer)} • วันที่ ${esc(d.review_date? new Date(d.review_date).toLocaleString('th-TH'):'-')} • ผล: ${reviewPill(d.review_status)}</div>`;
     if(d.history&&d.history.length){ chkHtml+=`<div style="margin-top:6px"><b>ประวัติการตรวจ/แก้ไข (${d.history.length} ครั้ง):</b>`+d.history.map((x,i)=>`<div class="muted">${i+1}. [${esc(x.type)}] โดย ${esc(x.by)} — ${esc(x.date? new Date(x.date).toLocaleString('th-TH'):'')}${x.detail?(' — '+esc(x.detail)):''}</div>`).join("")+`</div>`; }
     chkHtml+=`</div>`;
   }
-  chkHtml+=`<div class="sign-grid"><div class="sign-box"><div class="sign-line">ผู้ตรวจสอบ (QC Inspector)</div><div style="margin-top:4px">${maker}</div><div class="muted">วันที่ ${cdate}</div></div><div class="sign-box"><div class="sign-line">หัวหน้าผู้ตรวจรูป (QC Lead)</div><div style="margin-top:4px">${esc(d.reviewer||'')}</div></div><div class="sign-box"><div class="sign-line">ผู้รับรอง (Approved by)</div></div><div class="sign-box"><div class="sign-line">Factory Manager</div></div></div>`;
+  chkHtml+=`<div class="sign-grid"><div class="sign-box"><div class="sign-line">ผู้ตรวจสอบ (QC Inspector)</div><div style="margin-top:4px">${maker}</div><div class="muted">วันที่ ${cdate}</div></div><div class="sign-box"><div class="sign-line">หัวหน้าตรวจสอบ Report และกระบวนการ (QC Lead)</div><div style="margin-top:4px">${esc(d.reviewer||'')}</div></div><div class="sign-box"><div class="sign-line">ผู้ร่วมตรวจสอบ (Witnessed by)</div></div><div class="sign-box"><div class="sign-line">ผู้รับรอง (Approved by)</div></div><div class="sign-box"><div class="sign-line">Factory Manager</div></div></div>`;
   pages.push(chkHtml);
   const total=pages.length;
   const head=`${LETTERHEAD}<div class="page-head"><div class="t1">REPORT การวัดน้ำ / Water Gauging Report</div><div style="text-align:right"><div class="docno" style="font-size:17px;color:var(--stt-red-dark);font-weight:800">${esc(r.doc_no)}</div>${statusPill(r.status)}</div></div>`;
