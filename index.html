@@ -534,11 +534,12 @@ async function saveReview(){
 function buildReportPages(r){
   const d=r.data||{};
   const comp=(d.comps||[]);
+  const conds=Array.isArray(d.conditions)?d.conditions:(d.conditions?String(d.conditions).split(/,\s*/):[]);
   const maker=esc(r.created_by||"-");
   const cdate=r.created_at? new Date(r.created_at).toLocaleDateString('th-TH') : (r.measure_date||"-");
   const triple=v=>v==='pass'?'<span class="pill ok">ผ่าน</span>':v==='fail'?'<span class="pill bad">ไม่ผ่าน</span>':v==='na'?'<span class="pill na">–</span>':'<span class="pill draft">-</span>';
   const pages=[];
-  pages.push(`<h2>ข้อมูลทั่วไป</h2><div class="row"><div style="flex:1;min-width:200px"><div><b>ลูกค้า:</b> ${esc(r.customer)}</div><div><b>ที่อยู่:</b> ${esc(r.address||'-')}</div><div><b>Job:</b> ${esc(thaiOnly(r.job_type))} ${esc(r.job_no||'')} • <b>S/N:</b> ${esc(r.sa||'-')}</div><div><b>วันที่วัดน้ำ:</b> ${esc(r.measure_date||'-')}</div>${r.tank_origin?`<div><b>ประเภทแท็งค์:</b> ${esc(thaiOnly(r.tank_origin))}</div>`:''}</div><div style="flex:1;min-width:200px"><div><b>ทะเบียนหัว/แท็งก์:</b> ${esc(r.plate_head||'-')} / ${esc(r.plate_tank||'-')}</div><div><b>คัสซีหัว/หาง:</b> ${esc(r.chassis_head||'-')} / ${esc(r.chassis_tank||'-')}</div><div><b>ความจุ:</b> ${esc(r.capacity||'-')} ลิตร • ${esc(thaiOnly(r.product))}</div><div><b>ประเภทรถ:</b> ${esc(thaiOnly(r.vehicle_type))} • รุ่น ${esc(r.model_no||'-')}</div></div></div>${(d.conditions&&d.conditions.length)?`<div style="margin-top:10px"><b>เงื่อนไขการวัดน้ำ:</b> ${esc(d.conditions.map(thaiOnly).join(", "))}</div>`:''}<div class="guide-box" style="margin-top:12px">${esc(WATER_TERM)}</div>`);
+  pages.push(`<h2>ข้อมูลทั่วไป</h2><div class="row"><div style="flex:1;min-width:200px"><div><b>ลูกค้า:</b> ${esc(r.customer)}</div><div><b>ที่อยู่:</b> ${esc(r.address||'-')}</div><div><b>Job:</b> ${esc(thaiOnly(r.job_type))} ${esc(r.job_no||'')} • <b>S/N:</b> ${esc(r.sa||'-')}</div><div><b>วันที่วัดน้ำ:</b> ${esc(r.measure_date||'-')}</div>${r.tank_origin?`<div><b>ประเภทแท็งค์:</b> ${esc(thaiOnly(r.tank_origin))}</div>`:''}</div><div style="flex:1;min-width:200px"><div><b>ทะเบียนหัว/แท็งก์:</b> ${esc(r.plate_head||'-')} / ${esc(r.plate_tank||'-')}</div><div><b>คัสซีหัว/หาง:</b> ${esc(r.chassis_head||'-')} / ${esc(r.chassis_tank||'-')}</div><div><b>ความจุ:</b> ${esc(r.capacity||'-')} ลิตร • ${esc(thaiOnly(r.product))}</div><div><b>ประเภทรถ:</b> ${esc(thaiOnly(r.vehicle_type))} • รุ่น ${esc(r.model_no||'-')}</div></div></div>${(conds.length)?`<div style="margin-top:10px"><b>เงื่อนไขการวัดน้ำ:</b> ${esc(conds.map(thaiOnly).join(", "))}</div>`:''}<div class="guide-box" style="margin-top:12px">${esc(WATER_TERM)}</div>`);
   pages.push(`<h2>ข้อมูลการวัดน้ำ (${comp.length} ช่อง)</h2><div class="tbl-scroll"><table class="data"><tr><th class="rowlabel">ช่องที่</th>${comp.map((_,i)=>`<th>${i+1}</th>`).join("")}</tr><tr><td class="rowlabel">ปริมาตร ระดับ1</td>${comp.map(c=>`<td>${esc(c.vol1)}</td>`).join("")}</tr><tr><td class="rowlabel">ปริมาตร ระดับMax</td>${comp.map(c=>`<td>${esc(c.vol2)}</td>`).join("")}</tr><tr><td class="rowlabel">U ระดับ1</td>${comp.map(c=>`<td>${esc(c.u1)}</td>`).join("")}</tr><tr><td class="rowlabel">U ระดับMax</td>${comp.map(c=>`<td>${esc(c.u2)}</td>`).join("")}</tr><tr><td class="rowlabel">ก้น-แป้น ระดับ1</td>${comp.map(c=>`<td>${esc(c.bot1)}</td>`).join("")}</tr><tr><td class="rowlabel">ก้น-แป้น ระดับMax</td>${comp.map(c=>`<td>${esc(c.bot2)}</td>`).join("")}</tr><tr><td class="rowlabel">H</td>${comp.map(c=>`<td>${esc(c.h)}</td>`).join("")}</tr><tr><td class="rowlabel">Void</td>${comp.map(c=>`<td>${esc(c.void_l)}</td>`).join("")}</tr><tr><td class="rowlabel">ซีลแป้น</td>${comp.map(c=>`<td>${esc(c.seal_plate)}</td>`).join("")}</tr><tr><td class="rowlabel">ซีลฝา</td>${comp.map(c=>`<td>${esc(c.seal_cap)}</td>`).join("")}</tr></table></div>`);
   comp.forEach((c,i)=>{ const ph=COMP_SLOTS.map(s=>c[s.k]?`<div class="c"><div class="lab">${esc(thaiOnly(s.l))}</div><img src="${esc(c[s.k])}"></div>`:'').join(""); if(ph) pages.push(`<h2>รูปช่องที่ ${i+1}</h2><div class="rep-photos">${ph}</div>`); });
   const sealPh=SEAL_SLOTS.map((lab,idx)=>(d.seal_slots&&d.seal_slots[idx])?`<div class="c"><div class="lab">${esc(thaiOnly(lab))}</div><img src="${esc(d.seal_slots[idx])}"></div>`:'').join("");
@@ -567,8 +568,8 @@ async function DetailView(id){
   if(!r){$("#page").innerHTML='<p>ไม่พบรายงาน</p>';return;}
   const logs=await DB.printLogs(id).catch(()=>[]);
   const d=r.data||{};
-  const pagesHtml=buildReportPages(r);
-  const hasPhotos=allPhotos(d).length>0;
+  let pagesHtml=""; try{ pagesHtml=buildReportPages(r); }catch(err){ pagesHtml='<div class="card" style="color:#b91c1c">⚠️ แสดงรายงานมีปัญหา (แจ้ง Candy): '+esc(err.message||err)+'</div>'; }
+  let hasPhotos=false; try{ hasPhotos=allPhotos(d).length>0; }catch(e){}
   $("#page").innerHTML=`
     <div class="crumb no-print" onclick="go('search')">${t('back')}</div>
     ${r.status==='draft'?`<div class="banner demo no-print">ฉบับร่าง — <a href="javascript:void(0)" onclick="editReport('${esc(String(r.id))}')">กดเพื่อทำต่อ/แก้ไข</a></div>`:''}
@@ -589,6 +590,8 @@ async function DetailView(id){
 }
 async function doPrint(id){ await DB.logPrint(id,USER.name).catch(()=>{}); toast("บันทึกการพิมพ์โดย "+USER.name); setTimeout(()=>window.print(),350); }
 function reAlert(r){ alertSale(r,[]); }
+window.addEventListener('error',function(e){ try{ toast('ผิดพลาด: '+(e.message||'')); }catch(_){} });
+window.addEventListener('unhandledrejection',function(e){ try{ toast('ผิดพลาด: '+((e.reason&&e.reason.message)||e.reason||'')); }catch(_){} });
 render("home");
 </script>
 </body>
