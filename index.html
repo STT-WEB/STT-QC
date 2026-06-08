@@ -80,6 +80,10 @@ table.data th{background:#f8fafc;font-weight:700}
 .slot .ph img{width:100%;height:100%;object-fit:cover}.slot .ph .add{color:var(--ink-soft);font-size:24px}
 .slot .del{position:absolute;top:24px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:50%;width:22px;height:22px;font-size:13px;line-height:1}
 .up-note{font-size:11px;color:var(--ink-soft);margin-top:6px}
+.camov{position:fixed;inset:0;background:#000;z-index:300;display:flex;flex-direction:column}
+.camov video{flex:1;width:100%;min-height:0;object-fit:contain;background:#000}
+.camov .camhint{position:absolute;top:46%;left:0;right:0;text-align:center;color:#fff;font-size:14px;padding:0 20px}
+.camov .cambar{display:flex;gap:10px;justify-content:center;padding:16px;background:#111}
 .rep-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;cursor:pointer;background:#fff}
 .rep-item:hover{border-color:var(--stt-red);background:var(--stt-red-soft)}
 .rep-item .docno{font-weight:800;color:var(--stt-red-dark)}
@@ -257,8 +261,8 @@ function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show"
 function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 function statusPill(s){const m={pass:["ok","ผ่าน (ACCEPT)"],fail:["bad","ไม่ผ่าน"],needs_fix:["warn","ต้องแก้ไข"],draft:["draft","ฉบับร่าง (ทำต่อได้)"]};const x=m[s]||m.draft;return `<span class="pill ${x[0]}">${x[1]}</span>`;}
 function reviewPill(s){ if(s==='accepted') return '<span class="pill ok">รูปผ่านตรวจ</span>'; if(s==='rephoto') return '<span class="pill bad">ต้องถ่ายรูปใหม่</span>'; if(s==='pending') return '<span class="pill warn">รอหัวหน้าตรวจซ้ำ</span>'; return '<span class="pill draft">ยังไม่ตรวจ</span>'; }
-async function uploadImage(file,name){
-  if(CONFIG.LIVE_PHOTO_ONLY){ const ageMin=(Date.now()-(file.lastModified||0))/60000; if(isFinite(ageMin) && ageMin>CONFIG.LIVE_PHOTO_MAX_AGE_MIN){ throw new Error("LIVE_ONLY"); } }
+async function uploadImage(file,name,fromCam){
+  if(CONFIG.LIVE_PHOTO_ONLY && !fromCam){ const ageMin=(Date.now()-(file.lastModified||0))/60000; if(isFinite(ageMin) && ageMin>CONFIG.LIVE_PHOTO_MAX_AGE_MIN){ throw new Error("LIVE_ONLY"); } }
   const b64=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(file);});
   if(DEMO || CONFIG.IMGBB_KEY.startsWith("YOUR_")) return b64;
   const fd=new FormData(); fd.append("image", b64.split(",")[1]);
@@ -386,7 +390,7 @@ function stepSlots(target,labels,title,hint){
 }
 function slotHtml(target,a,b,label,url){
   const attr = target==="comp" ? `data-target="comp" data-ci="${a}" data-key="${b}"` : `data-target="${target}" data-idx="${b}"`;
-  return `<div class="slot"><div class="lab">${esc(label)}</div><label class="ph">${url?`<img src="${esc(url)}">`:`<span class="add">📷＋</span>`}<input type="file" accept="image/*" capture="environment" style="display:none" class="slot-input" ${attr}></label>${url?`<button class="del" ${attr} data-del="1">×</button>`:''}</div>`;
+  return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" ${attr} onclick="openCamera(this)">${url?`<img src="${esc(url)}">`:`<span class="add">📷</span>`}</div>${url?`<button class="del" ${attr} data-del="1">×</button>`:''}</div>`;
 }
 function stepSummary(){
   const fails=DRAFT.checklist.filter(x=>x.st==='fail').length;
@@ -397,7 +401,7 @@ function bindStep(){
   document.querySelectorAll("#stepbody input[data-c]").forEach(inp=>{ inp.addEventListener("input",()=>{DRAFT.comps[+inp.dataset.c][inp.dataset.k]=inp.value;}); });
   document.querySelectorAll("#stepbody input[data-chk]").forEach(inp=>{ inp.addEventListener("input",()=>{DRAFT.checklist[+inp.dataset.chk][inp.dataset.fk]=inp.value;}); });
   document.querySelectorAll(".seg[data-i]").forEach(seg=>{ seg.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{ const i=+seg.dataset.i,v=btn.dataset.v; DRAFT.checklist[i].st=v; drawStep(); }); });
-  document.querySelectorAll(".slot-input").forEach(inp=>{ inp.onchange=async e=>{ const f=e.target.files[0]; if(!f) return; toast(t('uploading')); const ds=inp.dataset; let label=slotLabel(ds); let url; try{ url=await uploadImage(f,label);}catch(err){ return toast(err.message==="LIVE_ONLY"?t('liveOnly'):"อัปโหลดไม่สำเร็จ"); } storeSlot(ds,url); drawStep(); }; });
+  /* ถ่ายรูปผ่านกล้องในแอป (openCamera) — ไม่ใช้ file input แล้ว เพื่อบังคับถ่ายสด */
   document.querySelectorAll(".del[data-del]").forEach(btn=>{ btn.onclick=()=>{ storeSlot(btn.dataset,""); drawStep(); }; });
 }
 function slotLabel(ds){
@@ -408,6 +412,34 @@ function slotLabel(ds){
   return tag;
 }
 function storeSlot(ds,url){ if(ds.target==="comp"){ DRAFT.comps[+ds.ci][ds.key]=url; } else { DRAFT[ds.target]=DRAFT[ds.target]||{}; DRAFT[ds.target][ds.idx]=url; } }
+/* ===== กล้องในแอป (ถ่ายสดเท่านั้น) ===== */
+let CAM={stream:null,ds:null,label:"",facing:"environment"};
+function openCamera(elem){
+  const ds=elem.dataset; CAM.ds={target:ds.target,ci:ds.ci,key:ds.key,idx:ds.idx}; CAM.label=slotLabel(CAM.ds); CAM.facing="environment";
+  const ov=document.createElement('div'); ov.id='camov'; ov.className='camov';
+  ov.innerHTML='<video id="camv" autoplay playsinline muted></video><div class="camhint" id="camhint">กำลังเปิดกล้อง... (อนุญาตให้ใช้กล้อง)</div><div class="cambar"><button class="btn grey" onclick="closeCamera()">ยกเลิก</button><button class="btn" onclick="captureCam()">📸 ถ่าย</button><button class="btn sec" onclick="switchCam()">🔄 สลับกล้อง</button></div>';
+  document.body.appendChild(ov);
+  startCam();
+}
+async function startCam(){
+  try{
+    if(CAM.stream) CAM.stream.getTracks().forEach(t=>t.stop());
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ toast('อุปกรณ์/เบราว์เซอร์นี้เปิดกล้องไม่ได้ (ต้องใช้ HTTPS)'); return closeCamera(); }
+    CAM.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:CAM.facing}},audio:false});
+    const v=document.getElementById('camv'); if(v) v.srcObject=CAM.stream;
+    const h=document.getElementById('camhint'); if(h) h.style.display='none';
+  }catch(e){ toast('เปิดกล้องไม่ได้: '+(e.message||e)+' — อนุญาตกล้อง/ใช้ผ่าน HTTPS'); closeCamera(); }
+}
+function switchCam(){ CAM.facing=CAM.facing==='environment'?'user':'environment'; startCam(); }
+function closeCamera(){ if(CAM.stream){ CAM.stream.getTracks().forEach(t=>t.stop()); CAM.stream=null; } const o=document.getElementById('camov'); if(o) o.remove(); }
+async function captureCam(){
+  const v=document.getElementById('camv'); if(!v||!v.videoWidth){ return toast('กล้องยังไม่พร้อม รอสักครู่'); }
+  const cv=document.createElement('canvas'); cv.width=v.videoWidth; cv.height=v.videoHeight; cv.getContext('2d').drawImage(v,0,0,cv.width,cv.height);
+  toast(t('uploading'));
+  const blob=await new Promise(res=>cv.toBlob(res,'image/jpeg',0.85));
+  let url; try{ url=await uploadImage(blob,CAM.label,true); }catch(err){ return toast('อัปโหลดไม่สำเร็จ: '+(err.message||err)); }
+  storeSlot(CAM.ds,url); closeCamera(); drawStep(); toast("เพิ่มรูปแล้ว ✓");
+}
 function collectStep(){
   const k=curKey();
   if(k==="job"){
