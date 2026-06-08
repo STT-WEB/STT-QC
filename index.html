@@ -3,79 +3,52 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>STT QC System — ระบบตรวจสอบคุณภาพ</title>
+<title>STT QC System</title>
 <style>
-/* ============================================================
-   STT QC SYSTEM  —  V1.0
-   ธีมสีแดง STT | ใช้ได้ทั้งมือถือและคอมพิวเตอร์
-   ============================================================ */
-:root{
-  --stt-red:#D81E2C; --stt-red-dark:#A6121E; --stt-red-soft:#fdecee;
-  --ink:#1f2937; --ink-soft:#6b7280; --line:#e5e7eb;
-  --bg:#f3f4f6; --card:#ffffff; --ok:#16a34a; --bad:#dc2626; --warn:#f59e0b;
-  --radius:14px; --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.04);
-}
+:root{--stt-red:#D81E2C;--stt-red-dark:#A6121E;--stt-red-soft:#fdecee;--ink:#1f2937;--ink-soft:#6b7280;--line:#e5e7eb;--bg:#f3f4f6;--card:#fff;--ok:#16a34a;--bad:#dc2626;--warn:#f59e0b;--na:#9ca3af;--radius:14px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.04)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{font-family:'Segoe UI','Sarabun',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5}
 button{font-family:inherit;cursor:pointer}
 input,select,textarea{font-family:inherit;font-size:15px}
-.hidden{display:none!important}
-
-/* ---------- App shell ---------- */
-.appbar{position:sticky;top:0;z-index:30;background:var(--stt-red);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 14px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.appbar{position:sticky;top:0;z-index:30;background:var(--stt-red);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 14px;box-shadow:0 2px 8px rgba(0,0,0,.15);flex-wrap:wrap}
 .appbar .logo{font-weight:800;letter-spacing:1px;font-size:18px;display:flex;align-items:center;gap:8px}
 .appbar .logo .mark{background:#fff;color:var(--stt-red);border-radius:6px;padding:1px 7px;font-weight:900;transform:skewX(-8deg)}
 .appbar .spacer{flex:1}
 .appbar .who{font-size:13px;opacity:.95;text-align:right;line-height:1.2}
 .appbar button.ghost{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:8px;padding:7px 12px;font-size:13px}
-.appbar button.ghost:hover{background:rgba(255,255,255,.28)}
+.langbar{display:flex;gap:4px;flex-wrap:wrap}
+.langbar button{border:0;border-radius:6px;padding:4px 8px;font-size:12px;font-weight:700;background:rgba(255,255,255,.2);color:#fff}
+.langbar button.on{background:#fff;color:var(--stt-red)}
 .wrap{max-width:1000px;margin:0 auto;padding:16px 14px 60px}
-
-/* ---------- Cards / buttons ---------- */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
 .btn{background:var(--stt-red);color:#fff;border:0;border-radius:10px;padding:12px 18px;font-weight:700;font-size:15px}
 .btn:hover{background:var(--stt-red-dark)}
-.btn:disabled{background:#cbd5e1;cursor:not-allowed}
 .btn.sec{background:#fff;color:var(--stt-red);border:1.5px solid var(--stt-red)}
-.btn.sec:hover{background:var(--stt-red-soft)}
 .btn.grey{background:#eef0f3;color:var(--ink)}
-.btn.grey:hover{background:#e2e6eb}
 .btn.block{width:100%}
+.btn.sm{padding:7px 12px;font-size:13px}
 .row{display:flex;gap:10px;flex-wrap:wrap}
-.field{margin-bottom:12px;flex:1;min-width:160px}
+.field{margin-bottom:12px;flex:1;min-width:150px}
 .field label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
 .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;outline:none}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--stt-red)}
 h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:0 0 12px}
 .muted{color:var(--ink-soft);font-size:13px}
 .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
-.pill.ok{background:#dcfce7;color:#166534}.pill.bad{background:#fee2e2;color:#991b1b}
-.pill.warn{background:#fef3c7;color:#92400e}.pill.draft{background:#e5e7eb;color:#374151}
-
-/* ---------- Login ---------- */
+.pill.ok{background:#dcfce7;color:#166534}.pill.bad{background:#fee2e2;color:#991b1b}.pill.warn{background:#fef3c7;color:#92400e}.pill.draft{background:#e5e7eb;color:#374151}.pill.na{background:#f1f5f9;color:#475569}
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,var(--stt-red),var(--stt-red-dark))}
 .login-card{background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:30px;width:100%;max-width:380px}
-.login-card .brand{text-align:center;margin-bottom:18px}
+.login-card .brand{text-align:center;margin-bottom:14px}
 .login-card .brand .mark{font-size:30px;font-weight:900;color:var(--stt-red);letter-spacing:1px}
 .login-card .brand .sub{color:var(--ink-soft);font-size:13px;margin-top:2px}
-.pin-display{display:flex;justify-content:center;gap:10px;margin:14px 0}
-.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--stt-red)}
-.pin-dot.on{background:var(--stt-red)}
-.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
-.keypad button{padding:16px;font-size:20px;font-weight:700;border:1.5px solid var(--line);background:#fff;border-radius:12px}
-.keypad button:hover{background:var(--stt-red-soft);border-color:var(--stt-red)}
-
-/* ---------- Module tiles ---------- */
+.langbar.dark button{background:#f1f1f3;color:#444}.langbar.dark button.on{background:var(--stt-red);color:#fff}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
-.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;text-align:center;position:relative;transition:transform .1s}
-.tile.active{cursor:pointer}.tile.active:hover{transform:translateY(-3px);border-color:var(--stt-red)}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;text-align:center;position:relative}
+.tile.active{cursor:pointer}.tile.active:hover{border-color:var(--stt-red)}
 .tile.soon{opacity:.55}
-.tile .ic{font-size:34px;margin-bottom:8px}
-.tile .nm{font-weight:700}
+.tile .ic{font-size:34px;margin-bottom:8px}.tile .nm{font-weight:700}
 .tile .tag{position:absolute;top:8px;right:8px}
-
-/* ---------- Stepper ---------- */
 .stepper{display:flex;overflow-x:auto;gap:6px;padding:6px 2px 12px;margin-bottom:6px}
 .step{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;min-width:78px;text-align:center;opacity:.5}
 .step.active{opacity:1}.step.done{opacity:1}
@@ -83,59 +56,58 @@ h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:0 0 12px}
 .step.active .circ{border-color:var(--stt-red);color:var(--stt-red);background:var(--stt-red-soft)}
 .step.done .circ{border-color:var(--ok);background:var(--ok);color:#fff}
 .step .lbl{font-size:11px;margin-top:5px;line-height:1.2}
-.step-panel{display:none}.step-panel.active{display:block}
-
-/* ---------- Side guide ---------- */
 .guide-box{background:var(--stt-red-soft);border-left:4px solid var(--stt-red);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13.5px}
 .guide-box b{color:var(--stt-red-dark)}
-
-/* ---------- Table ---------- */
-.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table.data{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
+.tbl-scroll{overflow-x:auto}
+table.data{border-collapse:collapse;width:100%;min-width:560px;font-size:13px}
 table.data th,table.data td{border:1px solid var(--line);padding:6px 8px;text-align:center}
-table.data th{background:#f8fafc;font-weight:700;position:sticky;top:0}
-table.data td input{width:100%;border:1px solid transparent;padding:6px;text-align:center;border-radius:6px}
-table.data td input:focus{border-color:var(--stt-red);background:#fff}
+table.data th{background:#f8fafc;font-weight:700}
 .rowlabel{background:#f8fafc;font-weight:600;text-align:left!important;white-space:nowrap}
-
-/* checklist */
 .chk-item{display:flex;align-items:center;gap:8px;padding:9px 6px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .chk-item .no{width:26px;height:26px;border-radius:50%;background:#eef0f3;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex:0 0 auto}
 .chk-item .desc{flex:1;min-width:140px;font-size:13.5px}
 .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{border:0;background:#fff;padding:6px 12px;font-size:12px;font-weight:700;color:var(--ink-soft)}
-.seg button.on-ok{background:var(--ok);color:#fff}
-.seg button.on-bad{background:var(--bad);color:#fff}
-
-/* photo */
-.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:8px}
-.photo-cell{position:relative;aspect-ratio:1;border:1.5px dashed var(--line);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fafafa}
-.photo-cell img{width:100%;height:100%;object-fit:cover}
-.photo-cell .add{color:var(--ink-soft);font-size:26px}
-.photo-cell .del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:50%;width:22px;height:22px;font-size:13px;line-height:1}
-.up-note{font-size:11px;color:var(--ink-soft);margin-top:4px}
-
-/* list */
+.seg button{border:0;background:#fff;padding:6px 10px;font-size:12px;font-weight:700;color:var(--ink-soft);border-left:1px solid var(--line)}
+.seg button:first-child{border-left:0}
+.seg button.on-ok{background:var(--ok);color:#fff}.seg button.on-bad{background:var(--bad);color:#fff}.seg button.on-na{background:var(--na);color:#fff}
+.comp-card{border:1.5px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.comp-card .hd{font-weight:800;color:var(--stt-red-dark);margin-bottom:10px;font-size:16px}
+.slot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:6px}
+.slot{border:1.5px dashed var(--line);border-radius:10px;overflow:hidden;background:#fafafa;position:relative}
+.slot .lab{font-size:11px;font-weight:700;color:var(--ink-soft);padding:5px 6px;background:#f3f4f6;text-align:center}
+.slot .ph{aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.slot .ph img{width:100%;height:100%;object-fit:cover}
+.slot .ph .add{color:var(--ink-soft);font-size:24px}
+.slot .del{position:absolute;top:24px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:50%;width:22px;height:22px;font-size:13px;line-height:1}
+.up-note{font-size:11px;color:var(--ink-soft);margin-top:6px}
 .rep-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;cursor:pointer;background:#fff}
 .rep-item:hover{border-color:var(--stt-red);background:var(--stt-red-soft)}
 .rep-item .docno{font-weight:800;color:var(--stt-red-dark)}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;z-index:100;box-shadow:var(--shadow);font-size:14px;opacity:0;transition:opacity .2s}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;z-index:100;box-shadow:var(--shadow);font-size:14px;opacity:0;transition:opacity .2s;max-width:90%;text-align:center}
 .toast.show{opacity:1}
 .banner{padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:14px}
 .banner.demo{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}
 .crumb{font-size:13px;color:var(--ink-soft);margin-bottom:10px;cursor:pointer}
-.crumb:hover{color:var(--stt-red)}
 .howto-step{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
 .howto-step .hd{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f8fafc;cursor:pointer}
 .howto-step .hd .n{width:30px;height:30px;border-radius:8px;background:var(--stt-red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto}
 .howto-step .bd{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
 .howto-step.open .bd{max-height:600px;padding:12px 14px}
-/* ---------- Paginated report ---------- */
+.cond-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
+.cond-grid label{display:flex;align-items:center;gap:6px;font-size:13px;padding:6px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.cond-grid input{width:auto}
+.sign-grid{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:24px}
+.sign-box{flex:1;min-width:160px;text-align:center}
+.sign-line{border-top:1px dotted #555;margin-top:46px;padding-top:6px;font-size:13px}
 .page{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px;display:flex;flex-direction:column}
 .page-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--stt-red);padding-bottom:8px;margin-bottom:12px}
 .page-head .t1{font-weight:900;color:var(--stt-red);font-size:20px;line-height:1}
 .page-body{flex:1}
 .page-foot{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin-top:14px;padding-top:8px;font-size:12px;color:var(--ink-soft)}
+.rep-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.rep-photos .c{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.rep-photos .c .lab{font-size:11px;font-weight:700;text-align:center;background:#f3f4f6;padding:4px}
+.rep-photos .c img{width:100%;display:block;aspect-ratio:1;object-fit:cover}
 @media print{
   .appbar,.no-print,.stepper,.crumb,.toast{display:none!important}
   body{background:#fff}.wrap{max-width:none;padding:0}
@@ -146,655 +118,541 @@ table.data td input:focus{border-color:var(--stt-red);background:#fff}
 </style>
 </head>
 <body>
-
-<!-- ============= CONFIG : เบียร์แก้ 3 ค่านี้ตามคู่มือ ============= -->
 <script>
 const CONFIG = {
-  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwwVHuuLu7k_syRWB_f8Fwy62bt5anx7Cde2PWnIobmT4rVH2x_fIPujff5alcoxWBHuw/exec",  // Web App ของ CB_Database
-  IMGBB_KEY:  "8e405c97165321f3c68eafb9d3d9bd8e"   // คีย์ IMGBB (เก็บรูป)
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwwVHuuLu7k_syRWB_f8Fwy62bt5anx7Cde2PWnIobmT4rVH2x_fIPujff5alcoxWBHuw/exec",
+  IMGBB_KEY:  "8e405c97165321f3c68eafb9d3d9bd8e",
+  LIVE_PHOTO_ONLY: true,
+  LIVE_PHOTO_MAX_AGE_MIN: 10
 };
 </script>
-
 <div id="root"></div>
 <div id="toast" class="toast"></div>
-
 <script>
-/* ============================================================
-   0) โหมดการทำงาน : ถ้ายังไม่ใส่ค่า config → DEMO MODE (เก็บในเครื่อง)
-   ============================================================ */
 const DEMO = CONFIG.SCRIPT_URL.startsWith("YOUR_");
-// เรียก Google Apps Script — ใช้ text/plain เพื่อเลี่ยง CORS preflight
 async function apiCall(action, payload){
-  const res = await fetch(CONFIG.SCRIPT_URL, {
-    method:"POST",
-    headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body: JSON.stringify(Object.assign({action}, payload||{}))
-  });
+  const res = await fetch(CONFIG.SCRIPT_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify(Object.assign({action}, payload||{}))});
   const j = await res.json();
   if(!j.ok) throw new Error(j.error||"server error");
   return j.data;
 }
 
-/* ---------- ค่าคงที่ของระบบ ---------- */
+/* ===== ภาษา (i18n) — ผลลัพธ์/รายงานออกเป็นไทยเสมอ แปลเฉพาะหน้าจอ =====
+   พม่า/ลาว/เขมร เป็น best-effort แก้ให้ตรงขึ้นได้ในออบเจกต์ T นี้ */
+const LANGS=[["th","ไทย"],["en","EN"],["my","မြန်မာ"],["lo","ລາວ"],["km","ខ្មែរ"]];
+let LANG = (typeof localStorage!=="undefined" && localStorage.getItem("sttqc_lang")) || "th";
+const T = {
+  logout:{th:"ออก",en:"Logout",my:"ထွက်",lo:"ອອກ",km:"ចេញ"},
+  roleAdmin:{th:"ผู้ดูแลระบบ",en:"Admin",my:"အက်ဒ်မင်",lo:"ຜູ້ດູແລ",km:"អ្នកគ្រប់គ្រង"},
+  roleStaff:{th:"พนักงาน QC",en:"QC Staff",my:"QC ဝန်ထမ်း",lo:"ພະນັກງານ QC",km:"បុគ្គលិក QC"},
+  loginSub:{th:"ระบบตรวจสอบคุณภาพ (QC) — ฝ่ายวัดน้ำ",en:"Quality Control (QC) — Water Gauging",my:"အရည်အသွေးစစ်ဆေးရေး (QC)",lo:"ລະບົບ QC — ວັດແທກນ້ຳ",km:"ប្រព័ន្ធ QC — វាស់ទឹក"},
+  loginName:{th:"ชื่อพนักงาน (พิมพ์เพื่อค้นหา)",en:"Employee name (type to search)",my:"ဝန်ထမ်းအမည် (ရှာရန်ရိုက်ပါ)",lo:"ຊື່ພະນັກງານ (ພິມເພື່ອຄົ້ນຫາ)",km:"ឈ្មោះបុគ្គលិក (វាយដើម្បីស្វែងរក)"},
+  loginPin:{th:"รหัสพนักงาน",en:"Employee code",my:"ဝန်ထမ်းကုဒ်",lo:"ລະຫັດພະນັກງານ",km:"លេខកូដបុគ្គលិក"},
+  loginBtn:{th:"เข้าสู่ระบบ",en:"Login",my:"ဝင်ရန်",lo:"ເຂົ້າສູ່ລະບົບ",km:"ចូល"},
+  loginHint:{th:'ใช้ "รหัสพนักงาน" จากฝ่าย HR เป็นรหัสผ่าน • ลาออกแล้วจะเข้าไม่ได้',en:'Use your HR "employee code" as password. Resigned staff cannot log in.',my:"HR ဝန်ထမ်းကုဒ်ကို စကားဝှက်အဖြစ်သုံးပါ။",lo:"ໃຊ້ລະຫັດພະນັກງານ HR ເປັນລະຫັດຜ່ານ",km:"ប្រើលេខកូដបុគ្គលិក HR ជាពាក្យសម្ងាត់"},
+  homeH1:{th:"เลือกงาน QC",en:"Choose QC task",my:"QC အလုပ်ရွေးပါ",lo:"ເລືອກงານ QC",km:"ជ្រើសការងារ QC"},
+  homeP:{th:'แตะการ์ดเพื่อเริ่มงาน — โมดูล "การวัดน้ำ" พร้อมใช้งานแล้ว',en:'Tap a card to start — "Water gauging" module is ready',my:"စတင်ရန် ကတ်ကိုနှိပ်ပါ",lo:"ແຕະບັດເພື່ອເລີ່ມ",km:"ចុចកាតដើម្បីចាប់ផ្តើម"},
+  ready:{th:"พร้อมใช้",en:"Ready",my:"အသင့်",lo:"ພ້ອມ",km:"រួចរាល់"},
+  soon:{th:"เร็วๆนี้",en:"Soon",my:"မကြာမီ",lo:"ໄວໆນີ້",km:"ឆាប់ៗ"},
+  modWater:{th:"การวัดน้ำ",en:"Water Gauging",my:"ရေတိုင်းတာ",lo:"ວັດແທກນ້ຳ",km:"វាស់ទឹក"},
+  newRep:{th:"สร้างใบวัดน้ำใหม่",en:"New gauging report",my:"အသစ်ဖန်တီး",lo:"ສ້າງໃໝ່",km:"បង្កើតថ្មី"},
+  searchRep:{th:"ค้นหา/ดูรายงาน",en:"Search / view reports",my:"ရှာ/ကြည့်",lo:"ຄົ້ນຫາ/ເບິ່ງ",km:"ស្វែងរក/មើល"},
+  howtoTile:{th:"คู่มือ How-to",en:"How-to guide",my:"လမ်းညွှန်",lo:"ຄູ່ມື",km:"មគ្គុទេসក៍"},
+  backHome:{th:"← กลับหน้าหลัก",en:"← Back to home",my:"← ပင်မသို့",lo:"← ກັບໜ້າຫຼັກ",km:"← ត្រឡប់"},
+  back:{th:"← หน้าหลัก",en:"← Home",my:"← ပင်မ",lo:"← ໜ້າຫຼັກ",km:"← ទំព័រដើម"},
+  prev:{th:"← ก่อนหน้า",en:"← Back",my:"← နောက်သို့",lo:"← ກ່ອນໜ້າ",km:"← ថយក្រោយ"},
+  next:{th:"ถัดไป →",en:"Next →",my:"ရှေ့သို့ →",lo:"ຕໍ່ໄປ →",km:"បន្ទាប់ →"},
+  saveBtn:{th:"💾 บันทึกรายงาน",en:"💾 Save report",my:"💾 သိမ်းမည်",lo:"💾 ບັນທຶກ",km:"💾 រក្សាទុក"},
+  chkPass:{th:"ผ่าน",en:"Pass",my:"အောင်",lo:"ຜ່ານ",km:"ជាប់"},
+  chkNA:{th:"ไม่ได้ตรวจ",en:"N/A",my:"မစစ်ရ",lo:"ບໍ່ໄດ້ກວດ",km:"មិនបានពិនិត្យ"},
+  chkFail:{th:"ไม่ผ่าน",en:"Fail",my:"မအောင်",lo:"ບໍ່ຜ່ານ",km:"ធ្លាក់"},
+  searchBtn:{th:"ค้นหา",en:"Search",my:"ရှာ",lo:"ຄົ້ນຫາ",km:"ស្វែងរក"},
+  searchPh:{th:"เลขเอกสาร / ลูกค้า / ทะเบียน / Job / SA",en:"Doc no / customer / plate / Job / SA",my:"စာရွက်နံပါတ်/ဖောက်သည်...",lo:"ເລກເອກະສານ/ລູກຄ້າ...",km:"លេខឯកសារ/អតិថិជន..."},
+  noReport:{th:"ไม่พบรายงาน",en:"No reports found",my:"မတွေ့ပါ",lo:"ບໍ່ພົບ",km:"រកមិនឃើញ"},
+  loading:{th:"กำลังโหลด...",en:"Loading...",my:"ဖွင့်နေသည်...",lo:"ກຳລັງໂຫຼດ...",km:"កំពុងផ្ទុក..."},
+  printBtn:{th:"🖨️ พิมพ์ / บันทึก PDF",en:"🖨️ Print / Save PDF",my:"🖨️ ပုံနှိပ်/PDF",lo:"🖨️ ພິມ/PDF",km:"🖨️ បោះពុម្ព/PDF"},
+  searchTitle:{th:"🔍 ค้นหารายงานวัดน้ำ",en:"🔍 Search gauging reports",my:"🔍 အစီရင်ခံစာရှာ",lo:"🔍 ຄົ້ນຫາ",km:"🔍 ស្វែងរក"},
+  howtoH1:{th:"📖 คู่มือการวัดน้ำ (How-to)",en:"📖 Water gauging guide",my:"📖 လမ်းညွှန်",lo:"📖 ຄູ່ມື",km:"📖 មគ្គុទេសក៍"},
+  howtoStart:{th:"เข้าใจแล้ว เริ่มทำใบวัดน้ำ →",en:"Got it, start a report →",my:"စတင်မည် →",lo:"ເລີ່ມ →",km:"ចាប់ផ្តើម →"},
+  newTitle:{th:"➕ ใบวัดน้ำใหม่",en:"➕ New gauging report",my:"➕ အသစ်",lo:"➕ ໃໝ່",km:"➕ ថ្មី"},
+  cancel:{th:"← ยกเลิก",en:"← Cancel",my:"← ပယ်ဖျက်",lo:"← ຍົກເລີກ",km:"← បោះបង់"},
+  // step names (key-based)
+  step_job:{th:"ข้อมูลงาน",en:"Job info",my:"အလုပ်အချက်",lo:"ຂໍ້ມູນงาน",km:"ព័ត៌មានការងារ"},
+  step_before:{th:"ตรวจ Before",en:"Before",my:"စစ်ဆေး (Before)",lo:"ກວດ Before",km:"មុនជួសជុល"},
+  step_after:{th:"ตรวจ After",en:"After",my:"စစ်ဆေး (After)",lo:"ກວດ After",km:"ក្រោយជួសជុល"},
+  step_check:{th:"ตรวจระบบ",en:"Inspection",my:"စစ်ဆေး",lo:"ກວດລະບົບ",km:"ត្រួតពិនិត្យ"},
+  step_table:{th:"ตารางวัดน้ำ",en:"Gauging table",my:"ရေဇယား",lo:"ຕາຕະລາງ",km:"តារាងវាស់"},
+  step_seal:{th:"ซีล+ลมยาง",en:"Seal+Tire",my:"ဆီး+တာယာ",lo:"ຊີນ+ຢາງ",km:"បិទ+សំបកកង់"},
+  step_chassis:{th:"Chassis",en:"Chassis",my:"Chassis",lo:"Chassis",km:"Chassis"},
+  step_summary:{th:"สรุป+บันทึก",en:"Summary+Save",my:"အကျဉ်း",lo:"ສະຫຼຸບ",km:"សង្ខេប"},
+  needName:{th:"กรุณากรอกชื่อลูกค้า",en:"Please enter customer name"},
+  needSA:{th:"กรุณากรอกเลข SA",en:"Please enter SA number"},
+  needChk:{th:"กรุณาเลือกผลให้ครบทุกข้อ (กันลัดขั้นตอน)",en:"Please answer every item (no skipping)"},
+  liveOnly:{th:"❌ ต้องถ่ายสดเท่านั้น (ห้ามใช้รูปเก่าจากแกลเลอรี)",en:"❌ Live photo only (no gallery images)"},
+  saving:{th:"กำลังบันทึก...",en:"Saving..."},
+  uploading:{th:"กำลังอัปโหลดรูป...",en:"Uploading photo..."}
+};
+function t(k){ const o=T[k]; if(!o) return k; return o[LANG]||o.en||o.th; }
+function setLang(l){ LANG=l; try{localStorage.setItem("sttqc_lang",l);}catch(e){} rerender(); }
+function langBar(dark){ return `<div class="langbar ${dark?'dark':''}">${LANGS.map(([c,n])=>`<button class="${LANG===c?'on':''}" onclick="setLang('${c}')">${n}</button>`).join("")}</div>`; }
+
 const JOB_TYPES = [
-  {code:"JT",  name:"JT — งานแท็งค์สร้างใหม่"},
-  {code:"JM",  name:"JM — งานซ่อม/หลังการขาย"},
-  {code:"JMC", name:"JMC — ซ่อม (เคมี)"},
-  {code:"JMI", name:"JMI — ซ่อม (ตรวจสภาพ)"},
-  {code:"JMT", name:"JMT — ซ่อม (แท็งค์)"},
-  {code:"JMS", name:"JMS — ซ่อม (บริการ)"}
+  {code:"JT",  name:"JT — งานแท็งค์สร้างใหม่ / New tank", after:false},
+  {code:"JM",  name:"JM — งานซ่อมแท็งค์ทั่วไป / General repair", after:true},
+  {code:"JMC", name:"JMC — STT ผลิต (ในประกัน) / STT-made (warranty)", after:true},
+  {code:"JMI", name:"JMI — Insurance Service", after:true},
+  {code:"JMT", name:"JMT — Service ตรวจวาระ / Periodic", after:true},
+  {code:"JMS", name:"JMS — รถในเครือ S-One / S-One group", after:true}
 ];
-const VEHICLE_TYPES = ["รถกึ่งพ่วง (Semi-Trailer)","รถสิบล้อ","รถหกล้อ"];
+function isJM(code){ return code!=="JT"; }
+const TANK_ORIGINS = ["STT ผลิต / STT-made","ผลิตจากบริษัทอื่น / Other maker"];
+const VEHICLE_TYPES = ["รถกึ่งพ่วง (Semi-Trailer)","รถสิบล้อ (10-wheel)","รถหกล้อ (6-wheel)"];
 const PRODUCT_TYPES = ["Petroleum (น้ำมัน)","Chemical (เคมี)"];
-
-/* Checklist — รถกึ่งพ่วง (24 ข้อ ตาม WI-QC-26) */
+const WATER_CONDITIONS = ["รถใหม่ / New","ครบกำหนด 3 ปี / 3-year due","ผ่านการขนส่งผลิตภัณฑ์ / Used","Chemical","Petroleum","Truck (10/6 ล้อ)","Semi-Trailer","ไม่ประจักษ์การสร้าง / Build not witnessed"];
 const CHK_TRAILER = [
- "ใบ Request / ใบสั่งขาย","รถเข้ามารับบริการ","ค่าไวไฟ เป็น 0","ลมยางทุกล้อ 120-130 PSI",
- "ระบบถุงลม","ระบบ Air Interlock","ระบบ Emergency Valve","ระบบ Emergency Stop","ระบบลม Pneumatic",
- "ทำการ Balance ลม","วัดค่า R&H และแจ้ง Production","Production ตรวจสอบแก้ไข",
- "เปิดฝา Manhole ทุกช่อง และเจียรแป้นเก่าออก (รถเก่า)","ดำเนินการวัดน้ำ ตามค่ามาตรฐาน",
- "ระดับแรก เติมน้ำทุกช่อง ปล่อยเข้า Line Pipe + Mark แป้นระดับ 1","วัดระดับน้ำระดับถัดไป และ Mark จุด",
- "แป้นบนสุด ถึง คอแมนโฮล ไม่ต่ำกว่า 1700 MM","วัดความสูงต่ำของหัวแท้งค์ ท้ายแท้งค์",
- "สูบน้ำออกจากแท้งค์ทุกช่อง","แจ้งช่าง มาเชื่อมแป้น","ตรวจสอบความถูกต้องของการเชื่อมแป้น",
- "ทดสอบการรั่วและทดสอบระบบ","ส่งข้อมูลเพื่อทำเอกสารใบวัดน้ำ","ใบวัดน้ำส่งพนักงานขับรถ / เก็บ Scan"
+ "ใบ Request / ใบสั่งขาย / Request or sales order","รถเข้ามารับบริการ / Vehicle arrives","ค่าไวไฟ เป็น 0 / Flammability = 0","ลมยางทุกล้อ 120-130 PSI / Tire 120-130 PSI",
+ "ระบบถุงลม / Air bag system","ระบบ Air Interlock","ระบบ Emergency Valve","ระบบ Emergency Stop","ระบบลม Pneumatic / Pneumatic system",
+ "ทำการ Balance ลม / Balance air","วัดค่า R&H และแจ้ง Production / Measure R&H, notify Production","Production ตรวจสอบแก้ไข / Production checks & fixes",
+ "เปิดฝา Manhole ทุกช่อง และเจียรแป้นเก่าออก (รถเก่า) / Open manholes, grind old plate","ดำเนินการวัดน้ำ ตามค่ามาตรฐาน / Gauge to standard",
+ "ระดับแรก เติมน้ำทุกช่อง ปล่อยเข้า Line Pipe + Mark แป้นระดับ 1 / Level 1 fill & mark","วัดระดับน้ำระดับถัดไป และ Mark จุด / Gauge next level & mark",
+ "แป้นบนสุด ถึง คอแมนโฮล ไม่ต่ำกว่า 1700 MM / Top plate to manhole ≥1700mm","วัดความสูงต่ำของหัวแท้งค์ ท้ายแท้งค์ / Tank front-rear height",
+ "สูบน้ำออกจากแท้งค์ทุกช่อง / Drain all comps","แจ้งช่าง มาเชื่อมแป้น / Notify welder","ตรวจสอบความถูกต้องของการเชื่อมแป้น / Verify welding",
+ "ทดสอบการรั่วและทดสอบระบบ / Leak & system test","ส่งข้อมูลเพื่อทำเอกสารใบวัดน้ำ / Submit data for certificate","ใบวัดน้ำส่งพนักงานขับรถ / เก็บ Scan / Give cert to driver, keep scan"
 ];
-/* Checklist — รถสิบล้อ/หกล้อ (21 ข้อ) */
 const CHK_TRUCK = [
- "ใบ Request / ใบสั่งขาย","รถเข้ามารับบริการ","ค่าไวไฟ เป็น 0","ลมยางทุกล้อ 120-130 PSI",
- "ระบบถุงลม","ระบบ Air Interlock","ระบบ Emergency Valve","ระบบ Emergency Stop","ระบบลม Pneumatic หรือสลิง",
- "เปิดฝา Manhole ทุกช่อง และเจียรแป้นเก่าออก (รถเก่า)","ดำเนินการวัดน้ำ ตามค่ามาตรฐาน",
- "ระดับแรก เติมน้ำทุกช่อง ปล่อยเข้า Line Pipe + Mark แป้นระดับ 1","วัดระดับน้ำระดับถัดไป และ Mark จุด",
- "แป้นบนสุด ถึง คอแมนโฮล ไม่ต่ำกว่า 1700 MM","วัดความสูงต่ำของหัวแท้งค์ ท้ายแท้งค์",
- "สูบน้ำออกจากแท้งค์ทุกช่อง","แจ้งช่าง มาเชื่อมแป้น","ตรวจสอบความถูกต้องของการเชื่อมแป้น",
- "ทดสอบการรั่วและทดสอบระบบ","ส่งข้อมูลเพื่อทำเอกสารใบวัดน้ำ","ใบวัดน้ำส่งพนักงานขับรถ / เก็บ Scan"
+ "ใบ Request / ใบสั่งขาย / Request or sales order","รถเข้ามารับบริการ / Vehicle arrives","ค่าไวไฟ เป็น 0 / Flammability = 0","ลมยางทุกล้อ 120-130 PSI / Tire 120-130 PSI",
+ "ระบบถุงลม / Air bag system","ระบบ Air Interlock","ระบบ Emergency Valve","ระบบ Emergency Stop","ระบบลม Pneumatic หรือสลิง / Pneumatic or sling",
+ "เปิดฝา Manhole ทุกช่อง และเจียรแป้นเก่าออก (รถเก่า) / Open manholes, grind old plate","ดำเนินการวัดน้ำ ตามค่ามาตรฐาน / Gauge to standard",
+ "ระดับแรก เติมน้ำทุกช่อง ปล่อยเข้า Line Pipe + Mark แป้นระดับ 1 / Level 1 fill & mark","วัดระดับน้ำระดับถัดไป และ Mark จุด / Gauge next level & mark",
+ "แป้นบนสุด ถึง คอแมนโฮล ไม่ต่ำกว่า 1700 MM / Top plate to manhole ≥1700mm","วัดความสูงต่ำของหัวแท้งค์ ท้ายแท้งค์ / Tank front-rear height",
+ "สูบน้ำออกจากแท้งค์ทุกช่อง / Drain all comps","แจ้งช่าง มาเชื่อมแป้น / Notify welder","ตรวจสอบความถูกต้องของการเชื่อมแป้น / Verify welding",
+ "ทดสอบการรั่วและทดสอบระบบ / Leak & system test","ส่งข้อมูลเพื่อทำเอกสารใบวัดน้ำ / Submit data for certificate","ใบวัดน้ำส่งพนักงานขับรถ / เก็บ Scan / Give cert to driver, keep scan"
 ];
-
-/* คู่มือ How-to (สรุปจาก WI-QC-26) */
+function chkList(vt){ return (vt||"").includes("กึ่งพ่วง")?CHK_TRAILER:CHK_TRUCK; }
+const COMP_SLOTS = [{k:"ph_lv1",l:"รูประดับที่ 1 / Level 1"},{k:"ph_lv2",l:"รูประดับ Max / Max level"},{k:"ph_seal",l:"ซีลแล้ว / Sealed"},{k:"ph_name",l:"Name Plate"}];
+const SEAL_SLOTS = ["ซีลแป้นวัดน้ำ / Gauge plate seal","ซีลฝา Manhole / Manhole seal","ซีล Over fill","ซีล Pressure relief","ซีลหลอดแก้ว API / API gauge glass","ซีลหลอดแก้ว Vapor / Vapor gauge glass","ซีล Emergency valve","ซีลก้านริเวอร์ริ่ง / Riveting rod seal","เช็คลมยาง ≥120 PSI / Tire ≥120 PSI"];
+const CHASSIS_SLOTS = ["ภาพหน้ารถ / Front","ภาพท้ายรถ / Rear","Chassis (เลขคัสซี) / Chassis No.","Name Plate"];
+const WATER_TERM = "การตรวจสอบการติดตั้งระยะแป้นวัดน้ำ ทางบริษัท สุธี แท็งเกอร์ฯ ขอรับรองการติดตั้งระบบ ภายในระยะเวลา 60 วัน หลังจากวันที่ออกเอกสารรับรองการติดตั้ง";
 const HOWTO = [
- {ic:"📄",t:"รับใบสั่งงาน",d:"รับใบ Inspector Work Request (FM-QC-3) จากฝ่ายผลิต หรือใบสั่งขายจาก Aftersales Service แล้วลงคิววัดน้ำ"},
- {ic:"🧰",t:"เตรียมอุปกรณ์ + เช็คน้ำ",d:"ทบทวนรายละเอียดงาน เตรียมเครื่องมือวัดน้ำ และเช็คปริมาณน้ำที่จะใช้"},
- {ic:"🔥",t:"ตรวจค่าไวไฟ = 0%",d:"ให้ Safety วัดค่าไวไฟ ต้องเป็น 0% ก่อนเข้าทำงานใน Tank (กรณีรถเก่าครบ 3 ปี/เคยขนส่งผลิตภัณฑ์)"},
- {ic:"🚛",t:"นำรถเข้าหอวัดน้ำ",d:"เตรียมพื้นที่ หนุนล้อกันรถไหล เช็คลมยาง 120-130 PSI"},
- {ic:"⚙️",t:"ทดสอบระบบรถ",d:"เช็คถุงลม / Air interlock / Emergency valve / Emergency stop / ระบบลม Pneumatic ว่าปกติ"},
- {ic:"📐",t:"ปรับค่า R/H",d:"QC วัดค่าจริงที่รถ แจ้ง Production แก้ไขตาม Standard (Hendrickson/Fuwa/Weweler) แล้ววิศวกรยืนยันค่า"},
- {ic:"💧",t:"ปั๊มน้ำวัดทีละระดับ",d:"เปิด Manhole ทุกช่อง → ปั๊มน้ำเข้าถังตวงมาตรฐาน (บันทึกทุก Step + เช็คอุณหภูมิ) → ปล่อยลง Tank ทีละระดับ เช็ครั่วซึมทุกช่อง"},
- {ic:"📍",t:"ติดตั้ง+Tag แป้นวัดน้ำ",d:"ติดแป้นด้วยเคเบิ้ลไทร์ 12\" แป้นต่ำกว่าระดับน้ำ 5 มม. (Standard STT) ทาน้ำยา เหลือง→แดงคือระดับน้ำ แล้ว Tag กันเลื่อน ทำซ้ำทุกระดับ"},
- {ic:"📏",t:"วัดระยะหัว-ท้าย Tank",d:"เมื่อเต็ม Maximum ทุกช่อง วัดระยะหัว/ท้าย Tank, เช็คแป้นบนสุดถึงคอแมนโฮลไม่ต่ำกว่า 1700 MM"},
- {ic:"🔧",t:"ดูดน้ำออก + เชื่อมแป้น",d:"ดูดน้ำออก 100% → แจ้ง Production เชื่อมแป้น 4 จุด (จุดละ 0.5-1 ซม.) สวม PPE เปิดพัดลมดูดอากาศ"},
- {ic:"🔒",t:"ร้อยซีล 8 จุด",d:"ซีลแป้น / Manhole / Over fill / Pressure relief / หลอดแก้ว API / Vapor / Emergency valve / ก้านริเวอร์ริ่ง — ตีซีลตะกั่ว No.6"},
- {ic:"🏷️",t:"ตอก Name Plate + สติกเกอร์",d:"บันทึกข้อมูลในระบบ ออกเอกสาร ตอกเนมเพลทที่ฝา Manhole ทุกช่อง ติดสติกเกอร์วันที่วัด/วันหมดอายุ"},
- {ic:"✅",t:"Test รั่ว + ส่งรายงาน",d:"อัด Pressure flushing แล้ว Test ระบบ (Petroleum 3-5 psi / Chemical 1 bar) → ส่งรายงานให้คนขับในวันรับรถ หรืออย่างช้า 1 วัน"}
+ {ic:"📄",t:"รับใบสั่งงาน / Receive work order",d:"รับใบ Inspector Work Request (FM-QC-3) หรือใบสั่งขาย แล้วลงคิววัดน้ำ"},
+ {ic:"🧰",t:"เตรียมอุปกรณ์ / Prepare tools",d:"ทบทวนงาน เตรียมเครื่องมือ เช็คปริมาณน้ำ"},
+ {ic:"🔥",t:"ตรวจค่าไวไฟ = 0% / Flammability 0%",d:"Safety วัดค่าไวไฟ ต้องเป็น 0% ก่อนเข้าทำงานใน Tank"},
+ {ic:"🚛",t:"นำรถเข้าหอวัดน้ำ / Move to bay",d:"เตรียมพื้นที่ หนุนล้อ เช็คลมยาง 120-130 PSI"},
+ {ic:"⚙️",t:"ทดสอบระบบรถ / Test systems",d:"เช็คถุงลม / Air interlock / Emergency valve / Emergency stop / ระบบลม"},
+ {ic:"📐",t:"ปรับค่า R/H / Adjust R/H",d:"QC วัดค่าจริง แจ้ง Production แก้ไขตาม Standard"},
+ {ic:"💧",t:"ปั๊มน้ำวัดทีละระดับ / Gauge by level",d:"เปิด Manhole ปั๊มน้ำเข้าถังตวงมาตรฐาน ปล่อยลง Tank ทีละระดับ เช็ครั่ว"},
+ {ic:"📍",t:"ติดตั้ง+Tag แป้น / Install plate",d:"ติดด้วยเคเบิ้ลไทร์ 12 นิ้ว แป้นต่ำกว่าน้ำ 5 มม. ทาน้ำยา Tag กันเลื่อน"},
+ {ic:"📏",t:"วัดระยะหัว-ท้าย / Measure ends",d:"เต็ม Max ทุกช่อง วัดหัว/ท้าย แป้นบนถึงคอแมนโฮล ≥1700 MM"},
+ {ic:"🔧",t:"ดูดน้ำออก+เชื่อมแป้น / Drain & weld",d:"ดูดน้ำออก 100% Production เชื่อมแป้น 4 จุด สวม PPE"},
+ {ic:"🔒",t:"ร้อยซีล 8 จุด / Seal 8 points",d:"ซีลแป้น/Manhole/Over fill/Pressure relief/API/Vapor/Emergency valve/ก้านริเวอร์ริ่ง"},
+ {ic:"🏷️",t:"ตอก Name Plate / Stamp plate",d:"บันทึกในระบบ ตอกเนมเพลททุกช่อง ติดสติกเกอร์วันที่"},
+ {ic:"✅",t:"Test รั่ว+ส่งรายงาน / Test & report",d:"อัด Pressure flushing Test (Petroleum 3-5 psi / Chemical 1 bar) ส่งรายงาน"}
 ];
-
-/* ขั้นตอน Stepper ของการกรอกรายงาน */
-const STEPS = [
- {ic:"📋",lbl:"ข้อมูลงาน"},
- {ic:"✓",lbl:"ตรวจระบบ"},
- {ic:"💧",lbl:"ตารางวัดน้ำ"},
- {ic:"🔒",lbl:"ซีล+ลมยาง"},
- {ic:"🚛",lbl:"Chassis"},
- {ic:"🏁",lbl:"สรุป+บันทึก"}
-];
-
-/* ============================================================
-   1) ชั้นข้อมูล (DB layer) — รองรับทั้ง Supabase และ DEMO
-   ============================================================ */
 const LS = {
   get:(k,d)=>{try{return JSON.parse(localStorage.getItem("sttqc_"+k))??d}catch(e){return d}},
   set:(k,v)=>localStorage.setItem("sttqc_"+k,JSON.stringify(v))
 };
 function seedDemo(){
   if(!LS.get("seeded")){
-    LS.set("employees",[
-      {name:"แอดมิน (เบียร์)",pin:"1234",role:"admin"},
-      {name:"นายวสันต์ ไชยวุฒิ",pin:"6902003",role:"staff"},
-      {name:"นายอนันตศักดิ์ บุญคง",pin:"6901003",role:"staff"}
-    ]);
+    LS.set("employees",[{name:"แอดมิน (เบียร์)",pin:"1234",role:"admin"},{name:"นายวสันต์ ไชยวุฒิ",pin:"6902003",role:"staff"},{name:"นายอนันตศักดิ์ บุญคง",pin:"6901003",role:"staff"}]);
     LS.set("reports",[]); LS.set("counters",{}); LS.set("printlogs",[]); LS.set("seeded",true);
   }
 }
 if(DEMO) seedDemo();
-
-function beYY(){ return String((new Date().getFullYear()+543)%100).padStart(2,"0"); } // ปี พ.ศ. 2 หลัก
+function beYY(){ return ("0"+String((new Date().getFullYear()+543)%100)).slice(-2); }
 const DB = {
-  async login(name,pin){
-    if(DEMO){
-      const e=LS.get("employees",[]).find(x=>x.name===name&&x.pin===pin);
-      return e?{name:e.name,role:e.role}:null;
-    }
-    return await apiCall("login",{name,pin});   // คืน null ถ้าไม่ผ่าน
-  },
-  async employeeNames(){
-    if(DEMO) return LS.get("employees",[]).map(e=>e.name);
-    return await apiCall("employees");
-  },
-  // เลขเอกสารใช้ในโหมด DEMO เท่านั้น (ของจริง Apps Script ออกให้ตอนบันทึก)
-  nextDocNoDemo(type){
-    const key="CB-"+beYY()+"-"+type;
-    const c=LS.get("counters",{}); c[key]=(c[key]||0)+1; LS.set("counters",c);
-    return "CB-"+beYY()+"-"+type+"/"+String(c[key]).padStart(4,"0");
-  },
-  async saveReport(r){
-    if(DEMO){
-      r.doc_no=this.nextDocNoDemo(r.job_type);
-      r.id=String(Date.now()); r.created_at=new Date().toISOString(); r.print_count=0;
-      const a=LS.get("reports",[]); a.unshift(r); LS.set("reports",a);
-      return r;
-    }
-    const d=await apiCall("saveReport",{report:r});   // คืน {id,doc_no,created_at,print_count}
-    return Object.assign({}, r, d);
-  },
-  async searchReports(q){
-    if(DEMO){
-      let a=LS.get("reports",[]);
-      if(q){const s=q.toLowerCase();a=a.filter(r=>JSON.stringify(r).toLowerCase().includes(s));}
-      return a;
-    }
-    return await apiCall("search",{q:q||""});
-  },
-  async getReport(id){
-    if(DEMO) return LS.get("reports",[]).find(r=>String(r.id)===String(id));
-    return await apiCall("getReport",{id});
-  },
-  async logPrint(reportId,by){
-    if(DEMO){
-      const l=LS.get("printlogs",[]);l.push({report_id:reportId,printed_by:by,printed_at:new Date().toISOString()});LS.set("printlogs",l);
-      const a=LS.get("reports",[]).map(r=>String(r.id)===String(reportId)?{...r,print_count:(r.print_count||0)+1,last_printed_by:by}:r);LS.set("reports",a);
-      return;
-    }
-    await apiCall("logPrint",{id:reportId,by});
-  },
-  async printLogs(reportId){
-    if(DEMO) return LS.get("printlogs",[]).filter(l=>String(l.report_id)===String(reportId));
-    return await apiCall("printLogs",{id:reportId});
-  }
+  async login(name,pin){ if(DEMO){const e=LS.get("employees",[]).find(x=>x.name===name&&x.pin===pin);return e?{name:e.name,role:e.role}:null;} return await apiCall("login",{name,pin}); },
+  async employeeNames(){ if(DEMO) return LS.get("employees",[]).map(e=>e.name); return await apiCall("employees"); },
+  nextDocNoDemo(type){ const key="CB-"+beYY()+"-"+type; const c=LS.get("counters",{}); c[key]=(c[key]||0)+1; LS.set("counters",c); return "CB-"+beYY()+"-"+type+"/"+String(c[key]).padStart(4,"0"); },
+  async saveReport(r){ if(DEMO){ r.doc_no=this.nextDocNoDemo(r.job_type); r.id=String(Date.now()); r.created_at=new Date().toISOString(); r.print_count=0; const a=LS.get("reports",[]); a.unshift(r); LS.set("reports",a); return r; } const d=await apiCall("saveReport",{report:r}); return Object.assign({}, r, d); },
+  async searchReports(q){ if(DEMO){let a=LS.get("reports",[]);if(q){const s=q.toLowerCase();a=a.filter(r=>JSON.stringify(r).toLowerCase().includes(s));}return a;} return await apiCall("search",{q:q||""}); },
+  async getReport(id){ if(DEMO) return LS.get("reports",[]).find(r=>String(r.id)===String(id)); return await apiCall("getReport",{id}); },
+  async getVehicle(key){ if(DEMO){const a=LS.get("reports",[]).filter(r=>(r.plate_tank&&r.plate_tank===key)||(r.chassis_tank&&r.chassis_tank===key));return a[0]||null;} return await apiCall("getVehicle",{key}); },
+  async logPrint(id,by){ if(DEMO){const l=LS.get("printlogs",[]);l.push({report_id:id,printed_by:by,printed_at:new Date().toISOString()});LS.set("printlogs",l);const a=LS.get("reports",[]).map(r=>String(r.id)===String(id)?{...r,print_count:(r.print_count||0)+1,last_printed_by:by}:r);LS.set("reports",a);return;} await apiCall("logPrint",{id,by}); },
+  async printLogs(id){ if(DEMO) return LS.get("printlogs",[]).filter(l=>String(l.report_id)===String(id)); return await apiCall("printLogs",{id}); }
 };
-
-/* ============================================================
-   2) สถานะ + helper
-   ============================================================ */
 let USER = LS.get("session",null);
+let CURVIEW="home", CURARG=null;
 const $=s=>document.querySelector(s);
 const root=()=> $("#root");
-function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove("show"),2600);}
 function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
-function statusPill(s){
-  const m={pass:["ok","ผ่าน (ACCEPT)"],fail:["bad","ไม่ผ่าน"],needs_fix:["warn","ต้องแก้ไข"],draft:["draft","ฉบับร่าง"]};
-  const x=m[s]||m.draft;return `<span class="pill ${x[0]}">${x[1]}</span>`;
-}
-
-/* อัปโหลดรูปไป IMGBB (หรือเก็บ data URL ในโหมด DEMO) */
+function statusPill(s){const m={pass:["ok","ผ่าน (ACCEPT)"],fail:["bad","ไม่ผ่าน"],needs_fix:["warn","ต้องแก้ไข"],draft:["draft","ฉบับร่าง"]};const x=m[s]||m.draft;return `<span class="pill ${x[0]}">${x[1]}</span>`;}
 async function uploadImage(file){
+  if(CONFIG.LIVE_PHOTO_ONLY){ const ageMin=(Date.now()-(file.lastModified||0))/60000; if(isFinite(ageMin) && ageMin>CONFIG.LIVE_PHOTO_MAX_AGE_MIN){ throw new Error("LIVE_ONLY"); } }
   const b64=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(file);});
-  if(DEMO || CONFIG.IMGBB_KEY.startsWith("YOUR_")) return b64; // โหมดทดลอง: ใช้รูปฝังในเครื่อง
+  if(DEMO || CONFIG.IMGBB_KEY.startsWith("YOUR_")) return b64;
   const fd=new FormData(); fd.append("image", b64.split(",")[1]);
   const res=await fetch("https://api.imgbb.com/1/upload?key="+CONFIG.IMGBB_KEY,{method:"POST",body:fd});
-  const j=await res.json();
-  if(j&&j.success) return j.data.url;
-  throw new Error("อัปโหลดรูปไม่สำเร็จ");
+  const j=await res.json(); if(j&&j.success) return j.data.url; throw new Error("upload failed");
 }
-
-/* ============================================================
-   3) Router
-   ============================================================ */
-function go(view,arg){ render(view,arg); window.scrollTo(0,0); }
-function render(view,arg){
-  if(!USER){ return LoginView(); }
-  Shell(view,arg);
-}
+function go(view,arg){ CURVIEW=view; CURARG=arg; render(view,arg); window.scrollTo(0,0); }
+function rerender(){ if(!USER) LoginView(); else go(CURVIEW,CURARG); }
+function render(view,arg){ if(!USER){ return LoginView(); } Shell(view,arg); }
 function Shell(view,arg){
-  const r=root();
-  r.innerHTML=`
+  root().innerHTML=`
     <div class="appbar">
       <div class="logo"><span class="mark">STT</span> QC SYSTEM</div>
       <div class="spacer"></div>
-      <div class="who">${esc(USER.name)}<br><span style="opacity:.8">${USER.role==='admin'?'ผู้ดูแลระบบ':'พนักงาน QC'}</span></div>
-      <button class="ghost" onclick="logout()">ออก</button>
+      ${langBar(false)}
+      <div class="who">${esc(USER.name)}<br><span style="opacity:.8">${USER.role==='admin'?t('roleAdmin'):t('roleStaff')}</span></div>
+      <button class="ghost" onclick="logout()">${t('logout')}</button>
     </div>
     <div class="wrap" id="page"></div>`;
   const v={home:HomeView,howto:HowtoView,new:NewReportView,search:SearchView,detail:DetailView}[view]||HomeView;
   v(arg);
 }
 function logout(){ USER=null; LS.set("session",null); go("home"); }
-
-/* ============================================================
-   4) Views
-   ============================================================ */
 function LoginView(){
   root().innerHTML=`
   <div class="login-wrap"><div class="login-card">
-    <div class="brand"><div class="mark">SUTEE</div><div class="sub">ระบบตรวจสอบคุณภาพ (QC) — ฝ่ายวัดน้ำ</div></div>
-    ${DEMO?'<div class="banner demo">⚠️ โหมดทดลอง — ลองใช้: ชื่อ "แอดมิน (เบียร์)" รหัส 1234</div>':''}
-    <div class="field"><label>ชื่อพนักงาน (พิมพ์เพื่อค้นหา)</label>
-      <input id="lg-name" list="emp-list" placeholder="พิมพ์ชื่อของคุณ..." autocomplete="off">
-      <datalist id="emp-list"></datalist></div>
-    <div class="field"><label>รหัสพนักงาน</label>
-      <input id="lg-pin" type="password" inputmode="numeric" placeholder="รหัสพนักงานของคุณ"></div>
-    <button class="btn block" style="margin-top:6px" onclick="doLogin()">เข้าสู่ระบบ</button>
-    <p class="up-note" style="margin-top:10px">ใช้ "รหัสพนักงาน" จากฝ่าย HR เป็นรหัสผ่าน • พนักงานที่ลาออกแล้วจะเข้าไม่ได้</p>
+    <div class="brand"><div class="mark">SUTEE</div><div class="sub">${t('loginSub')}</div></div>
+    <div style="display:flex;justify-content:center;margin-bottom:12px">${langBar(true)}</div>
+    ${DEMO?'<div class="banner demo">⚠️ โหมดทดลอง — ชื่อ "แอดมิน (เบียร์)" รหัส 1234</div>':''}
+    <div class="field"><label>${t('loginName')}</label><input id="lg-name" list="emp-list" placeholder="..." autocomplete="off"><datalist id="emp-list"></datalist></div>
+    <div class="field"><label>${t('loginPin')}</label><input id="lg-pin" type="password" inputmode="numeric"></div>
+    <button class="btn block" style="margin-top:6px" onclick="doLogin()">${t('loginBtn')}</button>
+    <p class="up-note" style="margin-top:10px">${t('loginHint')}</p>
   </div></div>`;
-  DB.employeeNames().then(names=>{
-    const el=document.getElementById("emp-list");
-    if(el) el.innerHTML=(names||[]).map(n=>`<option value="${esc(n)}">`).join("");
-  }).catch(()=>toast("โหลดรายชื่อไม่ได้ — เช็คการตั้งค่า"));
-  const pinEl=document.getElementById("lg-pin");
-  pinEl.addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+  DB.employeeNames().then(names=>{const el=document.getElementById("emp-list");if(el)el.innerHTML=(names||[]).map(n=>`<option value="${esc(n)}">`).join("");}).catch(()=>toast("โหลดรายชื่อไม่ได้"));
+  document.getElementById("lg-pin").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
 }
 async function doLogin(){
   const name=(document.getElementById("lg-name").value||"").trim();
   const pin=(document.getElementById("lg-pin").value||"").trim();
-  if(!name||!pin) return toast("กรอกชื่อและรหัสพนักงาน");
-  toast("กำลังตรวจสอบ...");
-  let u=null;
-  try{ u=await DB.login(name,pin); }catch(e){ return toast("เชื่อมต่อฐานข้อมูลไม่ได้"); }
-  if(!u) return toast("ชื่อหรือรหัสไม่ถูกต้อง");
+  if(!name||!pin) return toast(t('loginName'));
+  toast("...");
+  let u=null; try{u=await DB.login(name,pin);}catch(e){return toast("เชื่อมต่อฐานข้อมูลไม่ได้");}
+  if(!u) return toast("ชื่อหรือรหัสไม่ถูกต้อง / Wrong name or code");
   USER=u; LS.set("session",u); go("home");
 }
-
 function HomeView(){
-  const modules=[
-    {ic:"💧",nm:"การวัดน้ำ",active:true},
-    {ic:"🔍",nm:"ตรวจสภาพรถ",active:false},
-    {ic:"🎨",nm:"ตรวจงานสี",active:false},
-    {ic:"⚡",nm:"ตรวจงานไฟฟ้า",active:false},
-    {ic:"📦",nm:"ตรวจก่อนส่งมอบ",active:false},
-    {ic:"📊",nm:"รายงานสรุป",active:false}
-  ];
+  const modules=[{ic:"💧",nm:t('modWater'),active:true},{ic:"🔍",nm:"ตรวจสภาพรถ"},{ic:"🎨",nm:"ตรวจงานสี"},{ic:"⚡",nm:"ตรวจงานไฟฟ้า"},{ic:"📦",nm:"ตรวจก่อนส่งมอบ"},{ic:"📊",nm:"รายงานสรุป"}];
   $("#page").innerHTML=`
-    <h1>เลือกงาน QC</h1>
-    <p class="muted">แตะการ์ดเพื่อเริ่มงาน — โมดูล "การวัดน้ำ" พร้อมใช้งานแล้ว ส่วนอื่นจะเพิ่มในเวอร์ชันถัดไป</p>
+    <h1>${t('homeH1')}</h1>
+    <p class="muted">${t('homeP')}</p>
     <div class="tiles" style="margin-top:14px">
-      ${modules.map((m,i)=>`
-        <div class="tile ${m.active?'active':'soon'}" ${m.active?'onclick="openWater()"':''}>
-          ${m.active?'<span class="tag pill ok">พร้อมใช้</span>':'<span class="tag pill draft">เร็วๆนี้</span>'}
-          <div class="ic">${m.ic}</div><div class="nm">${m.nm}</div>
-        </div>`).join("")}
-    </div>
-    <p class="up-note" style="margin-top:16px">รายชื่อผู้ใช้งานเชื่อมกับฐานข้อมูลพนักงาน (HR) อัตโนมัติ</p>`;
-}
-function openWater(){
-  window.scrollTo(0,0);
-  $("#page").innerHTML=`
-    <div class="crumb" onclick="go('home')">← กลับหน้าหลัก</div>
-    <h1>💧 การวัดน้ำ</h1>
-    <div class="tiles" style="margin-top:14px">
-      <div class="tile active" onclick="go('new')"><div class="ic">➕</div><div class="nm">สร้างใบวัดน้ำใหม่</div></div>
-      <div class="tile active" onclick="go('search')"><div class="ic">🔍</div><div class="nm">ค้นหา/ดูรายงาน</div></div>
-      <div class="tile active" onclick="go('howto')"><div class="ic">📖</div><div class="nm">คู่มือ How-to</div></div>
+      ${modules.map(m=>`<div class="tile ${m.active?'active':'soon'}" ${m.active?'onclick="openWater()"':''}>
+        ${m.active?`<span class="tag pill ok">${t('ready')}</span>`:`<span class="tag pill draft">${t('soon')}</span>`}
+        <div class="ic">${m.ic}</div><div class="nm">${m.nm}</div></div>`).join("")}
     </div>`;
 }
-
+function openWater(){
+  CURVIEW="water"; window.scrollTo(0,0);
+  $("#page").innerHTML=`
+    <div class="crumb" onclick="go('home')">${t('backHome')}</div>
+    <h1>💧 ${t('modWater')}</h1>
+    <div class="tiles" style="margin-top:14px">
+      <div class="tile active" onclick="go('new')"><div class="ic">➕</div><div class="nm">${t('newRep')}</div></div>
+      <div class="tile active" onclick="go('search')"><div class="ic">🔍</div><div class="nm">${t('searchRep')}</div></div>
+      <div class="tile active" onclick="go('howto')"><div class="ic">📖</div><div class="nm">${t('howtoTile')}</div></div>
+    </div>`;
+}
 function HowtoView(){
   $("#page").innerHTML=`
-    <div class="crumb" onclick="go('home')">← หน้าหลัก</div>
-    <h1>📖 คู่มือการวัดน้ำ (How-to)</h1>
-    <p class="muted">ทำตามทีละขั้น 1-2-3 — แตะหัวข้อเพื่อดูรายละเอียด คนที่ไม่เคยวัดน้ำก็ทำตามได้</p>
+    <div class="crumb" onclick="go('home')">${t('back')}</div>
+    <h1>${t('howtoH1')}</h1>
     <div style="margin-top:14px">
-      ${HOWTO.map((h,i)=>`
-        <div class="howto-step" onclick="this.classList.toggle('open')">
-          <div class="hd"><div class="n">${i+1}</div><div style="font-size:20px">${h.ic}</div><b>${esc(h.t)}</b></div>
-          <div class="bd"><div class="muted" style="font-size:14px;color:var(--ink)">${esc(h.d)}</div>
-            <div class="up-note" style="margin-top:8px">📎 อ้างอิง: WI-QC-26 — เพิ่มรูป/วิดีโอประกอบได้ในเวอร์ชันถัดไป</div>
-          </div>
-        </div>`).join("")}
+      ${HOWTO.map((h,i)=>`<div class="howto-step" onclick="this.classList.toggle('open')">
+        <div class="hd"><div class="n">${i+1}</div><div style="font-size:20px">${h.ic}</div><b>${esc(h.t)}</b></div>
+        <div class="bd"><div style="font-size:14px">${esc(h.d)}</div><div class="up-note" style="margin-top:8px">📎 WI-QC-26</div></div>
+      </div>`).join("")}
     </div>
-    <button class="btn block" style="margin-top:10px" onclick="go('new')">เข้าใจแล้ว เริ่มทำใบวัดน้ำ →</button>`;
+    <button class="btn block" style="margin-top:10px" onclick="go('new')">${t('howtoStart')}</button>`;
 }
-
-/* ---------- New report (stepper) ---------- */
-let DRAFT=null, CUR=0;
-function blankCompartment(){return{vol:"",u_top:"",u_low:"",bot_top:"",bot_low:"",h:"",void_l:"",seal_plate:"",seal_cap:""};}
+let DRAFT=null, CUR=0, STEPS=[];
+function blankComp(){return{vol1:"",vol2:"",u1:"",u2:"",bot1:"",bot2:"",h:"",void_l:"",seal_plate:"",seal_cap:"STT",ph_lv1:"",ph_lv2:"",ph_seal:"",ph_name:""};}
+function buildSteps(){
+  const s=[{key:"job",ic:"📋"}];
+  if(isJM(DRAFT.job_type)){ s.push({key:"before",ic:"🅑"}); s.push({key:"after",ic:"🅐"}); }
+  else { s.push({key:"check",ic:"✓"}); }
+  s.push({key:"table",ic:"💧"},{key:"seal",ic:"🔒"},{key:"chassis",ic:"🚛"},{key:"summary",ic:"🏁"});
+  STEPS=s;
+}
 function NewReportView(){
   if(!DRAFT){
-    DRAFT={
-      job_type:"JM",job_no:"",doc_no:"(จะออกอัตโนมัติเมื่อบันทึก)",
-      customer:"",operator:"",address:"",plate_head:"",plate_tank:"",chassis_head:"",chassis_tank:"",
-      capacity:"",vehicle_type:VEHICLE_TYPES[0],product:PRODUCT_TYPES[0],model_no:"",
-      measure_date:new Date().toISOString().slice(0,10),location:"บริษัท สุธี แท็งเกอร์",
-      n_comp:8, comps:Array.from({length:8},blankCompartment),
-      checklist:[], chk_photos:[], plate_photos:[], seal_photos:[], chassis_photos:[],
-      conclusion:"pass", remark:"", status:"draft"
-    };
+    DRAFT={job_type:"JM",sa:"",job_no:"",measure_date:new Date().toISOString().slice(0,10),customer:"",address:"",plate_head:"",plate_tank:"",chassis_head:"",chassis_tank:"",capacity:"",vehicle_type:VEHICLE_TYPES[0],product:PRODUCT_TYPES[0],model_no:"",tank_origin:TANK_ORIGINS[0],conditions:[],location:"บริษัท สุธี แท็งเกอร์",n_comp:8,comps:Array.from({length:8},blankComp),checklist_before:[],checklist_after:[],seal_slots:{},chassis_slots:{},conclusion:"pass",remark:""};
     CUR=0;
   }
+  buildSteps();
   $("#page").innerHTML=`
-    <div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก?')){DRAFT=null;go(\'home\');}">← ยกเลิก</div>
-    <h1>➕ ใบวัดน้ำใหม่</h1>
+    <div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก? / Exit without saving?')){DRAFT=null;go('home');}">${t('cancel')}</div>
+    <h1>${t('newTitle')}</h1>
     <div class="stepper" id="stepper"></div>
     <div id="stepbody"></div>
     <div class="row no-print" style="margin-top:16px">
-      <button class="btn grey" id="btnPrev" onclick="stepPrev()">← ก่อนหน้า</button>
+      <button class="btn grey" id="btnPrev" onclick="stepPrev()">${t('prev')}</button>
       <div style="flex:1"></div>
-      <button class="btn" id="btnNext" onclick="stepNext()">ถัดไป →</button>
+      <button class="btn" id="btnNext" onclick="stepNext()">${t('next')}</button>
     </div>`;
   drawStepper(); drawStep();
 }
-function drawStepper(){
-  $("#stepper").innerHTML=STEPS.map((s,i)=>`
-    <div class="step ${i===CUR?'active':''} ${i<CUR?'done':''}">
-      <div class="circ">${i<CUR?'✓':s.ic}</div><div class="lbl">${i+1}. ${s.lbl}</div>
-    </div>`).join("");
-}
+function drawStepper(){ $("#stepper").innerHTML=STEPS.map((s,i)=>`<div class="step ${i===CUR?'active':''} ${i<CUR?'done':''}"><div class="circ">${i<CUR?'✓':s.ic}</div><div class="lbl">${i+1}. ${t('step_'+s.key)}</div></div>`).join(""); }
+function curKey(){ return STEPS[CUR].key; }
 function drawStep(){
-  const b=$("#stepbody");
+  const b=$("#stepbody"), k=curKey();
   $("#btnPrev").style.visibility=CUR===0?"hidden":"visible";
-  $("#btnNext").textContent=CUR===STEPS.length-1?"💾 บันทึกรายงาน":"ถัดไป →";
-  if(CUR===0) b.innerHTML=stepJob();
-  if(CUR===1) b.innerHTML=stepChecklist();
-  if(CUR===2) b.innerHTML=stepTable();
-  if(CUR===3) b.innerHTML=stepPhotos("seal_photos","🔒 จุดร้อยซีล (8 จุด) + เช็คลมยาง","ถ่ายซีลแป้น/Manhole/Over fill/Pressure relief/API/Vapor/Emergency valve/ก้านริเวอร์ริ่ง และลมยาง ≥120 PSI");
-  if(CUR===4) b.innerHTML=stepPhotos("chassis_photos","🚛 Chassis / Name Plate","ถ่ายหัวลาก, ป้ายทะเบียน, หมายเลขคัสซี, เนมเพลท");
-  if(CUR===5) b.innerHTML=stepSummary();
+  $("#btnNext").textContent=CUR===STEPS.length-1?t('saveBtn'):t('next');
+  if(k==="job") b.innerHTML=stepJob();
+  else if(k==="before"||k==="check") b.innerHTML=stepChecklist("before");
+  else if(k==="after") b.innerHTML=stepChecklist("after");
+  else if(k==="table") b.innerHTML=stepTable();
+  else if(k==="seal") b.innerHTML=stepSlots("seal_slots",SEAL_SLOTS,"🔒 จุดร้อยซีล + เช็คลมยาง / Seals + tire","ถ่ายให้ครบตามหัวข้อ (ตามข้อกำหนด) / Take all required photos");
+  else if(k==="chassis") b.innerHTML=stepSlots("chassis_slots",CHASSIS_SLOTS,"🚛 Chassis / Name Plate","ถ่าย: หน้ารถ, ท้ายรถ, เลขคัสซี, เนมเพลท / front, rear, chassis no., name plate");
+  else if(k==="summary") b.innerHTML=stepSummary();
   bindStep();
 }
 function gv(id){const e=document.getElementById(id);return e?e.value:"";}
-
 function stepJob(){
+  const isjm=isJM(DRAFT.job_type);
   return `<div class="card">
-    <div class="guide-box">📋 <b>ขั้นที่ 1:</b> กรอกข้อมูลงานและรถ — เลขเอกสารจะออกให้อัตโนมัติตอนบันทึก ตามประเภทงานที่เลือก</div>
+    <div class="guide-box">📋 <b>1.</b> กรอกข้อมูลงาน/รถ — งาน JM ดึงข้อมูลรถเดิมได้ • เลขเอกสารออกอัตโนมัติ / Fill job & vehicle info</div>
     <div class="row">
-      <div class="field"><label>ประเภทงาน *</label><select id="f_job_type">${JOB_TYPES.map(j=>`<option value="${j.code}" ${DRAFT.job_type===j.code?'selected':''}>${j.name}</option>`).join("")}</select></div>
-      <div class="field"><label>เลขที่งาน (Job No.)</label><input id="f_job_no" value="${esc(DRAFT.job_no)}" placeholder="เช่น 0451"></div>
-      <div class="field"><label>วันที่วัดน้ำ</label><input type="date" id="f_measure_date" value="${DRAFT.measure_date}"></div>
+      <div class="field"><label>ประเภทงาน / Job type *</label><select id="f_job_type" onchange="onJobTypeChange()">${JOB_TYPES.map(j=>`<option value="${j.code}" ${DRAFT.job_type===j.code?'selected':''}>${j.name}</option>`).join("")}</select></div>
+      <div class="field"><label>Job No.</label><input id="f_job_no" value="${esc(DRAFT.job_no)}"></div>
+      <div class="field"><label>เลข SA *</label><input id="f_sa" value="${esc(DRAFT.sa)}"></div>
+      <div class="field"><label>วันที่วัดน้ำ / Date</label><input type="date" id="f_measure_date" value="${DRAFT.measure_date}"></div>
+    </div>
+    ${isjm?`<div class="row">
+      <div class="field"><label>ประเภทแท็งค์ / Tank origin *</label><select id="f_tank_origin">${TANK_ORIGINS.map(o=>`<option ${DRAFT.tank_origin===o?'selected':''}>${o}</option>`).join("")}</select></div>
+      <div class="field" style="flex:2"><label>ดึงข้อมูลรถเดิม / Load existing vehicle (ทะเบียน/คัสซีแท็งก์)</label>
+        <div class="row" style="gap:6px"><input id="f_lookup" placeholder="ทะเบียน/คัสซีแท็งก์"><button class="btn sm sec" type="button" onclick="lookupVehicle()">🔎</button></div></div>
+    </div>`:''}
+    <div class="row">
+      <div class="field" style="flex:2"><label>ชื่อลูกค้า / Customer *</label><input id="f_customer" value="${esc(DRAFT.customer)}"></div>
+      <div class="field" style="flex:2"><label>ที่อยู่ / Address</label><input id="f_address" value="${esc(DRAFT.address)}"></div>
     </div>
     <div class="row">
-      <div class="field"><label>ชื่อลูกค้า / ผู้ประกอบการ *</label><input id="f_customer" value="${esc(DRAFT.customer)}"></div>
-      <div class="field"><label>ที่อยู่</label><input id="f_address" value="${esc(DRAFT.address)}"></div>
+      <div class="field"><label>ทะเบียนหัวลาก / Head plate</label><input id="f_plate_head" value="${esc(DRAFT.plate_head)}"></div>
+      <div class="field"><label>ทะเบียนแท็งก์ / Tank plate</label><input id="f_plate_tank" value="${esc(DRAFT.plate_tank)}"></div>
+      <div class="field"><label>คัสซีหัวลาก / Head chassis</label><input id="f_chassis_head" value="${esc(DRAFT.chassis_head)}"></div>
+      <div class="field"><label>คัสซีหาง / Tank chassis</label><input id="f_chassis_tank" value="${esc(DRAFT.chassis_tank)}"></div>
     </div>
     <div class="row">
-      <div class="field"><label>ทะเบียนหัวลาก</label><input id="f_plate_head" value="${esc(DRAFT.plate_head)}"></div>
-      <div class="field"><label>ทะเบียนแท็งก์</label><input id="f_plate_tank" value="${esc(DRAFT.plate_tank)}"></div>
+      <div class="field"><label>ความจุ ล. / Capacity</label><input id="f_capacity" value="${esc(DRAFT.capacity)}" inputmode="numeric"></div>
+      <div class="field"><label>ประเภทรถ / Vehicle</label><select id="f_vehicle_type">${VEHICLE_TYPES.map(v=>`<option ${DRAFT.vehicle_type===v?'selected':''}>${v}</option>`).join("")}</select></div>
+      <div class="field"><label>ผลิตภัณฑ์ / Product</label><select id="f_product">${PRODUCT_TYPES.map(v=>`<option ${DRAFT.product===v?'selected':''}>${v}</option>`).join("")}</select></div>
+      <div class="field"><label>รุ่น / Model</label><input id="f_model_no" value="${esc(DRAFT.model_no)}"></div>
+      <div class="field"><label>จำนวนช่อง / Comps</label><input id="f_n_comp" type="number" min="1" max="12" value="${DRAFT.n_comp}"></div>
     </div>
-    <div class="row">
-      <div class="field"><label>เลขคัสซีหัวลาก</label><input id="f_chassis_head" value="${esc(DRAFT.chassis_head)}"></div>
-      <div class="field"><label>เลขคัสซีหาง</label><input id="f_chassis_tank" value="${esc(DRAFT.chassis_tank)}"></div>
-    </div>
-    <div class="row">
-      <div class="field"><label>ความจุ (ลิตร)</label><input id="f_capacity" value="${esc(DRAFT.capacity)}" inputmode="numeric"></div>
-      <div class="field"><label>ประเภทรถ</label><select id="f_vehicle_type">${VEHICLE_TYPES.map(v=>`<option ${DRAFT.vehicle_type===v?'selected':''}>${v}</option>`).join("")}</select></div>
-      <div class="field"><label>ประเภทผลิตภัณฑ์</label><select id="f_product">${PRODUCT_TYPES.map(v=>`<option ${DRAFT.product===v?'selected':''}>${v}</option>`).join("")}</select></div>
-    </div>
-    <div class="row">
-      <div class="field"><label>รุ่น (Sutee Model No.)</label><input id="f_model_no" value="${esc(DRAFT.model_no)}" placeholder="เช่น SPTS-42000-08A"></div>
-      <div class="field"><label>จำนวน Compartment</label><input id="f_n_comp" type="number" min="1" max="12" value="${DRAFT.n_comp}"></div>
+    <label style="font-size:13px;font-weight:600;color:var(--ink-soft)">เงื่อนไขการวัดน้ำ / Conditions (เลือกได้หลายข้อ)</label>
+    <div class="cond-grid" style="margin-top:6px">
+      ${WATER_CONDITIONS.map(c=>`<label><input type="checkbox" class="f_cond" value="${esc(c)}" ${DRAFT.conditions.includes(c)?'checked':''}> ${esc(c)}</label>`).join("")}
     </div>
   </div>`;
 }
-function stepChecklist(){
-  const list = DRAFT.vehicle_type.includes("กึ่งพ่วง")?CHK_TRAILER:CHK_TRUCK;
-  if(DRAFT.checklist.length!==list.length) DRAFT.checklist=list.map(()=>"");
+function onJobTypeChange(){ DRAFT.job_type=gv("f_job_type"); buildSteps(); drawStep(); }
+async function lookupVehicle(){
+  const key=gv("f_lookup").trim(); if(!key) return toast("พิมพ์ทะเบียน/คัสซีก่อน");
+  collectStep(); toast("...");
+  let v=null; try{v=await DB.getVehicle(key);}catch(e){return toast("ค้นหาไม่สำเร็จ");}
+  if(!v) return toast("ไม่พบรถคันนี้ / Vehicle not found");
+  ["customer","address","plate_head","plate_tank","chassis_head","chassis_tank","capacity","vehicle_type","product","model_no","tank_origin"].forEach(k=>{ if(v[k]) DRAFT[k]=v[k]; });
+  drawStep(); toast("ดึงข้อมูลรถสำเร็จ / Loaded");
+}
+function stepChecklist(phase){
+  const list=chkList(DRAFT.vehicle_type);
+  const arrKey = phase==="after"?"checklist_after":"checklist_before";
+  if(DRAFT[arrKey].length!==list.length) DRAFT[arrKey]=list.map(()=>"");
+  const jm=isJM(DRAFT.job_type);
+  const title = phase==="after"?"ตรวจสอบหลังซ่อม (After)":(jm?"ตรวจสอบก่อนซ่อม (Before)":"ตรวจสอบระบบ");
+  const note = phase==="before"&&jm ? 'ถ้ามีข้อ "ไม่ผ่าน" ระบบจะแจ้งกลุ่ม Sale ให้เสนอราคา / Any "Fail" alerts Sales' : "เลือกผลแต่ละข้อ / Choose each result";
   return `<div class="card">
-    <div class="guide-box">✓ <b>ขั้นที่ 2:</b> ตรวจระบบรถทีละข้อ กด ผ่าน/ไม่ผ่าน ให้ครบ (กันลัดขั้นตอน) — มีข้อ "ไม่ผ่าน" ระบบจะเตือนให้ส่งแจ้ง Sale ในขั้นสรุป</div>
-    ${list.map((d,i)=>`
-      <div class="chk-item">
-        <div class="no">${i+1}</div><div class="desc">${esc(d)}</div>
-        <div class="seg" data-i="${i}">
-          <button data-v="ok" class="${DRAFT.checklist[i]==='ok'?'on-ok':''}">ผ่าน</button>
-          <button data-v="bad" class="${DRAFT.checklist[i]==='bad'?'on-bad':''}">ไม่ผ่าน</button>
-        </div>
-      </div>`).join("")}
-    <div style="margin-top:12px">${photoBlock("chk_photos","📷 รูปประกอบการตรวจระบบ (ถ้ามี)")}</div>
+    <div class="guide-box">✓ <b>${title}:</b> ${note}</div>
+    ${list.map((d,i)=>`<div class="chk-item">
+      <div class="no">${i+1}</div><div class="desc">${esc(d)}</div>
+      <div class="seg" data-arr="${arrKey}" data-i="${i}">
+        <button data-v="pass" class="${DRAFT[arrKey][i]==='pass'?'on-ok':''}">${t('chkPass')}</button>
+        <button data-v="na" class="${DRAFT[arrKey][i]==='na'?'on-na':''}">${t('chkNA')}</button>
+        <button data-v="fail" class="${DRAFT[arrKey][i]==='fail'?'on-bad':''}">${t('chkFail')}</button>
+      </div></div>`).join("")}
   </div>`;
 }
 function stepTable(){
   const n=DRAFT.n_comp;
-  if(DRAFT.comps.length!==n){
-    const a=Array.from({length:n},(_,i)=>DRAFT.comps[i]||blankCompartment());DRAFT.comps=a;
-  }
-  const cols=Array.from({length:n},(_,i)=>i);
-  const rowInput=(field,key)=>`<tr><td class="rowlabel">${field}</td>${cols.map(i=>`<td><input data-c="${i}" data-k="${key}" value="${esc(DRAFT.comps[i][key])}"></td>`).join("")}</tr>`;
+  if(DRAFT.comps.length!==n){ DRAFT.comps=Array.from({length:n},(_,i)=>DRAFT.comps[i]||blankComp()); }
   return `<div class="card">
-    <div class="guide-box">💧 <b>ขั้นที่ 3:</b> กรอกข้อมูลวัดน้ำทีละช่อง — U=ระยะแป้นถึงฝาบน, ก้นถึงแป้น, H=ก้นถึงฝาบน, Void ≥ 227 ลิตร, เลขซีลแป้น/ฝา (ตาม template PDF)</div>
-    <div class="tbl-scroll"><table class="data">
-      <tr><th class="rowlabel">ช่องที่ (Compartment)</th>${cols.map(i=>`<th>${i+1}</th>`).join("")}</tr>
-      ${rowInput("ปริมาตร (ลิตร)","vol")}
-      ${rowInput("ระยะแป้นถึงฝาบน U (มม.)","u_top")}
-      ${rowInput("ระยะก้นถึงแป้น (มม.)","bot_top")}
-      ${rowInput("ระยะก้นถึงฝาบน H (มม.)","h")}
-      ${rowInput("ความจุ Void ≥227L","void_l")}
-      ${rowInput("เลขซีลแป้นวัดน้ำ","seal_plate")}
-      ${rowInput("เลขซีลฝาถัง","seal_cap")}
-    </table></div>
-    <div style="margin-top:14px">${photoBlock("plate_photos","📷 รูปติดตั้งแป้นวัดน้ำ (ทุกช่อง)")}</div>
+    <div class="guide-box">💧 <b>ตารางวัดน้ำ (ทีละช่อง) / Gauging per compartment:</b> กรอกค่า + ถ่ายรูปตาม slot</div>
+    ${DRAFT.comps.map((c,i)=>compCard(c,i)).join("")}
   </div>`;
 }
-function stepPhotos(key,title,hint){
-  return `<div class="card"><div class="guide-box">📷 <b>${title}</b><br>${hint}</div>${photoBlock(key,title)}</div>`;
-}
-function photoBlock(key,title){
-  const arr=DRAFT[key]||[];
-  return `<div><div class="muted">${esc(title)}</div>
-    <div class="photo-grid" data-pk="${key}">
-      ${arr.map((u,i)=>`<div class="photo-cell"><img src="${esc(u)}"><button class="del" data-del="${i}">×</button></div>`).join("")}
-      <label class="photo-cell"><span class="add">＋</span><input type="file" accept="image/*" capture="environment" style="display:none" data-add="${key}"></label>
-    </div>
-    <div class="up-note">${DEMO||CONFIG.IMGBB_KEY.startsWith("YOUR_")?'⚠️ โหมดทดลอง: รูปเก็บในเครื่องชั่วคราว (ของจริงจะเก็บที่ IMGBB)':'รูปจะอัปโหลดไป IMGBB อัตโนมัติ'}</div>
+function compCard(c,i){
+  const f=(k,lab,ph)=>`<div class="field"><label>${lab}</label><input data-c="${i}" data-k="${k}" value="${esc(c[k])}" placeholder="${ph||''}"></div>`;
+  return `<div class="comp-card">
+    <div class="hd">ช่องที่ ${i+1} / Comp ${i+1}</div>
+    <div class="row">${f("vol1","ปริมาตรระดับ 1 (ล.)","6000")}${f("vol2","ปริมาตรระดับ Max (ล.)","9000")}${f("void_l","Void (≥227 ล.)","")}</div>
+    <div class="row">${f("u1","U ระดับ1 (มม.)")}${f("u2","U ระดับMax (มม.)")}${f("bot1","ก้น-แป้น ระดับ1")}${f("bot2","ก้น-แป้น ระดับMax")}${f("h","H (มม.)")}</div>
+    <div class="row">${f("seal_plate","เลขซีลแป้น / Plate seal")}${f("seal_cap","เลขซีลฝา / Cap seal")}</div>
+    <div class="slot-grid">${COMP_SLOTS.map(s=>slotHtml("comp",i,s.k,s.l,c[s.k])).join("")}</div>
   </div>`;
+}
+function stepSlots(target,labels,title,hint){
+  const store=DRAFT[target]||{};
+  return `<div class="card"><div class="guide-box">📷 <b>${title}</b><br>${hint}</div>
+    <div class="slot-grid">${labels.map((lab,idx)=>slotHtml(target,idx,idx,lab,store[idx])).join("")}</div></div>`;
+}
+function slotHtml(target,a,b,label,url){
+  const attr = target==="comp" ? `data-target="comp" data-ci="${a}" data-key="${b}"` : `data-target="${target}" data-idx="${b}"`;
+  return `<div class="slot"><div class="lab">${esc(label)}</div>
+    <label class="ph">${url?`<img src="${esc(url)}">`:`<span class="add">📷＋</span>`}<input type="file" accept="image/*" capture="environment" style="display:none" class="slot-input" ${attr}></label>
+    ${url?`<button class="del" ${attr} data-del="1">×</button>`:''}</div>`;
 }
 function stepSummary(){
-  const fails=DRAFT.checklist.filter(x=>x==='bad').length;
+  const failsB=(DRAFT.checklist_before||[]).filter(x=>x==='fail').length;
   return `<div class="card">
-    <div class="guide-box">🏁 <b>ขั้นที่ 6:</b> สรุปผลและบันทึก — ระบบจะออกเลขเอกสารอัตโนมัติ และบันทึกว่าใครเป็นผู้ทำรายงาน (${esc(USER.name)})</div>
-    ${fails>0?`<div class="banner" style="background:#fef2f2;border:1px solid #fca5a5;color:#991b1b">⚠️ พบรายการ "ไม่ผ่าน" ${fails} ข้อ — แนะนำเลือกผล "ต้องแก้ไข" และกดส่งแจ้งกลุ่ม Sale</div>`:''}
-    <div class="field"><label>ผลการตรวจสอบ (Conclusion)</label>
+    <div class="guide-box">🏁 <b>สรุปผล / Summary:</b> ผู้จัดทำ (${esc(USER.name)})</div>
+    ${failsB>0?`<div class="banner" style="background:#fef2f2;border:1px solid #fca5a5;color:#991b1b">⚠️ Before ไม่ผ่าน ${failsB} ข้อ — ระบบจะเตรียมข้อความแจ้ง Sale</div>`:''}
+    <div class="field"><label>ผลการตรวจสอบ / Conclusion</label>
       <select id="f_conclusion">
         <option value="pass" ${DRAFT.conclusion==='pass'?'selected':''}>ผ่าน (ACCEPT)</option>
         <option value="needs_fix" ${DRAFT.conclusion==='needs_fix'?'selected':''}>ต้องแก้ไขก่อน (แจ้ง Sale)</option>
         <option value="fail" ${DRAFT.conclusion==='fail'?'selected':''}>ไม่ผ่าน (UN ACCEPT)</option>
-      </select>
-    </div>
-    <div class="field"><label>หมายเหตุ / รายละเอียดที่ต้องแก้ไข</label><textarea id="f_remark" rows="3">${esc(DRAFT.remark)}</textarea></div>
-    <div class="muted">ผู้ตรวจสอบ (QC Inspector): <b>${esc(USER.name)}</b> • วันที่: ${DRAFT.measure_date}</div>
+      </select></div>
+    <div class="field"><label>หมายเหตุ / Remark</label><textarea id="f_remark" rows="3">${esc(DRAFT.remark)}</textarea></div>
+    <div class="muted">ผู้จัดทำ (QC): <b>${esc(USER.name)}</b> • ${DRAFT.measure_date}</div>
   </div>`;
 }
-
 function bindStep(){
-  // job fields
-  document.querySelectorAll("#stepbody input,#stepbody select,#stepbody textarea").forEach(el=>{
-    if(el.type==="file") return;
-    el.addEventListener("change",()=>collectStep());
-  });
-  // checklist segments
-  document.querySelectorAll(".seg").forEach(seg=>{
-    seg.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{
-      const i=+seg.dataset.i, v=btn.dataset.v;
-      DRAFT.checklist[i]=v;
-      seg.querySelectorAll("button").forEach(b=>{b.classList.remove("on-ok","on-bad");});
-      btn.classList.add(v==='ok'?'on-ok':'on-bad');
-    });
-  });
-  // table inputs
-  document.querySelectorAll('table.data input').forEach(inp=>{
-    inp.addEventListener("input",()=>{DRAFT.comps[+inp.dataset.c][inp.dataset.k]=inp.value;});
-  });
-  // photo add
-  document.querySelectorAll('input[data-add]').forEach(inp=>{
-    inp.onchange=async e=>{
-      const f=e.target.files[0]; if(!f) return;
-      const key=inp.dataset.add; toast("กำลังอัปโหลดรูป...");
-      try{const url=await uploadImage(f);(DRAFT[key]=DRAFT[key]||[]).push(url);drawStep();}
-      catch(err){toast("อัปโหลดไม่สำเร็จ");}
-    };
-  });
-  document.querySelectorAll('[data-del]').forEach(btn=>{
-    btn.onclick=()=>{const grid=btn.closest('.photo-grid');const key=grid.dataset.pk;DRAFT[key].splice(+btn.dataset.del,1);drawStep();};
-  });
+  document.querySelectorAll("#stepbody input,#stepbody select,#stepbody textarea").forEach(el=>{ if(el.type==="file"||el.classList.contains("f_cond")) return; el.addEventListener("change",collectStep); });
+  document.querySelectorAll("#stepbody input[data-c]").forEach(inp=>{ inp.addEventListener("input",()=>{DRAFT.comps[+inp.dataset.c][inp.dataset.k]=inp.value;}); });
+  document.querySelectorAll(".seg").forEach(seg=>{ seg.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{ const arr=seg.dataset.arr,i=+seg.dataset.i,v=btn.dataset.v; DRAFT[arr][i]=v; seg.querySelectorAll("button").forEach(b=>b.classList.remove("on-ok","on-bad","on-na")); btn.classList.add(v==='pass'?'on-ok':v==='fail'?'on-bad':'on-na'); }); });
+  document.querySelectorAll(".slot-input").forEach(inp=>{ inp.onchange=async e=>{ const f=e.target.files[0]; if(!f) return; toast(t('uploading')); let url; try{ url=await uploadImage(f);}catch(err){ return toast(err.message==="LIVE_ONLY"?t('liveOnly'):"อัปโหลดไม่สำเร็จ"); } storeSlot(inp.dataset,url); drawStep(); }; });
+  document.querySelectorAll(".del[data-del]").forEach(btn=>{ btn.onclick=()=>{ storeSlot(btn.dataset,""); drawStep(); }; });
 }
+function storeSlot(ds,url){ if(ds.target==="comp"){ DRAFT.comps[+ds.ci][ds.key]=url; } else { DRAFT[ds.target]=DRAFT[ds.target]||{}; DRAFT[ds.target][ds.idx]=url; } }
 function collectStep(){
-  if(CUR===0){
-    DRAFT.job_type=gv("f_job_type");DRAFT.job_no=gv("f_job_no");DRAFT.measure_date=gv("f_measure_date");
-    DRAFT.customer=gv("f_customer");DRAFT.address=gv("f_address");DRAFT.plate_head=gv("f_plate_head");
-    DRAFT.plate_tank=gv("f_plate_tank");DRAFT.chassis_head=gv("f_chassis_head");DRAFT.chassis_tank=gv("f_chassis_tank");
-    DRAFT.capacity=gv("f_capacity");DRAFT.vehicle_type=gv("f_vehicle_type");DRAFT.product=gv("f_product");
-    DRAFT.model_no=gv("f_model_no");DRAFT.n_comp=Math.max(1,Math.min(12,+gv("f_n_comp")||8));
+  const k=curKey();
+  if(k==="job"){
+    DRAFT.job_type=gv("f_job_type");DRAFT.job_no=gv("f_job_no");DRAFT.sa=gv("f_sa");DRAFT.measure_date=gv("f_measure_date");
+    DRAFT.customer=gv("f_customer");DRAFT.address=gv("f_address");DRAFT.plate_head=gv("f_plate_head");DRAFT.plate_tank=gv("f_plate_tank");DRAFT.chassis_head=gv("f_chassis_head");DRAFT.chassis_tank=gv("f_chassis_tank");
+    DRAFT.capacity=gv("f_capacity");DRAFT.vehicle_type=gv("f_vehicle_type");DRAFT.product=gv("f_product");DRAFT.model_no=gv("f_model_no");DRAFT.n_comp=Math.max(1,Math.min(12,+gv("f_n_comp")||8));
+    if(isJM(DRAFT.job_type)) DRAFT.tank_origin=gv("f_tank_origin");
+    DRAFT.conditions=Array.from(document.querySelectorAll(".f_cond:checked")).map(x=>x.value);
   }
-  if(CUR===5){DRAFT.conclusion=gv("f_conclusion");DRAFT.remark=gv("f_remark");}
+  if(k==="summary"){ DRAFT.conclusion=gv("f_conclusion"); DRAFT.remark=gv("f_remark"); }
 }
 function validateStep(){
-  collectStep();
-  if(CUR===0){
-    if(!DRAFT.customer.trim()){toast("กรุณากรอกชื่อลูกค้า");return false;}
-  }
-  if(CUR===1){
-    if(DRAFT.checklist.some(x=>!x)){toast("กรุณาตรวจให้ครบทุกข้อ (กันลัดขั้นตอน)");return false;}
-  }
+  collectStep(); const k=curKey();
+  if(k==="job"){ if(!DRAFT.customer.trim()){toast(t('needName'));return false;} if(!DRAFT.sa.trim()){toast(t('needSA'));return false;} }
+  if(k==="before"||k==="check"){ if((DRAFT.checklist_before||[]).some(x=>!x)){toast(t('needChk'));return false;} }
   return true;
 }
 function stepPrev(){ if(CUR>0){CUR--;drawStepper();drawStep();window.scrollTo(0,0);} }
-function stepNext(){
-  if(!validateStep()) return;
-  if(CUR<STEPS.length-1){CUR++;drawStepper();drawStep();window.scrollTo(0,0);}
-  else saveDraft();
-}
+function stepNext(){ if(!validateStep())return; if(CUR<STEPS.length-1){CUR++;drawStepper();drawStep();window.scrollTo(0,0);} else saveDraft(); }
 async function saveDraft(){
-  collectStep();
-  toast("กำลังบันทึก...");
-  const status=DRAFT.conclusion;
-  const rec={
-    job_type:DRAFT.job_type, job_no:DRAFT.job_no,
-    customer:DRAFT.customer, address:DRAFT.address,
-    plate_head:DRAFT.plate_head, plate_tank:DRAFT.plate_tank,
-    chassis_head:DRAFT.chassis_head, chassis_tank:DRAFT.chassis_tank,
-    capacity:DRAFT.capacity, vehicle_type:DRAFT.vehicle_type, product:DRAFT.product,
-    model_no:DRAFT.model_no, measure_date:DRAFT.measure_date, location:DRAFT.location,
-    status, created_by:USER.name,
-    data:{
-      n_comp:DRAFT.n_comp, comps:DRAFT.comps, checklist:DRAFT.checklist,
-      chk_photos:DRAFT.chk_photos, plate_photos:DRAFT.plate_photos,
-      seal_photos:DRAFT.seal_photos, chassis_photos:DRAFT.chassis_photos,
-      conclusion:DRAFT.conclusion, remark:DRAFT.remark
-    }
-  };
-  let saved;
-  try{ saved=await DB.saveReport(rec); }
-  catch(e){ return toast("บันทึกไม่สำเร็จ — เช็คการเชื่อมต่อ Google Sheets"); }
-  if(status==='needs_fix'||status==='fail') alertSale(saved);
-  DRAFT=null;
-  toast("บันทึกสำเร็จ: "+saved.doc_no);
-  go("detail",saved.id);
+  collectStep(); toast(t('saving'));
+  const rec={job_type:DRAFT.job_type,sa:DRAFT.sa,job_no:DRAFT.job_no,measure_date:DRAFT.measure_date,customer:DRAFT.customer,address:DRAFT.address,plate_head:DRAFT.plate_head,plate_tank:DRAFT.plate_tank,chassis_head:DRAFT.chassis_head,chassis_tank:DRAFT.chassis_tank,capacity:DRAFT.capacity,vehicle_type:DRAFT.vehicle_type,product:DRAFT.product,model_no:DRAFT.model_no,tank_origin:isJM(DRAFT.job_type)?DRAFT.tank_origin:"",conditions:(DRAFT.conditions||[]).join(", "),location:DRAFT.location,status:DRAFT.conclusion,created_by:USER.name,
+    data:{n_comp:DRAFT.n_comp,comps:DRAFT.comps,checklist_before:DRAFT.checklist_before,checklist_after:DRAFT.checklist_after,seal_slots:DRAFT.seal_slots,chassis_slots:DRAFT.chassis_slots,conditions:DRAFT.conditions,conclusion:DRAFT.conclusion,remark:DRAFT.remark}};
+  let saved; try{ saved=await DB.saveReport(rec);}catch(e){ return toast("บันทึกไม่สำเร็จ — เช็คการเชื่อมต่อ"); }
+  const beforeFails=(DRAFT.checklist_before||[]).map((v,i)=>v==='fail'?chkList(DRAFT.vehicle_type)[i]:null).filter(Boolean);
+  if(beforeFails.length || saved.status==='needs_fix' || saved.status==='fail') alertSale(saved,beforeFails);
+  DRAFT=null; toast("บันทึกสำเร็จ: "+saved.doc_no); go("detail",saved.id);
 }
-function alertSale(rec){
-  // V1: เปิดข้อความเตรียมส่งกลุ่ม Sale (เฟสหน้าจะต่อ Line Messaging API อัตโนมัติ)
-  const msg=`🔧 แจ้งงานต้องแก้ไข\nเลขเอกสาร: ${rec.doc_no}\nลูกค้า: ${rec.customer}\nทะเบียน: ${rec.plate_tank}\nรายละเอียด: ${rec.data?rec.data.remark:rec.remark||'-'}\nผู้ตรวจ: ${USER.name}`;
+function alertSale(rec,beforeFails){
+  const items=(beforeFails&&beforeFails.length)?("\nBefore ไม่ผ่าน:\n- "+beforeFails.join("\n- ")):"";
+  const msg=`🔧 แจ้งงานต้องแก้ไข/เสนอราคา\nเลขเอกสาร: ${rec.doc_no}\nงาน: ${rec.job_type} • SA ${rec.sa||'-'}\nลูกค้า: ${rec.customer}\nทะเบียน: ${rec.plate_tank}\nแท็งค์: ${rec.tank_origin||'-'}${items}\nหมายเหตุ: ${(rec.data?rec.data.remark:rec.remark)||'-'}\nผู้ตรวจ: ${USER.name}`;
   if(navigator.share){navigator.share({title:"แจ้งกลุ่ม Sale",text:msg}).catch(()=>{});}
-  else{navigator.clipboard?.writeText(msg);toast("คัดลอกข้อความแจ้ง Sale แล้ว — วางในกลุ่ม Line ได้เลย");}
+  else{navigator.clipboard?.writeText(msg);toast("คัดลอกข้อความแจ้ง Sale แล้ว");}
 }
-
-/* ---------- Search ---------- */
 function SearchView(){
   $("#page").innerHTML=`
-    <div class="crumb" onclick="go('home')">← หน้าหลัก</div>
-    <h1>🔍 ค้นหารายงานวัดน้ำ</h1>
-    <div class="row" style="margin-top:8px">
-      <input id="q" class="field" style="flex:1" placeholder="พิมพ์ เลขเอกสาร / ชื่อลูกค้า / ทะเบียน / Job">
-      <button class="btn" onclick="runSearch()">ค้นหา</button>
-    </div>
-    <div id="results"><p class="muted">กำลังโหลด...</p></div>`;
+    <div class="crumb" onclick="go('home')">${t('back')}</div>
+    <h1>${t('searchTitle')}</h1>
+    <div class="row" style="margin-top:8px"><input id="q" class="field" style="flex:1" placeholder="${t('searchPh')}"><button class="btn" onclick="runSearch()">${t('searchBtn')}</button></div>
+    <div id="results"><p class="muted">${t('loading')}</p></div>`;
   $("#q").addEventListener("keydown",e=>{if(e.key==="Enter")runSearch();});
   runSearch();
 }
 async function runSearch(){
   const q=$("#q")?$("#q").value.trim():"";
-  const rows=await DB.searchReports(q);
+  let rows=[]; try{rows=await DB.searchReports(q);}catch(e){$("#results").innerHTML='<p class="muted">โหลดไม่ได้</p>';return;}
   $("#results").innerHTML = rows.length? rows.map(r=>`
-    <div class="rep-item" onclick="go('detail',${JSON.stringify(r.id)})">
-      <div style="flex:1">
-        <div class="docno">${esc(r.doc_no)}</div>
-        <div class="muted">${esc(r.customer)} • ทะเบียน ${esc(r.plate_tank||'-')} • ${esc(r.measure_date||'')}</div>
-        <div class="muted">โดย ${esc(r.created_by)} • ปริ้น ${r.print_count||0} ครั้ง</div>
-      </div>
-      ${statusPill(r.status)}
-    </div>`).join("") : '<p class="muted">ไม่พบรายงาน</p>';
+    <div class="rep-item" onclick="go('detail',${JSON.stringify(String(r.id))})">
+      <div style="flex:1"><div class="docno">${esc(r.doc_no)}</div>
+        <div class="muted">${esc(r.customer)} • ${esc(r.plate_tank||'-')} • ${esc(r.measure_date||'')}</div>
+        <div class="muted">${esc(r.created_by)} • ปริ้น ${r.print_count||0}</div></div>${statusPill(r.status)}
+    </div>`).join("") : `<p class="muted">${t('noReport')}</p>`;
 }
-
-/* ---------- Detail + print (แบ่งหน้า มีผู้จัดทำ/วันที่/เลขหน้าทุกหน้า) ---------- */
 async function DetailView(id){
-  const r=await DB.getReport(id);
+  let r; try{r=await DB.getReport(id);}catch(e){$("#page").innerHTML='<p>โหลดไม่ได้</p>';return;}
   if(!r){$("#page").innerHTML='<p>ไม่พบรายงาน</p>';return;}
   const d=r.data||{};
-  const logs=await DB.printLogs(id);
+  const logs=await DB.printLogs(id).catch(()=>[]);
   const comp=(d.comps||[]);
   const maker=esc(r.created_by||"-");
   const cdate=r.created_at? new Date(r.created_at).toLocaleDateString('th-TH') : (r.measure_date||"-");
-  const chkList=(r.vehicle_type||"").includes("กึ่งพ่วง")?CHK_TRAILER:CHK_TRUCK;
-
+  const list=chkList(r.vehicle_type);
+  const triple=v=>v==='pass'?'<span class="pill ok">ผ่าน</span>':v==='fail'?'<span class="pill bad">ไม่ผ่าน</span>':v==='na'?'<span class="pill na">ไม่ได้ตรวจ</span>':'<span class="pill draft">-</span>';
+  const thai=s=>String(s||"").split(" / ")[0];
   const pages=[];
-  // หน้า: ข้อมูลทั่วไป + ตารางวัดน้ำ
   pages.push(`
     <h2>ข้อมูลทั่วไป</h2>
     <div class="row">
       <div style="flex:1;min-width:200px">
-        <div><b>ลูกค้า:</b> ${esc(r.customer)}</div>
-        <div><b>ที่อยู่:</b> ${esc(r.address||'-')}</div>
-        <div><b>Job:</b> ${esc(r.job_type)} ${esc(r.job_no||'')}</div>
-        <div><b>วันที่วัดน้ำ:</b> ${esc(r.measure_date||'-')}</div>
+        <div><b>ลูกค้า:</b> ${esc(r.customer)}</div><div><b>ที่อยู่:</b> ${esc(r.address||'-')}</div>
+        <div><b>Job:</b> ${esc(thai(r.job_type))} ${esc(r.job_no||'')} • <b>SA:</b> ${esc(r.sa||'-')}</div>
+        <div><b>วันที่วัดน้ำ:</b> ${esc(r.measure_date||'-')}</div>${r.tank_origin?`<div><b>ประเภทแท็งค์:</b> ${esc(thai(r.tank_origin))}</div>`:''}
       </div>
       <div style="flex:1;min-width:200px">
         <div><b>ทะเบียนหัว/แท็งก์:</b> ${esc(r.plate_head||'-')} / ${esc(r.plate_tank||'-')}</div>
         <div><b>คัสซีหัว/หาง:</b> ${esc(r.chassis_head||'-')} / ${esc(r.chassis_tank||'-')}</div>
-        <div><b>ความจุ:</b> ${esc(r.capacity||'-')} ลิตร • ${esc(r.product||'')}</div>
-        <div><b>ประเภทรถ:</b> ${esc(r.vehicle_type||'-')} • รุ่น ${esc(r.model_no||'-')}</div>
+        <div><b>ความจุ:</b> ${esc(r.capacity||'-')} ลิตร • ${esc(thai(r.product))}</div>
+        <div><b>ประเภทรถ:</b> ${esc(thai(r.vehicle_type))} • รุ่น ${esc(r.model_no||'-')}</div>
       </div>
     </div>
-    <h2 style="margin-top:14px">ข้อมูลการวัดน้ำ</h2>
+    ${(d.conditions&&d.conditions.length)?`<div style="margin-top:10px"><b>เงื่อนไขการวัดน้ำ:</b> ${esc(d.conditions.map(thai).join(", "))}</div>`:''}
+    <div class="guide-box" style="margin-top:12px">${esc(WATER_TERM)}</div>`);
+  pages.push(`<h2>ข้อมูลการวัดน้ำ (${comp.length} ช่อง)</h2>
     <div class="tbl-scroll"><table class="data">
       <tr><th class="rowlabel">ช่องที่</th>${comp.map((_,i)=>`<th>${i+1}</th>`).join("")}</tr>
-      <tr><td class="rowlabel">ปริมาตร (ลิตร)</td>${comp.map(c=>`<td>${esc(c.vol)}</td>`).join("")}</tr>
-      <tr><td class="rowlabel">U (มม.)</td>${comp.map(c=>`<td>${esc(c.u_top)}</td>`).join("")}</tr>
-      <tr><td class="rowlabel">ก้นถึงแป้น (มม.)</td>${comp.map(c=>`<td>${esc(c.bot_top)}</td>`).join("")}</tr>
-      <tr><td class="rowlabel">H (มม.)</td>${comp.map(c=>`<td>${esc(c.h)}</td>`).join("")}</tr>
-      <tr><td class="rowlabel">Void (L)</td>${comp.map(c=>`<td>${esc(c.void_l)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">ปริมาตร ระดับ1</td>${comp.map(c=>`<td>${esc(c.vol1)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">ปริมาตร ระดับMax</td>${comp.map(c=>`<td>${esc(c.vol2)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">U ระดับ1</td>${comp.map(c=>`<td>${esc(c.u1)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">U ระดับMax</td>${comp.map(c=>`<td>${esc(c.u2)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">ก้น-แป้น ระดับ1</td>${comp.map(c=>`<td>${esc(c.bot1)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">ก้น-แป้น ระดับMax</td>${comp.map(c=>`<td>${esc(c.bot2)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">H</td>${comp.map(c=>`<td>${esc(c.h)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">Void</td>${comp.map(c=>`<td>${esc(c.void_l)}</td>`).join("")}</tr>
       <tr><td class="rowlabel">ซีลแป้น</td>${comp.map(c=>`<td>${esc(c.seal_plate)}</td>`).join("")}</tr>
       <tr><td class="rowlabel">ซีลฝา</td>${comp.map(c=>`<td>${esc(c.seal_cap)}</td>`).join("")}</tr>
     </table></div>`);
-  // หน้า: checklist + หมายเหตุ
-  if((d.checklist||[]).length){
-    pages.push(`<h2>ผลการตรวจเช็คระบบ</h2>`+
-      d.checklist.map((v,i)=>`<div class="chk-item"><div class="no">${i+1}</div><div class="desc">${esc(chkList[i]||'')}</div>${v==='ok'?'<span class="pill ok">ผ่าน</span>':v==='bad'?'<span class="pill bad">ไม่ผ่าน</span>':'<span class="pill draft">-</span>'}</div>`).join("")+
-      (d.remark?`<div class="guide-box" style="margin-top:12px"><b>หมายเหตุ/สิ่งที่ต้องแก้ไข:</b> ${esc(d.remark)}</div>`:''));
-  }
-  // หน้า: รูปแต่ละชุด
-  const pphoto=(t,a)=>{a=a||[];return a.length?`<h2>${esc(t)}</h2><div class="photo-grid">${a.map(u=>`<div class="photo-cell"><img src="${esc(u)}"></div>`).join("")}</div>`:null;};
-  [["รูปติดตั้งแป้นวัดน้ำ",d.plate_photos],["จุดร้อยซีล + เช็คลมยาง",d.seal_photos],["Chassis / Name Plate",d.chassis_photos],["รูปตรวจระบบ",d.chk_photos]]
-    .forEach(p=>{const h=pphoto(p[0],p[1]);if(h)pages.push(h);});
-
-  const total=pages.length;
-  const head=`<div class="page-head">
-      <div><div class="t1">SUTEE TANKERS</div><div class="muted">REPORT การวัดน้ำ</div></div>
-      <div style="text-align:right"><div class="docno" style="font-size:18px">${esc(r.doc_no)}</div>${statusPill(r.status)}</div>
+  comp.forEach((c,i)=>{ const ph=COMP_SLOTS.map(s=>c[s.k]?`<div class="c"><div class="lab">${esc(thai(s.l))}</div><img src="${esc(c[s.k])}"></div>`:'').join(""); if(ph) pages.push(`<h2>รูปช่องที่ ${i+1}</h2><div class="rep-photos">${ph}</div>`); });
+  const sealPh=SEAL_SLOTS.map((lab,idx)=>(d.seal_slots&&d.seal_slots[idx])?`<div class="c"><div class="lab">${esc(thai(lab))}</div><img src="${esc(d.seal_slots[idx])}"></div>`:'').join("");
+  if(sealPh) pages.push(`<h2>จุดร้อยซีล + เช็คลมยาง</h2><div class="rep-photos">${sealPh}</div>`);
+  const chPh=CHASSIS_SLOTS.map((lab,idx)=>(d.chassis_slots&&d.chassis_slots[idx])?`<div class="c"><div class="lab">${esc(thai(lab))}</div><img src="${esc(d.chassis_slots[idx])}"></div>`:'').join("");
+  if(chPh) pages.push(`<h2>Chassis / Name Plate</h2><div class="rep-photos">${chPh}</div>`);
+  const renderChk=(arr,title)=> (arr&&arr.length)?`<h2>${title}</h2>${arr.map((v,i)=>`<div class="chk-item"><div class="no">${i+1}</div><div class="desc">${esc(thai(list[i]||''))}</div>${triple(v)}</div>`).join("")}`:'';
+  let lastPage = renderChk(d.checklist_before, isJM(r.job_type)?"ผลตรวจก่อนซ่อม (Before)":"ผลการตรวจสอบระบบ");
+  if(isJM(r.job_type)) lastPage += renderChk(d.checklist_after,"ผลตรวจหลังซ่อม (After)");
+  if(d.remark) lastPage += `<div class="guide-box" style="margin-top:12px"><b>หมายเหตุ:</b> ${esc(d.remark)}</div>`;
+  lastPage += `<div class="sign-grid">
+      <div class="sign-box"><div class="sign-line">ผู้ตรวจสอบ (QC Inspector)</div><div style="margin-top:4px">${maker}</div><div class="muted">วันที่ ${cdate}</div></div>
+      <div class="sign-box"><div class="sign-line">ผู้รับรอง (Approved by)</div></div>
+      <div class="sign-box"><div class="sign-line">Factory Manager</div></div>
     </div>`;
+  pages.push(lastPage);
+  const total=pages.length;
+  const head=`<div class="page-head"><div><div class="t1">SUTEE TANKERS</div><div class="muted">REPORT การวัดน้ำ</div></div>
+      <div style="text-align:right"><div class="docno" style="font-size:18px;color:var(--stt-red-dark);font-weight:800">${esc(r.doc_no)}</div>${statusPill(r.status)}</div></div>`;
   const foot=n=>`<div class="page-foot"><div>ผู้จัดทำ: <b>${maker}</b></div><div>วันที่จัดทำ: ${cdate}</div><div>หน้า ${n} / ${total}</div></div>`;
   const pagesHtml=pages.map((c,i)=>`<div class="page">${head}<div class="page-body">${c}</div>${foot(i+1)}</div>`).join("");
-
   $("#page").innerHTML=`
-    <div class="crumb no-print" onclick="go('search')">← กลับการค้นหา</div>
+    <div class="crumb no-print" onclick="go('search')">${t('back')}</div>
     <div id="printable">${pagesHtml}</div>
     <div class="card no-print">
       <div class="row" style="align-items:center">
-        <button class="btn" onclick="doPrint(${JSON.stringify(r.id)})">🖨️ สั่งพิมพ์</button>
-        ${(r.status==='needs_fix'||r.status==='fail')?`<button class="btn sec" onclick='reAlert(${JSON.stringify(r)})'>📣 แจ้งกลุ่ม Sale</button>`:''}
+        <button class="btn" onclick="doPrint(${JSON.stringify(String(r.id))})">${t('printBtn')}</button>
+        ${(r.status==='needs_fix'||r.status==='fail')?`<button class="btn sec" onclick='reAlert(${JSON.stringify(r).replace(/'/g,"&#39;")})'>📣 แจ้งกลุ่ม Sale</button>`:''}
         <div style="flex:1"></div>
         <div class="muted">ปริ้นไปแล้ว <b>${r.print_count||0}</b> ครั้ง${r.last_printed_by?` • ล่าสุดโดย ${esc(r.last_printed_by)}`:''}</div>
       </div>
-      ${logs.length?`<div style="margin-top:10px"><b>ประวัติการพิมพ์</b>${logs.map(l=>`<div class="muted">• ${esc(l.printed_by)} — ${new Date(l.printed_at).toLocaleString('th-TH')}</div>`).join("")}</div>`:''}
+      <p class="up-note">กด "พิมพ์/บันทึก PDF" แล้วเลือก "บันทึกเป็น PDF (Save as PDF)" จะได้ไฟล์ PDF พร้อมช่องเซ็น</p>
+      ${logs.length?`<div style="margin-top:6px"><b>ประวัติการพิมพ์</b>${logs.map(l=>`<div class="muted">• ${esc(l.printed_by)} — ${new Date(l.printed_at).toLocaleString('th-TH')}</div>`).join("")}</div>`:''}
     </div>`;
 }
-function photoView(title,arr){
-  arr=arr||[];if(!arr.length) return "";
-  return `<h2 style="margin-top:16px">${esc(title)}</h2><div class="photo-grid">${arr.map(u=>`<div class="photo-cell"><img src="${esc(u)}"></div>`).join("")}</div>`;
-}
-async function doPrint(id){
-  await DB.logPrint(id,USER.name);
-  toast("บันทึกการพิมพ์โดย "+USER.name);
-  setTimeout(()=>window.print(),300);
-}
-function reAlert(r){ alertSale(r); }
-
-/* ============================================================
-   5) start
-   ============================================================ */
+async function doPrint(id){ await DB.logPrint(id,USER.name).catch(()=>{}); toast("บันทึกการพิมพ์โดย "+USER.name); setTimeout(()=>window.print(),350); }
+function reAlert(r){ alertSale(r,[]); }
 render("home");
 </script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
