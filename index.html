@@ -480,7 +480,7 @@ function SearchView(){
 async function runSearch(){
   const q=$("#q")?$("#q").value.trim():"";
   let rows=[]; try{rows=await DB.searchReports(q);}catch(e){$("#results").innerHTML='<p class="muted">โหลดไม่ได้</p>';return;}
-  $("#results").innerHTML = rows.length? rows.map(r=>`<div class="rep-item" onclick="openReport(${JSON.stringify(String(r.id))})"><div style="flex:1"><div class="docno">${esc(r.doc_no)} ${r.status==='draft'?`<span class="muted">— ${t('resume')}</span>`:''}</div><div class="muted">${esc(r.customer)} • ${esc(r.plate_tank||'-')} • Job ${esc(r.job_no||'-')} • SA ${esc(r.sa||'-')}</div><div class="muted">${esc(r.created_by)} • ปริ้น ${r.print_count||0} ${r.review_status?'• '+reviewPill(r.review_status):''}</div></div>${statusPill(r.status)}</div>`).join("") : `<p class="muted">${t('noReport')}</p>`;
+  $("#results").innerHTML = rows.length? rows.map(r=>`<div class="rep-item" onclick="openReport('${esc(String(r.id))}')"><div style="flex:1"><div class="docno">${esc(r.doc_no)} ${r.status==='draft'?`<span class="muted">— ${t('resume')}</span>`:''}</div><div class="muted">${esc(r.customer)} • ${esc(r.plate_tank||'-')} • Job ${esc(r.job_no||'-')} • SA ${esc(r.sa||'-')}</div><div class="muted">${esc(r.created_by)} • ปริ้น ${r.print_count||0} ${r.review_status?'• '+reviewPill(r.review_status):''}</div></div>${statusPill(r.status)}</div>`).join("") : `<p class="muted">${t('noReport')}</p>`;
 }
 async function openReport(id){
   let r; try{r=await DB.getReport(id);}catch(e){return toast("โหลดไม่ได้");}
@@ -495,7 +495,7 @@ async function editReport(id){ let r; try{r=await DB.getReport(id);}catch(e){ret
 /* ===== Review (หัวหน้า) ===== */
 let REVIEW={id:null,r:null,photos:[],map:{}};
 async function ReviewView(id){
-  if(!canReview()){ $("#page").innerHTML=`<div class="crumb" onclick="go('detail',${JSON.stringify(String(id))})">← กลับ</div><div class="card">${t('reviewOnlyLead')}</div>`; return; }
+  if(!canReview()){ $("#page").innerHTML=`<div class="crumb" onclick="go('detail','${esc(String(id))}')">← กลับ</div><div class="card">${t('reviewOnlyLead')}</div>`; return; }
   let r; try{r=await DB.getReport(id);}catch(e){$("#page").innerHTML='<p>โหลดไม่ได้</p>';return;}
   if(!r){$("#page").innerHTML='<p>ไม่พบรายงาน</p>';return;}
   REVIEW={id:id,r:r,photos:allPhotos(r.data||{}),map:Object.assign({},(r.data&&r.data.review_photos)||{})};
@@ -503,10 +503,10 @@ async function ReviewView(id){
 }
 function drawReview(){
   const photos=REVIEW.photos;
-  if(!photos.length){ $("#page").innerHTML=`<div class="crumb" onclick="go('detail',${JSON.stringify(String(REVIEW.id))})">← กลับ</div><div class="card">ยังไม่มีรูปให้ตรวจ — ให้พนักงานถ่ายรูปก่อน</div>`; return; }
+  if(!photos.length){ $("#page").innerHTML=`<div class="crumb" onclick="go('detail','${esc(String(REVIEW.id))}')">← กลับ</div><div class="card">ยังไม่มีรูปให้ตรวจ — ให้พนักงานถ่ายรูปก่อน</div>`; return; }
   const secs=[]; photos.forEach(p=>{ if(secs.indexOf(p.sec)<0) secs.push(p.sec); });
   $("#page").innerHTML=`
-    <div class="crumb no-print" onclick="go('detail',${JSON.stringify(String(REVIEW.id))})">← กลับ</div>
+    <div class="crumb no-print" onclick="go('detail','${esc(String(REVIEW.id))}')">← กลับ</div>
     <h1>🔎 ${t('reviewTitle')}</h1>
     <div class="guide-box">${t('reviewerLabel')}: <b>${esc(USER.name)}</b> • เอกสาร ${esc(REVIEW.r.doc_no)} — ติ๊ก OK/ไม่OK ทุกรูป หรือกด "Accept ทั้งหมด" • ถ้ามีรูปไม่ผ่าน ระบบจะแจ้งกลุ่ม Line QC ให้ถ่ายใหม่ทันที</div>
     <div style="margin-bottom:10px"><button class="btn sm" onclick="reviewAcceptAll()">${t('acceptAll')}</button></div>
@@ -571,14 +571,14 @@ async function DetailView(id){
   const hasPhotos=allPhotos(d).length>0;
   $("#page").innerHTML=`
     <div class="crumb no-print" onclick="go('search')">${t('back')}</div>
-    ${r.status==='draft'?`<div class="banner demo no-print">ฉบับร่าง — <a href="javascript:void(0)" onclick="editReport(${JSON.stringify(String(r.id))})">กดเพื่อทำต่อ/แก้ไข</a></div>`:''}
+    ${r.status==='draft'?`<div class="banner demo no-print">ฉบับร่าง — <a href="javascript:void(0)" onclick="editReport('${esc(String(r.id))}')">กดเพื่อทำต่อ/แก้ไข</a></div>`:''}
     ${(d.review_status)?`<div class="banner no-print" style="background:#f0f9ff;border:1px solid #bae6fd;color:#075985">สถานะตรวจรูป: ${reviewPill(d.review_status)} ${d.reviewer?('• โดย '+esc(d.reviewer)):''}</div>`:''}
     <div id="printable">${pagesHtml}</div>
     <div class="card no-print">
       <div class="row" style="align-items:center">
-        <button class="btn" onclick="doPrint(${JSON.stringify(String(r.id))})">${t('printBtn')}</button>
-        ${canReview()&&hasPhotos?`<button class="btn sec" onclick="go('review',${JSON.stringify(String(r.id))})">${t('reviewBtn')}</button>`:''}
-        <button class="btn grey" onclick="editReport(${JSON.stringify(String(r.id))})">${t('editBtn')}</button>
+        <button class="btn" onclick="doPrint('${esc(String(r.id))}')">${t('printBtn')}</button>
+        ${canReview()&&hasPhotos?`<button class="btn sec" onclick="go('review','${esc(String(r.id))}')">${t('reviewBtn')}</button>`:''}
+        <button class="btn grey" onclick="editReport('${esc(String(r.id))}')">${t('editBtn')}</button>
         ${(r.status==='needs_fix'||r.status==='fail')?`<button class="btn sec" onclick='reAlert(${JSON.stringify(r).replace(/'/g,"&#39;")})'>📣 แจ้งกลุ่ม Sale</button>`:''}
         <div style="flex:1"></div>
         <div class="muted">ปริ้นไปแล้ว <b>${r.print_count||0}</b> ครั้ง${r.last_printed_by?` • ล่าสุดโดย ${esc(r.last_printed_by)}`:''}</div>
