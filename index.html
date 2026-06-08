@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STT QC System — ระบบตรวจสอบคุณภาพ</title>
+<style>
+/* ============================================================
+   STT QC SYSTEM  —  V1.0
+   ธีมสีแดง STT | ใช้ได้ทั้งมือถือและคอมพิวเตอร์
+   ============================================================ */
+:root{
+  --stt-red:#D81E2C; --stt-red-dark:#A6121E; --stt-red-soft:#fdecee;
+  --ink:#1f2937; --ink-soft:#6b7280; --line:#e5e7eb;
+  --bg:#f3f4f6; --card:#ffffff; --ok:#16a34a; --bad:#dc2626; --warn:#f59e0b;
+  --radius:14px; --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 14px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:'Segoe UI','Sarabun',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:15px}
+.hidden{display:none!important}
+
+/* ---------- App shell ---------- */
+.appbar{position:sticky;top:0;z-index:30;background:var(--stt-red);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 14px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.appbar .logo{font-weight:800;letter-spacing:1px;font-size:18px;display:flex;align-items:center;gap:8px}
+.appbar .logo .mark{background:#fff;color:var(--stt-red);border-radius:6px;padding:1px 7px;font-weight:900;transform:skewX(-8deg)}
+.appbar .spacer{flex:1}
+.appbar .who{font-size:13px;opacity:.95;text-align:right;line-height:1.2}
+.appbar button.ghost{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:8px;padding:7px 12px;font-size:13px}
+.appbar button.ghost:hover{background:rgba(255,255,255,.28)}
+.wrap{max-width:1000px;margin:0 auto;padding:16px 14px 60px}
+
+/* ---------- Cards / buttons ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+.btn{background:var(--stt-red);color:#fff;border:0;border-radius:10px;padding:12px 18px;font-weight:700;font-size:15px}
+.btn:hover{background:var(--stt-red-dark)}
+.btn:disabled{background:#cbd5e1;cursor:not-allowed}
+.btn.sec{background:#fff;color:var(--stt-red);border:1.5px solid var(--stt-red)}
+.btn.sec:hover{background:var(--stt-red-soft)}
+.btn.grey{background:#eef0f3;color:var(--ink)}
+.btn.grey:hover{background:#e2e6eb}
+.btn.block{width:100%}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.field{margin-bottom:12px;flex:1;min-width:160px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--stt-red)}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:0 0 12px}
+.muted{color:var(--ink-soft);font-size:13px}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.ok{background:#dcfce7;color:#166534}.pill.bad{background:#fee2e2;color:#991b1b}
+.pill.warn{background:#fef3c7;color:#92400e}.pill.draft{background:#e5e7eb;color:#374151}
+
+/* ---------- Login ---------- */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,var(--stt-red),var(--stt-red-dark))}
+.login-card{background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:30px;width:100%;max-width:380px}
+.login-card .brand{text-align:center;margin-bottom:18px}
+.login-card .brand .mark{font-size:30px;font-weight:900;color:var(--stt-red);letter-spacing:1px}
+.login-card .brand .sub{color:var(--ink-soft);font-size:13px;margin-top:2px}
+.pin-display{display:flex;justify-content:center;gap:10px;margin:14px 0}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--stt-red)}
+.pin-dot.on{background:var(--stt-red)}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.keypad button{padding:16px;font-size:20px;font-weight:700;border:1.5px solid var(--line);background:#fff;border-radius:12px}
+.keypad button:hover{background:var(--stt-red-soft);border-color:var(--stt-red)}
+
+/* ---------- Module tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;text-align:center;position:relative;transition:transform .1s}
+.tile.active{cursor:pointer}.tile.active:hover{transform:translateY(-3px);border-color:var(--stt-red)}
+.tile.soon{opacity:.55}
+.tile .ic{font-size:34px;margin-bottom:8px}
+.tile .nm{font-weight:700}
+.tile .tag{position:absolute;top:8px;right:8px}
+
+/* ---------- Stepper ---------- */
+.stepper{display:flex;overflow-x:auto;gap:6px;padding:6px 2px 12px;margin-bottom:6px}
+.step{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;min-width:78px;text-align:center;opacity:.5}
+.step.active{opacity:1}.step.done{opacity:1}
+.step .circ{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--line);background:#fff;color:var(--ink-soft);font-size:16px}
+.step.active .circ{border-color:var(--stt-red);color:var(--stt-red);background:var(--stt-red-soft)}
+.step.done .circ{border-color:var(--ok);background:var(--ok);color:#fff}
+.step .lbl{font-size:11px;margin-top:5px;line-height:1.2}
+.step-panel{display:none}.step-panel.active{display:block}
+
+/* ---------- Side guide ---------- */
+.guide-box{background:var(--stt-red-soft);border-left:4px solid var(--stt-red);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13.5px}
+.guide-box b{color:var(--stt-red-dark)}
+
+/* ---------- Table ---------- */
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.data{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
+table.data th,table.data td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.data th{background:#f8fafc;font-weight:700;position:sticky;top:0}
+table.data td input{width:100%;border:1px solid transparent;padding:6px;text-align:center;border-radius:6px}
+table.data td input:focus{border-color:var(--stt-red);background:#fff}
+.rowlabel{background:#f8fafc;font-weight:600;text-align:left!important;white-space:nowrap}
+
+/* checklist */
+.chk-item{display:flex;align-items:center;gap:8px;padding:9px 6px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.chk-item .no{width:26px;height:26px;border-radius:50%;background:#eef0f3;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex:0 0 auto}
+.chk-item .desc{flex:1;min-width:140px;font-size:13.5px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:6px 12px;font-size:12px;font-weight:700;color:var(--ink-soft)}
+.seg button.on-ok{background:var(--ok);color:#fff}
+.seg button.on-bad{background:var(--bad);color:#fff}
+
+/* photo */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:8px}
+.photo-cell{position:relative;aspect-ratio:1;border:1.5px dashed var(--line);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fafafa}
+.photo-cell img{width:100%;height:100%;object-fit:cover}
+.photo-cell .add{color:var(--ink-soft);font-size:26px}
+.photo-cell .del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:50%;width:22px;height:22px;font-size:13px;line-height:1}
+.up-note{font-size:11px;color:var(--ink-soft);margin-top:4px}
+
+/* list */
+.rep-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;cursor:pointer;background:#fff}
+.rep-item:hover{border-color:var(--stt-red);background:var(--stt-red-soft)}
+.rep-item .docno{font-weight:800;color:var(--stt-red-dark)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;z-index:100;box-shadow:var(--shadow);font-size:14px;opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}
+.banner{padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:14px}
+.banner.demo{background:#fff7ed;border:1px solid #fdba74;color:#9a3412}
+.crumb{font-size:13px;color:var(--ink-soft);margin-bottom:10px;cursor:pointer}
+.crumb:hover{color:var(--stt-red)}
+.howto-step{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.howto-step .hd{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f8fafc;cursor:pointer}
+.howto-step .hd .n{width:30px;height:30px;border-radius:8px;background:var(--stt-red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto}
+.howto-step .bd{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .25s,padding .25s}
+.howto-step.open .bd{max-height:600px;padding:12px 14px}
+/* ---------- Paginated report ---------- */
+.page{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px;display:flex;flex-direction:column}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--stt-red);padding-bottom:8px;margin-bottom:12px}
+.page-head .t1{font-weight:900;color:var(--stt-red);font-size:20px;line-height:1}
+.page-body{flex:1}
+.page-foot{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin-top:14px;padding-top:8px;font-size:12px;color:var(--ink-soft)}
+@media print{
+  .appbar,.no-print,.stepper,.crumb,.toast{display:none!important}
+  body{background:#fff}.wrap{max-width:none;padding:0}
+  .card{box-shadow:none;border:1px solid #999;page-break-inside:avoid}
+  .page{border:none;border-radius:0;box-shadow:none;margin:0;min-height:96vh;page-break-after:always}
+  .page:last-child{page-break-after:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ============= CONFIG : เบียร์แก้ 3 ค่านี้ตามคู่มือ ============= -->
+<script>
+const CONFIG = {
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwwVHuuLu7k_syRWB_f8Fwy62bt5anx7Cde2PWnIobmT4rVH2x_fIPujff5alcoxWBHuw/exec",  // Web App ของ CB_Database
+  IMGBB_KEY:  "8e405c97165321f3c68eafb9d3d9bd8e"   // คีย์ IMGBB (เก็บรูป)
+};
+</script>
+
+<div id="root"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* ============================================================
+   0) โหมดการทำงาน : ถ้ายังไม่ใส่ค่า config → DEMO MODE (เก็บในเครื่อง)
+   ============================================================ */
+const DEMO = CONFIG.SCRIPT_URL.startsWith("YOUR_");
+// เรียก Google Apps Script — ใช้ text/plain เพื่อเลี่ยง CORS preflight
+async function apiCall(action, payload){
+  const res = await fetch(CONFIG.SCRIPT_URL, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify(Object.assign({action}, payload||{}))
+  });
+  const j = await res.json();
+  if(!j.ok) throw new Error(j.error||"server error");
+  return j.data;
+}
+
+/* ---------- ค่าคงที่ของระบบ ---------- */
+const JOB_TYPES = [
+  {code:"JT",  name:"JT — งานแท็งค์สร้างใหม่"},
+  {code:"JM",  name:"JM — งานซ่อม/หลังการขาย"},
+  {code:"JMC", name:"JMC — ซ่อม (เคมี)"},
+  {code:"JMI", name:"JMI — ซ่อม (ตรวจสภาพ)"},
+  {code:"JMT", name:"JMT — ซ่อม (แท็งค์)"},
+  {code:"JMS", name:"JMS — ซ่อม (บริการ)"}
+];
+const VEHICLE_TYPES = ["รถกึ่งพ่วง (Semi-Trailer)","รถสิบล้อ","รถหกล้อ"];
+const PRODUCT_TYPES = ["Petroleum (น้ำมัน)","Chemical (เคมี)"];
+
+/* Checklist — รถกึ่งพ่วง (24 ข้อ ตาม WI-QC-26) */
+const CHK_TRAILER = [
+ "ใบ Request / ใบสั่งขาย","รถเข้ามารับบริการ","ค่าไวไฟ เป็น 0","ลมยางทุกล้อ 120-130 PSI",
+ "ระบบถุงลม","ระบบ Air Interlock","ระบบ Emergency Valve","ระบบ Emergency Stop","ระบบลม Pneumatic",
+ "ทำการ Balance ลม","วัดค่า R&H และแจ้ง Production","Production ตรวจสอบแก้ไข",
+ "เปิดฝา Manhole ทุกช่อง และเจียรแป้นเก่าออก (รถเก่า)","ดำเนินการวัดน้ำ ตามค่ามาตรฐาน",
+ "ระดับแรก เติมน้ำทุกช่อง ปล่อยเข้า Line Pipe + Mark แป้นระดับ 1","วัดระดับน้ำระดับถัดไป และ Mark จุด",
+ "แป้นบนสุด ถึง คอแมนโฮล ไม่ต่ำกว่า 1700 MM","วัดความสูงต่ำของหัวแท้งค์ ท้ายแท้งค์",
+ "สูบน้ำออกจากแท้งค์ทุกช่อง","แจ้งช่าง มาเชื่อมแป้น","ตรวจสอบความถูกต้องของการเชื่อมแป้น",
+ "ทดสอบการรั่วและทดสอบระบบ","ส่งข้อมูลเพื่อทำเอกสารใบวัดน้ำ","ใบวัดน้ำส่งพนักงานขับรถ / เก็บ Scan"
+];
+/* Checklist — รถสิบล้อ/หกล้อ (21 ข้อ) */
+const CHK_TRUCK = [
+ "ใบ Request / ใบสั่งขาย","รถเข้ามารับบริการ","ค่าไวไฟ เป็น 0","ลมยางทุกล้อ 120-130 PSI",
+ "ระบบถุงลม","ระบบ Air Interlock","ระบบ Emergency Valve","ระบบ Emergency Stop","ระบบลม Pneumatic หรือสลิง",
+ "เปิดฝา Manhole ทุกช่อง และเจียรแป้นเก่าออก (รถเก่า)","ดำเนินการวัดน้ำ ตามค่ามาตรฐาน",
+ "ระดับแรก เติมน้ำทุกช่อง ปล่อยเข้า Line Pipe + Mark แป้นระดับ 1","วัดระดับน้ำระดับถัดไป และ Mark จุด",
+ "แป้นบนสุด ถึง คอแมนโฮล ไม่ต่ำกว่า 1700 MM","วัดความสูงต่ำของหัวแท้งค์ ท้ายแท้งค์",
+ "สูบน้ำออกจากแท้งค์ทุกช่อง","แจ้งช่าง มาเชื่อมแป้น","ตรวจสอบความถูกต้องของการเชื่อมแป้น",
+ "ทดสอบการรั่วและทดสอบระบบ","ส่งข้อมูลเพื่อทำเอกสารใบวัดน้ำ","ใบวัดน้ำส่งพนักงานขับรถ / เก็บ Scan"
+];
+
+/* คู่มือ How-to (สรุปจาก WI-QC-26) */
+const HOWTO = [
+ {ic:"📄",t:"รับใบสั่งงาน",d:"รับใบ Inspector Work Request (FM-QC-3) จากฝ่ายผลิต หรือใบสั่งขายจาก Aftersales Service แล้วลงคิววัดน้ำ"},
+ {ic:"🧰",t:"เตรียมอุปกรณ์ + เช็คน้ำ",d:"ทบทวนรายละเอียดงาน เตรียมเครื่องมือวัดน้ำ และเช็คปริมาณน้ำที่จะใช้"},
+ {ic:"🔥",t:"ตรวจค่าไวไฟ = 0%",d:"ให้ Safety วัดค่าไวไฟ ต้องเป็น 0% ก่อนเข้าทำงานใน Tank (กรณีรถเก่าครบ 3 ปี/เคยขนส่งผลิตภัณฑ์)"},
+ {ic:"🚛",t:"นำรถเข้าหอวัดน้ำ",d:"เตรียมพื้นที่ หนุนล้อกันรถไหล เช็คลมยาง 120-130 PSI"},
+ {ic:"⚙️",t:"ทดสอบระบบรถ",d:"เช็คถุงลม / Air interlock / Emergency valve / Emergency stop / ระบบลม Pneumatic ว่าปกติ"},
+ {ic:"📐",t:"ปรับค่า R/H",d:"QC วัดค่าจริงที่รถ แจ้ง Production แก้ไขตาม Standard (Hendrickson/Fuwa/Weweler) แล้ววิศวกรยืนยันค่า"},
+ {ic:"💧",t:"ปั๊มน้ำวัดทีละระดับ",d:"เปิด Manhole ทุกช่อง → ปั๊มน้ำเข้าถังตวงมาตรฐาน (บันทึกทุก Step + เช็คอุณหภูมิ) → ปล่อยลง Tank ทีละระดับ เช็ครั่วซึมทุกช่อง"},
+ {ic:"📍",t:"ติดตั้ง+Tag แป้นวัดน้ำ",d:"ติดแป้นด้วยเคเบิ้ลไทร์ 12\" แป้นต่ำกว่าระดับน้ำ 5 มม. (Standard STT) ทาน้ำยา เหลือง→แดงคือระดับน้ำ แล้ว Tag กันเลื่อน ทำซ้ำทุกระดับ"},
+ {ic:"📏",t:"วัดระยะหัว-ท้าย Tank",d:"เมื่อเต็ม Maximum ทุกช่อง วัดระยะหัว/ท้าย Tank, เช็คแป้นบนสุดถึงคอแมนโฮลไม่ต่ำกว่า 1700 MM"},
+ {ic:"🔧",t:"ดูดน้ำออก + เชื่อมแป้น",d:"ดูดน้ำออก 100% → แจ้ง Production เชื่อมแป้น 4 จุด (จุดละ 0.5-1 ซม.) สวม PPE เปิดพัดลมดูดอากาศ"},
+ {ic:"🔒",t:"ร้อยซีล 8 จุด",d:"ซีลแป้น / Manhole / Over fill / Pressure relief / หลอดแก้ว API / Vapor / Emergency valve / ก้านริเวอร์ริ่ง — ตีซีลตะกั่ว No.6"},
+ {ic:"🏷️",t:"ตอก Name Plate + สติกเกอร์",d:"บันทึกข้อมูลในระบบ ออกเอกสาร ตอกเนมเพลทที่ฝา Manhole ทุกช่อง ติดสติกเกอร์วันที่วัด/วันหมดอายุ"},
+ {ic:"✅",t:"Test รั่ว + ส่งรายงาน",d:"อัด Pressure flushing แล้ว Test ระบบ (Petroleum 3-5 psi / Chemical 1 bar) → ส่งรายงานให้คนขับในวันรับรถ หรืออย่างช้า 1 วัน"}
+];
+
+/* ขั้นตอน Stepper ของการกรอกรายงาน */
+const STEPS = [
+ {ic:"📋",lbl:"ข้อมูลงาน"},
+ {ic:"✓",lbl:"ตรวจระบบ"},
+ {ic:"💧",lbl:"ตารางวัดน้ำ"},
+ {ic:"🔒",lbl:"ซีล+ลมยาง"},
+ {ic:"🚛",lbl:"Chassis"},
+ {ic:"🏁",lbl:"สรุป+บันทึก"}
+];
+
+/* ============================================================
+   1) ชั้นข้อมูล (DB layer) — รองรับทั้ง Supabase และ DEMO
+   ============================================================ */
+const LS = {
+  get:(k,d)=>{try{return JSON.parse(localStorage.getItem("sttqc_"+k))??d}catch(e){return d}},
+  set:(k,v)=>localStorage.setItem("sttqc_"+k,JSON.stringify(v))
+};
+function seedDemo(){
+  if(!LS.get("seeded")){
+    LS.set("employees",[
+      {name:"แอดมิน (เบียร์)",pin:"1234",role:"admin"},
+      {name:"นายวสันต์ ไชยวุฒิ",pin:"6902003",role:"staff"},
+      {name:"นายอนันตศักดิ์ บุญคง",pin:"6901003",role:"staff"}
+    ]);
+    LS.set("reports",[]); LS.set("counters",{}); LS.set("printlogs",[]); LS.set("seeded",true);
+  }
+}
+if(DEMO) seedDemo();
+
+function beYY(){ return String((new Date().getFullYear()+543)%100).padStart(2,"0"); } // ปี พ.ศ. 2 หลัก
+const DB = {
+  async login(name,pin){
+    if(DEMO){
+      const e=LS.get("employees",[]).find(x=>x.name===name&&x.pin===pin);
+      return e?{name:e.name,role:e.role}:null;
+    }
+    return await apiCall("login",{name,pin});   // คืน null ถ้าไม่ผ่าน
+  },
+  async employeeNames(){
+    if(DEMO) return LS.get("employees",[]).map(e=>e.name);
+    return await apiCall("employees");
+  },
+  // เลขเอกสารใช้ในโหมด DEMO เท่านั้น (ของจริง Apps Script ออกให้ตอนบันทึก)
+  nextDocNoDemo(type){
+    const key="CB-"+beYY()+"-"+type;
+    const c=LS.get("counters",{}); c[key]=(c[key]||0)+1; LS.set("counters",c);
+    return "CB-"+beYY()+"-"+type+"/"+String(c[key]).padStart(4,"0");
+  },
+  async saveReport(r){
+    if(DEMO){
+      r.doc_no=this.nextDocNoDemo(r.job_type);
+      r.id=String(Date.now()); r.created_at=new Date().toISOString(); r.print_count=0;
+      const a=LS.get("reports",[]); a.unshift(r); LS.set("reports",a);
+      return r;
+    }
+    const d=await apiCall("saveReport",{report:r});   // คืน {id,doc_no,created_at,print_count}
+    return Object.assign({}, r, d);
+  },
+  async searchReports(q){
+    if(DEMO){
+      let a=LS.get("reports",[]);
+      if(q){const s=q.toLowerCase();a=a.filter(r=>JSON.stringify(r).toLowerCase().includes(s));}
+      return a;
+    }
+    return await apiCall("search",{q:q||""});
+  },
+  async getReport(id){
+    if(DEMO) return LS.get("reports",[]).find(r=>String(r.id)===String(id));
+    return await apiCall("getReport",{id});
+  },
+  async logPrint(reportId,by){
+    if(DEMO){
+      const l=LS.get("printlogs",[]);l.push({report_id:reportId,printed_by:by,printed_at:new Date().toISOString()});LS.set("printlogs",l);
+      const a=LS.get("reports",[]).map(r=>String(r.id)===String(reportId)?{...r,print_count:(r.print_count||0)+1,last_printed_by:by}:r);LS.set("reports",a);
+      return;
+    }
+    await apiCall("logPrint",{id:reportId,by});
+  },
+  async printLogs(reportId){
+    if(DEMO) return LS.get("printlogs",[]).filter(l=>String(l.report_id)===String(reportId));
+    return await apiCall("printLogs",{id:reportId});
+  }
+};
+
+/* ============================================================
+   2) สถานะ + helper
+   ============================================================ */
+let USER = LS.get("session",null);
+const $=s=>document.querySelector(s);
+const root=()=> $("#root");
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
+function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function statusPill(s){
+  const m={pass:["ok","ผ่าน (ACCEPT)"],fail:["bad","ไม่ผ่าน"],needs_fix:["warn","ต้องแก้ไข"],draft:["draft","ฉบับร่าง"]};
+  const x=m[s]||m.draft;return `<span class="pill ${x[0]}">${x[1]}</span>`;
+}
+
+/* อัปโหลดรูปไป IMGBB (หรือเก็บ data URL ในโหมด DEMO) */
+async function uploadImage(file){
+  const b64=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(file);});
+  if(DEMO || CONFIG.IMGBB_KEY.startsWith("YOUR_")) return b64; // โหมดทดลอง: ใช้รูปฝังในเครื่อง
+  const fd=new FormData(); fd.append("image", b64.split(",")[1]);
+  const res=await fetch("https://api.imgbb.com/1/upload?key="+CONFIG.IMGBB_KEY,{method:"POST",body:fd});
+  const j=await res.json();
+  if(j&&j.success) return j.data.url;
+  throw new Error("อัปโหลดรูปไม่สำเร็จ");
+}
+
+/* ============================================================
+   3) Router
+   ============================================================ */
+function go(view,arg){ render(view,arg); window.scrollTo(0,0); }
+function render(view,arg){
+  if(!USER){ return LoginView(); }
+  Shell(view,arg);
+}
+function Shell(view,arg){
+  const r=root();
+  r.innerHTML=`
+    <div class="appbar">
+      <div class="logo"><span class="mark">STT</span> QC SYSTEM</div>
+      <div class="spacer"></div>
+      <div class="who">${esc(USER.name)}<br><span style="opacity:.8">${USER.role==='admin'?'ผู้ดูแลระบบ':'พนักงาน QC'}</span></div>
+      <button class="ghost" onclick="logout()">ออก</button>
+    </div>
+    <div class="wrap" id="page"></div>`;
+  const v={home:HomeView,howto:HowtoView,new:NewReportView,search:SearchView,detail:DetailView}[view]||HomeView;
+  v(arg);
+}
+function logout(){ USER=null; LS.set("session",null); go("home"); }
+
+/* ============================================================
+   4) Views
+   ============================================================ */
+function LoginView(){
+  root().innerHTML=`
+  <div class="login-wrap"><div class="login-card">
+    <div class="brand"><div class="mark">SUTEE</div><div class="sub">ระบบตรวจสอบคุณภาพ (QC) — ฝ่ายวัดน้ำ</div></div>
+    ${DEMO?'<div class="banner demo">⚠️ โหมดทดลอง — ลองใช้: ชื่อ "แอดมิน (เบียร์)" รหัส 1234</div>':''}
+    <div class="field"><label>ชื่อพนักงาน (พิมพ์เพื่อค้นหา)</label>
+      <input id="lg-name" list="emp-list" placeholder="พิมพ์ชื่อของคุณ..." autocomplete="off">
+      <datalist id="emp-list"></datalist></div>
+    <div class="field"><label>รหัสพนักงาน</label>
+      <input id="lg-pin" type="password" inputmode="numeric" placeholder="รหัสพนักงานของคุณ"></div>
+    <button class="btn block" style="margin-top:6px" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <p class="up-note" style="margin-top:10px">ใช้ "รหัสพนักงาน" จากฝ่าย HR เป็นรหัสผ่าน • พนักงานที่ลาออกแล้วจะเข้าไม่ได้</p>
+  </div></div>`;
+  DB.employeeNames().then(names=>{
+    const el=document.getElementById("emp-list");
+    if(el) el.innerHTML=(names||[]).map(n=>`<option value="${esc(n)}">`).join("");
+  }).catch(()=>toast("โหลดรายชื่อไม่ได้ — เช็คการตั้งค่า"));
+  const pinEl=document.getElementById("lg-pin");
+  pinEl.addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+}
+async function doLogin(){
+  const name=(document.getElementById("lg-name").value||"").trim();
+  const pin=(document.getElementById("lg-pin").value||"").trim();
+  if(!name||!pin) return toast("กรอกชื่อและรหัสพนักงาน");
+  toast("กำลังตรวจสอบ...");
+  let u=null;
+  try{ u=await DB.login(name,pin); }catch(e){ return toast("เชื่อมต่อฐานข้อมูลไม่ได้"); }
+  if(!u) return toast("ชื่อหรือรหัสไม่ถูกต้อง");
+  USER=u; LS.set("session",u); go("home");
+}
+
+function HomeView(){
+  const modules=[
+    {ic:"💧",nm:"การวัดน้ำ",active:true},
+    {ic:"🔍",nm:"ตรวจสภาพรถ",active:false},
+    {ic:"🎨",nm:"ตรวจงานสี",active:false},
+    {ic:"⚡",nm:"ตรวจงานไฟฟ้า",active:false},
+    {ic:"📦",nm:"ตรวจก่อนส่งมอบ",active:false},
+    {ic:"📊",nm:"รายงานสรุป",active:false}
+  ];
+  $("#page").innerHTML=`
+    <h1>เลือกงาน QC</h1>
+    <p class="muted">แตะการ์ดเพื่อเริ่มงาน — โมดูล "การวัดน้ำ" พร้อมใช้งานแล้ว ส่วนอื่นจะเพิ่มในเวอร์ชันถัดไป</p>
+    <div class="tiles" style="margin-top:14px">
+      ${modules.map((m,i)=>`
+        <div class="tile ${m.active?'active':'soon'}" ${m.active?'onclick="openWater()"':''}>
+          ${m.active?'<span class="tag pill ok">พร้อมใช้</span>':'<span class="tag pill draft">เร็วๆนี้</span>'}
+          <div class="ic">${m.ic}</div><div class="nm">${m.nm}</div>
+        </div>`).join("")}
+    </div>
+    <p class="up-note" style="margin-top:16px">รายชื่อผู้ใช้งานเชื่อมกับฐานข้อมูลพนักงาน (HR) อัตโนมัติ</p>`;
+}
+function openWater(){
+  window.scrollTo(0,0);
+  $("#page").innerHTML=`
+    <div class="crumb" onclick="go('home')">← กลับหน้าหลัก</div>
+    <h1>💧 การวัดน้ำ</h1>
+    <div class="tiles" style="margin-top:14px">
+      <div class="tile active" onclick="go('new')"><div class="ic">➕</div><div class="nm">สร้างใบวัดน้ำใหม่</div></div>
+      <div class="tile active" onclick="go('search')"><div class="ic">🔍</div><div class="nm">ค้นหา/ดูรายงาน</div></div>
+      <div class="tile active" onclick="go('howto')"><div class="ic">📖</div><div class="nm">คู่มือ How-to</div></div>
+    </div>`;
+}
+
+function HowtoView(){
+  $("#page").innerHTML=`
+    <div class="crumb" onclick="go('home')">← หน้าหลัก</div>
+    <h1>📖 คู่มือการวัดน้ำ (How-to)</h1>
+    <p class="muted">ทำตามทีละขั้น 1-2-3 — แตะหัวข้อเพื่อดูรายละเอียด คนที่ไม่เคยวัดน้ำก็ทำตามได้</p>
+    <div style="margin-top:14px">
+      ${HOWTO.map((h,i)=>`
+        <div class="howto-step" onclick="this.classList.toggle('open')">
+          <div class="hd"><div class="n">${i+1}</div><div style="font-size:20px">${h.ic}</div><b>${esc(h.t)}</b></div>
+          <div class="bd"><div class="muted" style="font-size:14px;color:var(--ink)">${esc(h.d)}</div>
+            <div class="up-note" style="margin-top:8px">📎 อ้างอิง: WI-QC-26 — เพิ่มรูป/วิดีโอประกอบได้ในเวอร์ชันถัดไป</div>
+          </div>
+        </div>`).join("")}
+    </div>
+    <button class="btn block" style="margin-top:10px" onclick="go('new')">เข้าใจแล้ว เริ่มทำใบวัดน้ำ →</button>`;
+}
+
+/* ---------- New report (stepper) ---------- */
+let DRAFT=null, CUR=0;
+function blankCompartment(){return{vol:"",u_top:"",u_low:"",bot_top:"",bot_low:"",h:"",void_l:"",seal_plate:"",seal_cap:""};}
+function NewReportView(){
+  if(!DRAFT){
+    DRAFT={
+      job_type:"JM",job_no:"",doc_no:"(จะออกอัตโนมัติเมื่อบันทึก)",
+      customer:"",operator:"",address:"",plate_head:"",plate_tank:"",chassis_head:"",chassis_tank:"",
+      capacity:"",vehicle_type:VEHICLE_TYPES[0],product:PRODUCT_TYPES[0],model_no:"",
+      measure_date:new Date().toISOString().slice(0,10),location:"บริษัท สุธี แท็งเกอร์",
+      n_comp:8, comps:Array.from({length:8},blankCompartment),
+      checklist:[], chk_photos:[], plate_photos:[], seal_photos:[], chassis_photos:[],
+      conclusion:"pass", remark:"", status:"draft"
+    };
+    CUR=0;
+  }
+  $("#page").innerHTML=`
+    <div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก?')){DRAFT=null;go(\'home\');}">← ยกเลิก</div>
+    <h1>➕ ใบวัดน้ำใหม่</h1>
+    <div class="stepper" id="stepper"></div>
+    <div id="stepbody"></div>
+    <div class="row no-print" style="margin-top:16px">
+      <button class="btn grey" id="btnPrev" onclick="stepPrev()">← ก่อนหน้า</button>
+      <div style="flex:1"></div>
+      <button class="btn" id="btnNext" onclick="stepNext()">ถัดไป →</button>
+    </div>`;
+  drawStepper(); drawStep();
+}
+function drawStepper(){
+  $("#stepper").innerHTML=STEPS.map((s,i)=>`
+    <div class="step ${i===CUR?'active':''} ${i<CUR?'done':''}">
+      <div class="circ">${i<CUR?'✓':s.ic}</div><div class="lbl">${i+1}. ${s.lbl}</div>
+    </div>`).join("");
+}
+function drawStep(){
+  const b=$("#stepbody");
+  $("#btnPrev").style.visibility=CUR===0?"hidden":"visible";
+  $("#btnNext").textContent=CUR===STEPS.length-1?"💾 บันทึกรายงาน":"ถัดไป →";
+  if(CUR===0) b.innerHTML=stepJob();
+  if(CUR===1) b.innerHTML=stepChecklist();
+  if(CUR===2) b.innerHTML=stepTable();
+  if(CUR===3) b.innerHTML=stepPhotos("seal_photos","🔒 จุดร้อยซีล (8 จุด) + เช็คลมยาง","ถ่ายซีลแป้น/Manhole/Over fill/Pressure relief/API/Vapor/Emergency valve/ก้านริเวอร์ริ่ง และลมยาง ≥120 PSI");
+  if(CUR===4) b.innerHTML=stepPhotos("chassis_photos","🚛 Chassis / Name Plate","ถ่ายหัวลาก, ป้ายทะเบียน, หมายเลขคัสซี, เนมเพลท");
+  if(CUR===5) b.innerHTML=stepSummary();
+  bindStep();
+}
+function gv(id){const e=document.getElementById(id);return e?e.value:"";}
+
+function stepJob(){
+  return `<div class="card">
+    <div class="guide-box">📋 <b>ขั้นที่ 1:</b> กรอกข้อมูลงานและรถ — เลขเอกสารจะออกให้อัตโนมัติตอนบันทึก ตามประเภทงานที่เลือก</div>
+    <div class="row">
+      <div class="field"><label>ประเภทงาน *</label><select id="f_job_type">${JOB_TYPES.map(j=>`<option value="${j.code}" ${DRAFT.job_type===j.code?'selected':''}>${j.name}</option>`).join("")}</select></div>
+      <div class="field"><label>เลขที่งาน (Job No.)</label><input id="f_job_no" value="${esc(DRAFT.job_no)}" placeholder="เช่น 0451"></div>
+      <div class="field"><label>วันที่วัดน้ำ</label><input type="date" id="f_measure_date" value="${DRAFT.measure_date}"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>ชื่อลูกค้า / ผู้ประกอบการ *</label><input id="f_customer" value="${esc(DRAFT.customer)}"></div>
+      <div class="field"><label>ที่อยู่</label><input id="f_address" value="${esc(DRAFT.address)}"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>ทะเบียนหัวลาก</label><input id="f_plate_head" value="${esc(DRAFT.plate_head)}"></div>
+      <div class="field"><label>ทะเบียนแท็งก์</label><input id="f_plate_tank" value="${esc(DRAFT.plate_tank)}"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>เลขคัสซีหัวลาก</label><input id="f_chassis_head" value="${esc(DRAFT.chassis_head)}"></div>
+      <div class="field"><label>เลขคัสซีหาง</label><input id="f_chassis_tank" value="${esc(DRAFT.chassis_tank)}"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>ความจุ (ลิตร)</label><input id="f_capacity" value="${esc(DRAFT.capacity)}" inputmode="numeric"></div>
+      <div class="field"><label>ประเภทรถ</label><select id="f_vehicle_type">${VEHICLE_TYPES.map(v=>`<option ${DRAFT.vehicle_type===v?'selected':''}>${v}</option>`).join("")}</select></div>
+      <div class="field"><label>ประเภทผลิตภัณฑ์</label><select id="f_product">${PRODUCT_TYPES.map(v=>`<option ${DRAFT.product===v?'selected':''}>${v}</option>`).join("")}</select></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>รุ่น (Sutee Model No.)</label><input id="f_model_no" value="${esc(DRAFT.model_no)}" placeholder="เช่น SPTS-42000-08A"></div>
+      <div class="field"><label>จำนวน Compartment</label><input id="f_n_comp" type="number" min="1" max="12" value="${DRAFT.n_comp}"></div>
+    </div>
+  </div>`;
+}
+function stepChecklist(){
+  const list = DRAFT.vehicle_type.includes("กึ่งพ่วง")?CHK_TRAILER:CHK_TRUCK;
+  if(DRAFT.checklist.length!==list.length) DRAFT.checklist=list.map(()=>"");
+  return `<div class="card">
+    <div class="guide-box">✓ <b>ขั้นที่ 2:</b> ตรวจระบบรถทีละข้อ กด ผ่าน/ไม่ผ่าน ให้ครบ (กันลัดขั้นตอน) — มีข้อ "ไม่ผ่าน" ระบบจะเตือนให้ส่งแจ้ง Sale ในขั้นสรุป</div>
+    ${list.map((d,i)=>`
+      <div class="chk-item">
+        <div class="no">${i+1}</div><div class="desc">${esc(d)}</div>
+        <div class="seg" data-i="${i}">
+          <button data-v="ok" class="${DRAFT.checklist[i]==='ok'?'on-ok':''}">ผ่าน</button>
+          <button data-v="bad" class="${DRAFT.checklist[i]==='bad'?'on-bad':''}">ไม่ผ่าน</button>
+        </div>
+      </div>`).join("")}
+    <div style="margin-top:12px">${photoBlock("chk_photos","📷 รูปประกอบการตรวจระบบ (ถ้ามี)")}</div>
+  </div>`;
+}
+function stepTable(){
+  const n=DRAFT.n_comp;
+  if(DRAFT.comps.length!==n){
+    const a=Array.from({length:n},(_,i)=>DRAFT.comps[i]||blankCompartment());DRAFT.comps=a;
+  }
+  const cols=Array.from({length:n},(_,i)=>i);
+  const rowInput=(field,key)=>`<tr><td class="rowlabel">${field}</td>${cols.map(i=>`<td><input data-c="${i}" data-k="${key}" value="${esc(DRAFT.comps[i][key])}"></td>`).join("")}</tr>`;
+  return `<div class="card">
+    <div class="guide-box">💧 <b>ขั้นที่ 3:</b> กรอกข้อมูลวัดน้ำทีละช่อง — U=ระยะแป้นถึงฝาบน, ก้นถึงแป้น, H=ก้นถึงฝาบน, Void ≥ 227 ลิตร, เลขซีลแป้น/ฝา (ตาม template PDF)</div>
+    <div class="tbl-scroll"><table class="data">
+      <tr><th class="rowlabel">ช่องที่ (Compartment)</th>${cols.map(i=>`<th>${i+1}</th>`).join("")}</tr>
+      ${rowInput("ปริมาตร (ลิตร)","vol")}
+      ${rowInput("ระยะแป้นถึงฝาบน U (มม.)","u_top")}
+      ${rowInput("ระยะก้นถึงแป้น (มม.)","bot_top")}
+      ${rowInput("ระยะก้นถึงฝาบน H (มม.)","h")}
+      ${rowInput("ความจุ Void ≥227L","void_l")}
+      ${rowInput("เลขซีลแป้นวัดน้ำ","seal_plate")}
+      ${rowInput("เลขซีลฝาถัง","seal_cap")}
+    </table></div>
+    <div style="margin-top:14px">${photoBlock("plate_photos","📷 รูปติดตั้งแป้นวัดน้ำ (ทุกช่อง)")}</div>
+  </div>`;
+}
+function stepPhotos(key,title,hint){
+  return `<div class="card"><div class="guide-box">📷 <b>${title}</b><br>${hint}</div>${photoBlock(key,title)}</div>`;
+}
+function photoBlock(key,title){
+  const arr=DRAFT[key]||[];
+  return `<div><div class="muted">${esc(title)}</div>
+    <div class="photo-grid" data-pk="${key}">
+      ${arr.map((u,i)=>`<div class="photo-cell"><img src="${esc(u)}"><button class="del" data-del="${i}">×</button></div>`).join("")}
+      <label class="photo-cell"><span class="add">＋</span><input type="file" accept="image/*" capture="environment" style="display:none" data-add="${key}"></label>
+    </div>
+    <div class="up-note">${DEMO||CONFIG.IMGBB_KEY.startsWith("YOUR_")?'⚠️ โหมดทดลอง: รูปเก็บในเครื่องชั่วคราว (ของจริงจะเก็บที่ IMGBB)':'รูปจะอัปโหลดไป IMGBB อัตโนมัติ'}</div>
+  </div>`;
+}
+function stepSummary(){
+  const fails=DRAFT.checklist.filter(x=>x==='bad').length;
+  return `<div class="card">
+    <div class="guide-box">🏁 <b>ขั้นที่ 6:</b> สรุปผลและบันทึก — ระบบจะออกเลขเอกสารอัตโนมัติ และบันทึกว่าใครเป็นผู้ทำรายงาน (${esc(USER.name)})</div>
+    ${fails>0?`<div class="banner" style="background:#fef2f2;border:1px solid #fca5a5;color:#991b1b">⚠️ พบรายการ "ไม่ผ่าน" ${fails} ข้อ — แนะนำเลือกผล "ต้องแก้ไข" และกดส่งแจ้งกลุ่ม Sale</div>`:''}
+    <div class="field"><label>ผลการตรวจสอบ (Conclusion)</label>
+      <select id="f_conclusion">
+        <option value="pass" ${DRAFT.conclusion==='pass'?'selected':''}>ผ่าน (ACCEPT)</option>
+        <option value="needs_fix" ${DRAFT.conclusion==='needs_fix'?'selected':''}>ต้องแก้ไขก่อน (แจ้ง Sale)</option>
+        <option value="fail" ${DRAFT.conclusion==='fail'?'selected':''}>ไม่ผ่าน (UN ACCEPT)</option>
+      </select>
+    </div>
+    <div class="field"><label>หมายเหตุ / รายละเอียดที่ต้องแก้ไข</label><textarea id="f_remark" rows="3">${esc(DRAFT.remark)}</textarea></div>
+    <div class="muted">ผู้ตรวจสอบ (QC Inspector): <b>${esc(USER.name)}</b> • วันที่: ${DRAFT.measure_date}</div>
+  </div>`;
+}
+
+function bindStep(){
+  // job fields
+  document.querySelectorAll("#stepbody input,#stepbody select,#stepbody textarea").forEach(el=>{
+    if(el.type==="file") return;
+    el.addEventListener("change",()=>collectStep());
+  });
+  // checklist segments
+  document.querySelectorAll(".seg").forEach(seg=>{
+    seg.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{
+      const i=+seg.dataset.i, v=btn.dataset.v;
+      DRAFT.checklist[i]=v;
+      seg.querySelectorAll("button").forEach(b=>{b.classList.remove("on-ok","on-bad");});
+      btn.classList.add(v==='ok'?'on-ok':'on-bad');
+    });
+  });
+  // table inputs
+  document.querySelectorAll('table.data input').forEach(inp=>{
+    inp.addEventListener("input",()=>{DRAFT.comps[+inp.dataset.c][inp.dataset.k]=inp.value;});
+  });
+  // photo add
+  document.querySelectorAll('input[data-add]').forEach(inp=>{
+    inp.onchange=async e=>{
+      const f=e.target.files[0]; if(!f) return;
+      const key=inp.dataset.add; toast("กำลังอัปโหลดรูป...");
+      try{const url=await uploadImage(f);(DRAFT[key]=DRAFT[key]||[]).push(url);drawStep();}
+      catch(err){toast("อัปโหลดไม่สำเร็จ");}
+    };
+  });
+  document.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.onclick=()=>{const grid=btn.closest('.photo-grid');const key=grid.dataset.pk;DRAFT[key].splice(+btn.dataset.del,1);drawStep();};
+  });
+}
+function collectStep(){
+  if(CUR===0){
+    DRAFT.job_type=gv("f_job_type");DRAFT.job_no=gv("f_job_no");DRAFT.measure_date=gv("f_measure_date");
+    DRAFT.customer=gv("f_customer");DRAFT.address=gv("f_address");DRAFT.plate_head=gv("f_plate_head");
+    DRAFT.plate_tank=gv("f_plate_tank");DRAFT.chassis_head=gv("f_chassis_head");DRAFT.chassis_tank=gv("f_chassis_tank");
+    DRAFT.capacity=gv("f_capacity");DRAFT.vehicle_type=gv("f_vehicle_type");DRAFT.product=gv("f_product");
+    DRAFT.model_no=gv("f_model_no");DRAFT.n_comp=Math.max(1,Math.min(12,+gv("f_n_comp")||8));
+  }
+  if(CUR===5){DRAFT.conclusion=gv("f_conclusion");DRAFT.remark=gv("f_remark");}
+}
+function validateStep(){
+  collectStep();
+  if(CUR===0){
+    if(!DRAFT.customer.trim()){toast("กรุณากรอกชื่อลูกค้า");return false;}
+  }
+  if(CUR===1){
+    if(DRAFT.checklist.some(x=>!x)){toast("กรุณาตรวจให้ครบทุกข้อ (กันลัดขั้นตอน)");return false;}
+  }
+  return true;
+}
+function stepPrev(){ if(CUR>0){CUR--;drawStepper();drawStep();window.scrollTo(0,0);} }
+function stepNext(){
+  if(!validateStep()) return;
+  if(CUR<STEPS.length-1){CUR++;drawStepper();drawStep();window.scrollTo(0,0);}
+  else saveDraft();
+}
+async function saveDraft(){
+  collectStep();
+  toast("กำลังบันทึก...");
+  const status=DRAFT.conclusion;
+  const rec={
+    job_type:DRAFT.job_type, job_no:DRAFT.job_no,
+    customer:DRAFT.customer, address:DRAFT.address,
+    plate_head:DRAFT.plate_head, plate_tank:DRAFT.plate_tank,
+    chassis_head:DRAFT.chassis_head, chassis_tank:DRAFT.chassis_tank,
+    capacity:DRAFT.capacity, vehicle_type:DRAFT.vehicle_type, product:DRAFT.product,
+    model_no:DRAFT.model_no, measure_date:DRAFT.measure_date, location:DRAFT.location,
+    status, created_by:USER.name,
+    data:{
+      n_comp:DRAFT.n_comp, comps:DRAFT.comps, checklist:DRAFT.checklist,
+      chk_photos:DRAFT.chk_photos, plate_photos:DRAFT.plate_photos,
+      seal_photos:DRAFT.seal_photos, chassis_photos:DRAFT.chassis_photos,
+      conclusion:DRAFT.conclusion, remark:DRAFT.remark
+    }
+  };
+  let saved;
+  try{ saved=await DB.saveReport(rec); }
+  catch(e){ return toast("บันทึกไม่สำเร็จ — เช็คการเชื่อมต่อ Google Sheets"); }
+  if(status==='needs_fix'||status==='fail') alertSale(saved);
+  DRAFT=null;
+  toast("บันทึกสำเร็จ: "+saved.doc_no);
+  go("detail",saved.id);
+}
+function alertSale(rec){
+  // V1: เปิดข้อความเตรียมส่งกลุ่ม Sale (เฟสหน้าจะต่อ Line Messaging API อัตโนมัติ)
+  const msg=`🔧 แจ้งงานต้องแก้ไข\nเลขเอกสาร: ${rec.doc_no}\nลูกค้า: ${rec.customer}\nทะเบียน: ${rec.plate_tank}\nรายละเอียด: ${rec.data?rec.data.remark:rec.remark||'-'}\nผู้ตรวจ: ${USER.name}`;
+  if(navigator.share){navigator.share({title:"แจ้งกลุ่ม Sale",text:msg}).catch(()=>{});}
+  else{navigator.clipboard?.writeText(msg);toast("คัดลอกข้อความแจ้ง Sale แล้ว — วางในกลุ่ม Line ได้เลย");}
+}
+
+/* ---------- Search ---------- */
+function SearchView(){
+  $("#page").innerHTML=`
+    <div class="crumb" onclick="go('home')">← หน้าหลัก</div>
+    <h1>🔍 ค้นหารายงานวัดน้ำ</h1>
+    <div class="row" style="margin-top:8px">
+      <input id="q" class="field" style="flex:1" placeholder="พิมพ์ เลขเอกสาร / ชื่อลูกค้า / ทะเบียน / Job">
+      <button class="btn" onclick="runSearch()">ค้นหา</button>
+    </div>
+    <div id="results"><p class="muted">กำลังโหลด...</p></div>`;
+  $("#q").addEventListener("keydown",e=>{if(e.key==="Enter")runSearch();});
+  runSearch();
+}
+async function runSearch(){
+  const q=$("#q")?$("#q").value.trim():"";
+  const rows=await DB.searchReports(q);
+  $("#results").innerHTML = rows.length? rows.map(r=>`
+    <div class="rep-item" onclick="go('detail',${JSON.stringify(r.id)})">
+      <div style="flex:1">
+        <div class="docno">${esc(r.doc_no)}</div>
+        <div class="muted">${esc(r.customer)} • ทะเบียน ${esc(r.plate_tank||'-')} • ${esc(r.measure_date||'')}</div>
+        <div class="muted">โดย ${esc(r.created_by)} • ปริ้น ${r.print_count||0} ครั้ง</div>
+      </div>
+      ${statusPill(r.status)}
+    </div>`).join("") : '<p class="muted">ไม่พบรายงาน</p>';
+}
+
+/* ---------- Detail + print (แบ่งหน้า มีผู้จัดทำ/วันที่/เลขหน้าทุกหน้า) ---------- */
+async function DetailView(id){
+  const r=await DB.getReport(id);
+  if(!r){$("#page").innerHTML='<p>ไม่พบรายงาน</p>';return;}
+  const d=r.data||{};
+  const logs=await DB.printLogs(id);
+  const comp=(d.comps||[]);
+  const maker=esc(r.created_by||"-");
+  const cdate=r.created_at? new Date(r.created_at).toLocaleDateString('th-TH') : (r.measure_date||"-");
+  const chkList=(r.vehicle_type||"").includes("กึ่งพ่วง")?CHK_TRAILER:CHK_TRUCK;
+
+  const pages=[];
+  // หน้า: ข้อมูลทั่วไป + ตารางวัดน้ำ
+  pages.push(`
+    <h2>ข้อมูลทั่วไป</h2>
+    <div class="row">
+      <div style="flex:1;min-width:200px">
+        <div><b>ลูกค้า:</b> ${esc(r.customer)}</div>
+        <div><b>ที่อยู่:</b> ${esc(r.address||'-')}</div>
+        <div><b>Job:</b> ${esc(r.job_type)} ${esc(r.job_no||'')}</div>
+        <div><b>วันที่วัดน้ำ:</b> ${esc(r.measure_date||'-')}</div>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <div><b>ทะเบียนหัว/แท็งก์:</b> ${esc(r.plate_head||'-')} / ${esc(r.plate_tank||'-')}</div>
+        <div><b>คัสซีหัว/หาง:</b> ${esc(r.chassis_head||'-')} / ${esc(r.chassis_tank||'-')}</div>
+        <div><b>ความจุ:</b> ${esc(r.capacity||'-')} ลิตร • ${esc(r.product||'')}</div>
+        <div><b>ประเภทรถ:</b> ${esc(r.vehicle_type||'-')} • รุ่น ${esc(r.model_no||'-')}</div>
+      </div>
+    </div>
+    <h2 style="margin-top:14px">ข้อมูลการวัดน้ำ</h2>
+    <div class="tbl-scroll"><table class="data">
+      <tr><th class="rowlabel">ช่องที่</th>${comp.map((_,i)=>`<th>${i+1}</th>`).join("")}</tr>
+      <tr><td class="rowlabel">ปริมาตร (ลิตร)</td>${comp.map(c=>`<td>${esc(c.vol)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">U (มม.)</td>${comp.map(c=>`<td>${esc(c.u_top)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">ก้นถึงแป้น (มม.)</td>${comp.map(c=>`<td>${esc(c.bot_top)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">H (มม.)</td>${comp.map(c=>`<td>${esc(c.h)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">Void (L)</td>${comp.map(c=>`<td>${esc(c.void_l)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">ซีลแป้น</td>${comp.map(c=>`<td>${esc(c.seal_plate)}</td>`).join("")}</tr>
+      <tr><td class="rowlabel">ซีลฝา</td>${comp.map(c=>`<td>${esc(c.seal_cap)}</td>`).join("")}</tr>
+    </table></div>`);
+  // หน้า: checklist + หมายเหตุ
+  if((d.checklist||[]).length){
+    pages.push(`<h2>ผลการตรวจเช็คระบบ</h2>`+
+      d.checklist.map((v,i)=>`<div class="chk-item"><div class="no">${i+1}</div><div class="desc">${esc(chkList[i]||'')}</div>${v==='ok'?'<span class="pill ok">ผ่าน</span>':v==='bad'?'<span class="pill bad">ไม่ผ่าน</span>':'<span class="pill draft">-</span>'}</div>`).join("")+
+      (d.remark?`<div class="guide-box" style="margin-top:12px"><b>หมายเหตุ/สิ่งที่ต้องแก้ไข:</b> ${esc(d.remark)}</div>`:''));
+  }
+  // หน้า: รูปแต่ละชุด
+  const pphoto=(t,a)=>{a=a||[];return a.length?`<h2>${esc(t)}</h2><div class="photo-grid">${a.map(u=>`<div class="photo-cell"><img src="${esc(u)}"></div>`).join("")}</div>`:null;};
+  [["รูปติดตั้งแป้นวัดน้ำ",d.plate_photos],["จุดร้อยซีล + เช็คลมยาง",d.seal_photos],["Chassis / Name Plate",d.chassis_photos],["รูปตรวจระบบ",d.chk_photos]]
+    .forEach(p=>{const h=pphoto(p[0],p[1]);if(h)pages.push(h);});
+
+  const total=pages.length;
+  const head=`<div class="page-head">
+      <div><div class="t1">SUTEE TANKERS</div><div class="muted">REPORT การวัดน้ำ</div></div>
+      <div style="text-align:right"><div class="docno" style="font-size:18px">${esc(r.doc_no)}</div>${statusPill(r.status)}</div>
+    </div>`;
+  const foot=n=>`<div class="page-foot"><div>ผู้จัดทำ: <b>${maker}</b></div><div>วันที่จัดทำ: ${cdate}</div><div>หน้า ${n} / ${total}</div></div>`;
+  const pagesHtml=pages.map((c,i)=>`<div class="page">${head}<div class="page-body">${c}</div>${foot(i+1)}</div>`).join("");
+
+  $("#page").innerHTML=`
+    <div class="crumb no-print" onclick="go('search')">← กลับการค้นหา</div>
+    <div id="printable">${pagesHtml}</div>
+    <div class="card no-print">
+      <div class="row" style="align-items:center">
+        <button class="btn" onclick="doPrint(${JSON.stringify(r.id)})">🖨️ สั่งพิมพ์</button>
+        ${(r.status==='needs_fix'||r.status==='fail')?`<button class="btn sec" onclick='reAlert(${JSON.stringify(r)})'>📣 แจ้งกลุ่ม Sale</button>`:''}
+        <div style="flex:1"></div>
+        <div class="muted">ปริ้นไปแล้ว <b>${r.print_count||0}</b> ครั้ง${r.last_printed_by?` • ล่าสุดโดย ${esc(r.last_printed_by)}`:''}</div>
+      </div>
+      ${logs.length?`<div style="margin-top:10px"><b>ประวัติการพิมพ์</b>${logs.map(l=>`<div class="muted">• ${esc(l.printed_by)} — ${new Date(l.printed_at).toLocaleString('th-TH')}</div>`).join("")}</div>`:''}
+    </div>`;
+}
+function photoView(title,arr){
+  arr=arr||[];if(!arr.length) return "";
+  return `<h2 style="margin-top:16px">${esc(title)}</h2><div class="photo-grid">${arr.map(u=>`<div class="photo-cell"><img src="${esc(u)}"></div>`).join("")}</div>`;
+}
+async function doPrint(id){
+  await DB.logPrint(id,USER.name);
+  toast("บันทึกการพิมพ์โดย "+USER.name);
+  setTimeout(()=>window.print(),300);
+}
+function reAlert(r){ alertSale(r); }
+
+/* ============================================================
+   5) start
+   ============================================================ */
+render("home");
+</script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
