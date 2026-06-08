@@ -173,7 +173,7 @@ const T = {
   printBtn:{th:"🖨️ พิมพ์ / บันทึก PDF",en:"🖨️ Print / Save PDF"},
   searchTitle:{th:"🔍 ค้นหารายงานวัดน้ำ",en:"🔍 Search reports"},howtoH1:{th:"📖 คู่มือการวัดน้ำ",en:"📖 Guide"},howtoStart:{th:"เริ่มทำใบวัดน้ำ →",en:"Start →"},
   newTitle:{th:"➕ ใบวัดน้ำ",en:"➕ Gauging report"},cancel:{th:"← ยกเลิก",en:"← Cancel"},
-  step_job:{th:"ข้อมูลงาน",en:"Job info"},step_check:{th:"ตรวจเช็ค",en:"Inspection"},step_table:{th:"ตารางวัดน้ำ",en:"Gauging"},step_seal:{th:"ซีล+ลมยาง",en:"Seal+Tire"},step_chassis:{th:"Chassis",en:"Chassis"},step_summary:{th:"สรุป+บันทึก",en:"Summary"},
+  step_job:{th:"ข้อมูลงาน",en:"Job info"},step_check:{th:"ตรวจเช็ค",en:"Inspection"},step_precheck:{th:"ตรวจ 1-8",en:"Check 1-8"},step_postcheck:{th:"ตรวจ 9-12",en:"Check 9-12"},step_table:{th:"ตารางวัดน้ำ",en:"Gauging"},step_seal:{th:"ซีล+ลมยาง",en:"Seal+Tire"},step_chassis:{th:"Chassis",en:"Chassis"},step_summary:{th:"สรุป+บันทึก",en:"Summary"},
   needName:{th:"กรุณากรอกชื่อลูกค้า",en:"Enter customer name"},needSA:{th:"กรุณากรอกเลข Serial No. (S/N)",en:"Enter Serial No. (S/N)"},needChk:{th:"กรุณาเลือกผลให้ครบทุกข้อ",en:"Answer every item"},
   liveOnly:{th:"❌ ต้องถ่ายสดเท่านั้น (ห้ามใช้รูปเก่า)",en:"❌ Live photo only"},saving:{th:"กำลังบันทึก...",en:"Saving..."},uploading:{th:"กำลังอัปโหลดรูป...",en:"Uploading..."},
   previewBtn:{th:"👁️ ดูตัวอย่าง PDF",en:"👁️ Preview PDF"},backEdit:{th:"← กลับไปแก้ไข",en:"← Back to edit"},
@@ -278,13 +278,13 @@ function rerender(){ if(!USER) LoginView(); else go(CURVIEW,CURARG); }
 function render(view,arg){ if(!USER){ return LoginView(); } Shell(view,arg); }
 function roleLabel(){ return USER.role==='admin'?t('roleAdmin'):(USER.role==='lead'?t('roleLead'):t('roleStaff')); }
 function Shell(view,arg){
-  root().innerHTML=`<div class="appbar"><div class="logo"><span class="mark">STT</span> QC SYSTEM</div><div class="spacer"></div>${langBar(false)}<div class="who">${esc(USER.name)}<br><span style="opacity:.8">${roleLabel()}</span></div><button class="ghost" onclick="logout()">${t('logout')}</button></div><div class="wrap" id="page"></div>`;
+  root().innerHTML=`<div class="appbar"><div class="logo"><span class="mark">STT</span> QC SYSTEM</div><div class="spacer"></div><div class="who">${esc(USER.name)}<br><span style="opacity:.8">${roleLabel()}</span></div><button class="ghost" onclick="logout()">${t('logout')}</button></div><div class="wrap" id="page"></div>`;
   const v={home:HomeView,howto:HowtoView,new:NewReportView,search:SearchView,detail:DetailView,review:ReviewView}[view]||HomeView;
   v(arg);
 }
 function logout(){ USER=null; LS.set("session",null); go("home"); }
 function LoginView(){
-  root().innerHTML=`<div class="login-wrap"><div class="login-card"><div class="brand"><div class="mark">SUTEE</div><div class="sub">${t('loginSub')}</div></div><div style="display:flex;justify-content:center;margin-bottom:12px">${langBar(true)}</div>${DEMO?'<div class="banner demo">⚠️ โหมดทดลอง — แอดมิน 1234 • หัวหน้า "นายวสันต์ ไชยวุฒิ"/6902003 • พนักงาน "พนักงาน ทดสอบ"/0000</div>':''}<div class="field"><label>${t('loginName')}</label><input id="lg-name" list="emp-list" autocomplete="off"><datalist id="emp-list"></datalist></div><div class="field"><label>${t('loginPin')}</label><input id="lg-pin" type="password" inputmode="numeric"></div><button class="btn block" style="margin-top:6px" onclick="doLogin()">${t('loginBtn')}</button><p class="up-note" style="margin-top:10px">${t('loginHint')}</p></div></div>`;
+  root().innerHTML=`<div class="login-wrap"><div class="login-card"><div class="brand"><div class="mark">SUTEE</div><div class="sub">${t('loginSub')}</div></div>${DEMO?'<div class="banner demo">⚠️ โหมดทดลอง — แอดมิน 1234 • หัวหน้า "นายวสันต์ ไชยวุฒิ"/6902003 • พนักงาน "พนักงาน ทดสอบ"/0000</div>':''}<div class="field"><label>${t('loginName')}</label><input id="lg-name" list="emp-list" autocomplete="off"><datalist id="emp-list"></datalist></div><div class="field"><label>${t('loginPin')}</label><input id="lg-pin" type="password" inputmode="numeric"></div><button class="btn block" style="margin-top:6px" onclick="doLogin()">${t('loginBtn')}</button><p class="up-note" style="margin-top:10px">${t('loginHint')}</p></div></div>`;
   DB.employeeNames().then(names=>{const el=document.getElementById("emp-list");if(el)el.innerHTML=(names||[]).map(n=>`<option value="${esc(n)}">`).join("");}).catch(()=>toast("โหลดรายชื่อไม่ได้"));
   document.getElementById("lg-pin").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
 }
@@ -311,7 +311,7 @@ function HowtoView(){
 let DRAFT=null, CUR=0, STEPS=[];
 function blankComp(){return{vol1:"",vol2:"",u1:"",u2:"",bot1:"",bot2:"",h:"",void_l:"",seal_plate:"",seal_cap:"STT",ph_lv1:"",ph_lv2:"",ph_seal:"",ph_name:""};}
 function blankChk(){return{st:"",fd:"",fdate:"",fby:""};}
-function buildSteps(){ STEPS=[{key:"job",ic:"📋"},{key:"check",ic:"✓"},{key:"table",ic:"💧"},{key:"seal",ic:"🔒"},{key:"chassis",ic:"🚛"},{key:"summary",ic:"🏁"}]; }
+function buildSteps(){ STEPS=[{key:"job",ic:"📋"},{key:"precheck",ic:"✓"},{key:"table",ic:"💧"},{key:"seal",ic:"🔒"},{key:"chassis",ic:"🚛"},{key:"postcheck",ic:"☑️"},{key:"summary",ic:"🏁"}]; }
 function newDraft(){ return {id:null,doc_no:null,job_type:"JM",sa:"",job_no:"",measure_date:new Date().toISOString().slice(0,10),customer:"",address:"",plate_head:"",plate_tank:"",chassis_head:"",chassis_tank:"",capacity:"",vehicle_type:VEHICLE_TYPES[0],product:PRODUCT_TYPES[0],model_no:"",tank_origin:TANK_ORIGINS[0],conditions:[],location:"บริษัท สุธี แท็งเกอร์",n_comp:8,comps:Array.from({length:8},blankComp),checklist:CHK_FM.map(blankChk),seal_slots:{},chassis_slots:{},conclusion:"pass",remark:"",history:[],review_photos:{},reviewer:"",review_status:"",review_date:"",_editLog:false,_wasReviewed:false}; }
 function NewReportView(){
   if(!DRAFT){ DRAFT=newDraft(); CUR=0; }
@@ -327,7 +327,8 @@ function drawStep(){
   $("#btnPrev").style.visibility=CUR===0?"hidden":"visible";
   $("#btnNext").textContent=CUR===STEPS.length-1?t('saveBtn'):t('next');
   if(k==="job") b.innerHTML=stepJob();
-  else if(k==="check") b.innerHTML=stepChecklist();
+  else if(k==="precheck") b.innerHTML=stepChecklist(0,CHK_PRE,'pre');
+  else if(k==="postcheck") b.innerHTML=stepChecklist(CHK_PRE,CHK_FM.length,'post');
   else if(k==="table") b.innerHTML=stepTable();
   else if(k==="seal") b.innerHTML=stepSlots("seal_slots",SEAL_SLOTS,"🔒 จุดร้อยซีล + เช็คลมยาง / Seals + tire","ถ่ายให้ครบตามหัวข้อ (ตามข้อกำหนด)");
   else if(k==="chassis") b.innerHTML=stepSlots("chassis_slots",CHASSIS_SLOTS,"🚛 Chassis / Name Plate","ถ่าย: หน้ารถ, ท้ายรถ, เลขคัสซี, เนมเพลท");
@@ -359,11 +360,16 @@ async function lookupVehicle(){
   ["customer","address","plate_head","plate_tank","chassis_head","chassis_tank","capacity","vehicle_type","product","model_no","tank_origin"].forEach(k=>{ if(v[k]) DRAFT[k]=v[k]; });
   drawStep(); toast("ดึงข้อมูลรถสำเร็จ / Loaded");
 }
-function stepChecklist(){
+function stepChecklist(start,end,phase){
   if(DRAFT.checklist.length!==CHK_FM.length) DRAFT.checklist=CHK_FM.map(blankChk);
-  return `<div class="card"><div class="guide-box">✓ <b>ตรวจเช็ค (FM-SAL-0102):</b> ข้อ 1-8 ก่อนวัดน้ำ, ข้อ 9-12 หลังวัดน้ำ — ติ๊ก ผ่าน / – / ไม่ผ่าน • ถ้า "ไม่ผ่าน" กรอกวันที่+ชื่อผู้แก้ไข</div>
-    ${CHK_FM.map((d,i)=>{ const it=DRAFT.checklist[i]; return `${i===0?`<div class="grp">${t('preGauge')}</div>`:''}${i===CHK_PRE?`<div class="grp">${t('postGauge')}</div>`:''}<div class="chk-item"><div class="no">${i+1}</div><div class="desc">${esc(d)}${it.st==='fail'?`<div class="fixbox"><input data-chk="${i}" data-fk="fd" placeholder="${t('fixDetail')}" value="${esc(it.fd)}"><input type="date" data-chk="${i}" data-fk="fdate" value="${esc(it.fdate)}"><input data-chk="${i}" data-fk="fby" placeholder="${t('fixBy')}" value="${esc(it.fby)}"></div>`:''}</div><div class="seg" data-i="${i}"><button data-v="pass" class="${it.st==='pass'?'on-ok':''}">${t('chkPass')}</button><button data-v="na" class="${it.st==='na'?'on-na':''}">${t('chkNA')}</button><button data-v="fail" class="${it.st==='fail'?'on-bad':''}">${t('chkFail')}</button></div></div>`; }).join("")}
-  </div>`;
+  const title = phase==='pre' ? 'ตรวจเช็คก่อนวัดน้ำ (ข้อ 1-8)' : 'ตรวจเช็คหลังวัดน้ำ (ข้อ 9-12)';
+  const note  = phase==='pre' ? 'ติ๊กข้อ 1-8 ให้ครบ แล้วกด "ถัดไป" เพื่อไปวัดน้ำ' : 'หลังวัดน้ำ/ติดตั้ง Name Plate เสร็จ ค่อยกลับมาติ๊กข้อ 9-12';
+  let rows='';
+  for(let i=start;i<end;i++){
+    const d=CHK_FM[i], it=DRAFT.checklist[i];
+    rows+=`<div class="chk-item"><div class="no">${i+1}</div><div class="desc">${esc(d)}${it.st==='fail'?`<div class="fixbox"><input data-chk="${i}" data-fk="fd" placeholder="${t('fixDetail')}" value="${esc(it.fd)}"><input type="date" data-chk="${i}" data-fk="fdate" value="${esc(it.fdate)}"><input data-chk="${i}" data-fk="fby" placeholder="${t('fixBy')}" value="${esc(it.fby)}"></div>`:''}</div><div class="seg" data-i="${i}"><button data-v="pass" class="${it.st==='pass'?'on-ok':''}">${t('chkPass')}</button><button data-v="na" class="${it.st==='na'?'on-na':''}">${t('chkNA')}</button><button data-v="fail" class="${it.st==='fail'?'on-bad':''}">${t('chkFail')}</button></div></div>`;
+  }
+  return `<div class="card"><div class="guide-box">✓ <b>${title} (FM-SAL-0102):</b> ${note} • ติ๊ก ผ่าน / – / ไม่ผ่าน • ถ้า "ไม่ผ่าน" กรอกวันที่+ชื่อผู้แก้ไข</div>${rows}</div>`;
 }
 function stepTable(){
   const n=DRAFT.n_comp;
@@ -416,7 +422,12 @@ function collectStep(){
 function validateStep(){
   collectStep(); const k=curKey();
   if(k==="job"){ if(!DRAFT.customer.trim()){toast(t('needName'));return false;} if(!DRAFT.sa.trim()){toast(t('needSA'));return false;} }
-  if(k==="check"){ if(DRAFT.checklist.some(x=>!x.st)){toast(t('needChk'));return false;} if(DRAFT.checklist.some(x=>x.st==='fail'&&(!x.fdate||!x.fby))){toast(t('needFix'));return false;} }
+  if(k==="precheck"||k==="postcheck"){
+    const s=k==="precheck"?0:CHK_PRE, e=k==="precheck"?CHK_PRE:CHK_FM.length;
+    for(let i=s;i<e;i++){ const x=DRAFT.checklist[i];
+      if(!x.st){toast(t('needChk'));return false;}
+      if(x.st==='fail'&&(!x.fdate||!x.fby)){toast(t('needFix'));return false;} }
+  }
   return true;
 }
 function stepPrev(){ if(CUR>0){CUR--;drawStepper();drawStep();window.scrollTo(0,0);} }
