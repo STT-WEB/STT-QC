@@ -259,7 +259,7 @@ const CHK_FM = [
 ];
 const CHK_PRE = 8;
 const COMP_EXTRA = [{k:"ph_seal",l:"รูปการตีซีล / Sealed"},{k:"ph_name",l:"Name Plate"}];
-const CHASSIS_SLOTS = ["รูปหน้ารถ / Front","รูปท้ายรถ / Rear","รูป Chassis (เลขคัสซี) / Chassis No.","รูปรถ 45° / 45° view","Name Plate"];
+const CHASSIS_SLOTS = ["หน้ารถ (เห็นป้ายทะเบียน) / Front","Chassis No. หัวรถ / Head chassis No.","ท้ายรถ (เห็นป้ายทะเบียน) / Rear","Chassis No. หาง / Tail chassis No.","รูปรถ 45° / 45° view","Name Plate"];
 const WATER_TERM = "การตรวจสอบการติดตั้งระยะแป้นวัดน้ำ ทางบริษัท สุธี แท็งเกอร์ฯ ขอรับรองการติดตั้งระบบ ภายในระยะเวลา 60 วัน หลังจากวันที่ออกเอกสารรับรองการติดตั้ง";
 const HOWTO = [
  {ic:"📄",t:"รับใบสั่งงาน / Receive work order",d:"รับใบ Inspector Work Request (FM-QC-3) หรือใบสั่งขาย แล้วลงคิววัดน้ำ"},
@@ -323,7 +323,7 @@ function render(view,arg){ if(!USER){ return LoginView(); } Shell(view,arg); }
 function roleLabel(){ return USER.role==='admin'?t('roleAdmin'):(USER.role==='lead'?t('roleLead'):t('roleStaff')); }
 function Shell(view,arg){
   root().innerHTML=`<div class="appbar"><div class="logo"><span class="mark">STT</span> QC SYSTEM</div><div class="spacer"></div><div class="who">${esc(USER.name)}<br><span style="opacity:.8">${roleLabel()}</span></div><button class="ghost" onclick="logout()">${t('logout')}</button></div><div class="wrap" id="page"></div>`;
-  const v={home:HomeView,howto:HowtoView,new:NewReportView,search:SearchView,detail:DetailView,review:ReviewView}[view]||HomeView;
+  const v={home:HomeView,howto:HowtoView,new:NewReportView,search:SearchView,detail:DetailView,review:ReviewView,approve:ApproveView}[view]||HomeView;
   v(arg);
 }
 function logout(){ USER=null; LS.set("session",null); go("home"); }
@@ -347,7 +347,8 @@ function HomeView(){
 }
 function openWater(){
   CURVIEW="water"; window.scrollTo(0,0);
-  $("#page").innerHTML=`<div class="crumb" onclick="go('home')">${t('backHome')}</div><h1>💧 ${t('modWater')}</h1><div class="tiles" style="margin-top:14px"><div class="tile active" onclick="go('new')"><div class="ic">➕</div><div class="nm">${t('newRep')}</div></div><div class="tile active" onclick="go('search')"><div class="ic">🔍</div><div class="nm">${t('searchRep')}</div></div><div class="tile active" onclick="go('howto')"><div class="ic">📖</div><div class="nm">${t('howtoTile')}</div></div></div>`;
+  $("#page").innerHTML=`<div class="crumb" onclick="go('home')">${t('backHome')}</div><h1>💧 ${t('modWater')}</h1><div class="tiles" style="margin-top:14px"><div class="tile active" onclick="go('new')"><div class="ic">➕</div><div class="nm">${t('newRep')}</div></div><div class="tile active" onclick="go('search')"><div class="ic">🔍</div><div class="nm">${t('searchRep')}</div></div>${canReview()?`<div class="tile active" onclick="go('approve')"><span class="tag pill warn" id="apvbadge"></span><div class="ic">✅</div><div class="nm">รอ Approve (หัวหน้า)</div></div>`:''}<div class="tile active" onclick="go('howto')"><div class="ic">📖</div><div class="nm">${t('howtoTile')}</div></div></div>`;
+  if(canReview()) DB.searchReports("").then(rows=>{ const n=(rows||[]).filter(r=>r.status!=='draft'&&r.review_status!=='accepted').length; const b=document.getElementById("apvbadge"); if(b&&n) b.textContent=n+" รอ"; }).catch(()=>{});
 }
 function HowtoView(){
   $("#page").innerHTML=`<div class="crumb" onclick="go('home')">${t('back')}</div><h1>${t('howtoH1')}</h1><div style="margin-top:14px">${HOWTO.map((h,i)=>`<div class="howto-step" onclick="this.classList.toggle('open')"><div class="hd"><div class="n">${i+1}</div><div style="font-size:20px">${h.ic}</div><b>${esc(h.t)}</b></div><div class="bd"><div style="font-size:14px">${esc(h.d)}</div><div class="up-note" style="margin-top:8px">📎 WI-QC-26</div></div></div>`).join("")}</div><button class="btn block" style="margin-top:10px" onclick="go('new')">${t('howtoStart')}</button>`;
@@ -370,7 +371,7 @@ function NewReportView(){
   $("#page").innerHTML=`<div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก? / Exit?')){DRAFT=null;go('home');}">${t('cancel')}</div><h1>${t('newTitle')}</h1><div id="docbanner"></div><div class="stepper" id="stepper"></div><div id="stepbody"></div><div class="row no-print" style="margin-top:16px"><button class="btn grey" id="btnPrev" onclick="stepPrev()">${t('prev')}</button><button class="btn sec" onclick="saveCore(false)">${t('saveDraftBtn')}</button><div style="flex:1"></div><button class="btn" id="btnNext" onclick="stepNext()">${t('next')}</button></div>`;
   refreshDocBanner(); drawStepper(); drawStep();
 }
-function refreshDocBanner(){ const el=document.getElementById("docbanner"); if(!el)return; el.innerHTML = (DRAFT&&DRAFT.doc_no)?`<div class="docnote">📄 ${t('docNoLabel')}: <b>${esc(DRAFT.doc_no)}</b></div>`:`<div class="docnote pending">📄 ${t('docNoNone')}</div>`; }
+function refreshDocBanner(){ const el=document.getElementById("docbanner"); if(!el)return; const info=(DRAFT&&(DRAFT.job_no||DRAFT.customer))?` <span class="muted" style="font-weight:600">• Job ${esc(DRAFT.job_no||'-')} • ${esc(DRAFT.customer||'-')}</span>`:''; el.innerHTML = (DRAFT&&DRAFT.doc_no)?`<div class="docnote">📄 ${t('docNoLabel')}: <b>${esc(DRAFT.doc_no)}</b>${info}</div>`:`<div class="docnote pending">📄 ${t('docNoNone')}${info}</div>`; }
 function drawStepper(){ $("#stepper").innerHTML=STEPS.map((s,i)=>`<div class="step ${i===CUR?'active':''} ${i<CUR?'done':''}" onclick="jumpStep(${i})"><div class="circ">${i<CUR?'✓':s.ic}</div><div class="lbl">${i+1}. ${t('step_'+s.key)}</div></div>`).join(""); }
 function jumpStep(i){ collectStep(); CUR=i; drawStepper(); drawStep(); window.scrollTo(0,0); }
 function camImgErr(img){ try{ img.style.display='none'; const s=document.createElement('span'); s.className='add'; s.style.fontSize='12px'; s.style.color='#16a34a'; s.textContent='✓ มีรูปแล้ว'; img.parentNode.appendChild(s); }catch(e){} }
@@ -384,9 +385,9 @@ function drawStep(){
   else if(k==="postcheck") b.innerHTML=stepChecklist(CHK_PRE,CHK_FM.length,'post');
   else if(k==="table") b.innerHTML=stepTable();
   else if(k==="seal") b.innerHTML=stepSlots("seal_slots",SEAL_SLOTS,"🔒 จุดร้อยซีล + เช็คลมยาง / Seals + tire","ถ่ายให้ครบตามหัวข้อ (ตามข้อกำหนด)");
-  else if(k==="chassis") b.innerHTML=stepSlots("chassis_slots",CHASSIS_SLOTS,"🚛 Chassis / Name Plate","ถ่าย: หน้ารถ, ท้ายรถ, เลขคัสซี, เนมเพลท");
+  else if(k==="chassis") b.innerHTML=stepSlots("chassis_slots",CHASSIS_SLOTS,"🚛 Chassis / Name Plate","ถ่าย 6 รูป: หน้ารถ(เห็นทะเบียน), Chassis No.หัว, ท้ายรถ(เห็นทะเบียน), Chassis No.หาง, รูป 45°, Name Plate");
   else if(k==="summary") b.innerHTML=stepSummary();
-  bindStep();
+  refreshDocBanner(); bindStep();
 }
 function gv(id){const e=document.getElementById(id);return e?e.value:"";}
 function stepJob(){
@@ -630,6 +631,20 @@ async function runSearch(){
   const q=$("#q")?$("#q").value.trim():"";
   let rows=[]; try{rows=await DB.searchReports(q);}catch(e){$("#results").innerHTML='<p class="muted">โหลดไม่ได้</p>';return;}
   $("#results").innerHTML = rows.length? rows.map(r=>`<div class="rep-item" onclick="openReport('${esc(String(r.id))}')"><div style="flex:1"><div class="docno">${esc(r.doc_no)} ${r.status==='draft'?`<span class="muted">— ${t('resume')}</span>`:''}</div><div class="muted">${esc(r.customer)} • ${esc(r.plate_tank||'-')} • Job ${esc(r.job_no||'-')} • SA ${esc(r.sa||'-')}</div><div class="muted">${esc(r.created_by)} • ปริ้น ${r.print_count||0} ${r.review_status?'• '+reviewPill(r.review_status):''}</div></div>${statusPill(r.status)}</div>`).join("") : `<p class="muted">${t('noReport')}</p>`;
+}
+async function ApproveView(){
+  if(!canReview()){ $("#page").innerHTML=`<div class="crumb" onclick="go('home')">${t('back')}</div><div class="card">เฉพาะหัวหน้า/แอดมินเท่านั้น</div>`; return; }
+  $("#page").innerHTML=`<div class="crumb" onclick="go('home')">${t('back')}</div><h1>✅ รอ Approve (หัวหน้า)</h1><p class="muted">รายงานที่ยังไม่ถูกอนุมัติ — กดเข้าไปตรวจ/Accept • Approve แล้วจะหายจากรายการนี้ (เก็บในฐานข้อมูล)</p><div class="row" style="margin-top:8px"><input id="aq" class="field" style="flex:1" placeholder="กรองในรายการ (เลขเอกสาร/ลูกค้า/ทะเบียน)"><button class="btn" onclick="runApprove()">${t('searchBtn')}</button></div><div id="aresults"><p class="muted">${t('loading')}</p></div>`;
+  const inp=document.getElementById("aq"); if(inp) inp.addEventListener("keydown",e=>{if(e.key==="Enter")runApprove();});
+  runApprove();
+}
+async function runApprove(){
+  const q=document.getElementById("aq")?document.getElementById("aq").value.trim().toLowerCase():"";
+  let rows=[]; try{ rows=await DB.searchReports(""); }catch(e){ const el=document.getElementById("aresults"); if(el)el.innerHTML='<p class="muted">โหลดไม่ได้</p>'; return; }
+  let pend=(rows||[]).filter(r=>r.status!=='draft' && r.review_status!=='accepted');
+  if(q) pend=pend.filter(r=>((r.doc_no||'')+" "+(r.customer||'')+" "+(r.plate_tank||'')+" "+(r.job_no||'')).toLowerCase().indexOf(q)>=0);
+  const el=document.getElementById("aresults"); if(!el) return;
+  el.innerHTML = pend.length? pend.map(r=>`<div class="rep-item" onclick="go('review','${esc(String(r.id))}')"><div style="flex:1"><div class="docno">${esc(r.doc_no)}</div><div class="muted">${esc(r.customer)} • ${esc(r.plate_tank||'-')} • Job ${esc(r.job_no||'-')}</div><div class="muted">ผู้จัดทำ ${esc(r.created_by)}</div></div>${reviewPill(r.review_status||'')}</div>`).join("") : `<p class="muted">✅ ไม่มีรายการรอ Approve แล้ว</p>`;
 }
 async function openReport(id){
   let r; try{r=await DB.getReport(id);}catch(e){return toast("โหลดไม่ได้");}
