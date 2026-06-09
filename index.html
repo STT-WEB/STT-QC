@@ -234,7 +234,7 @@ const TANK_ORIGINS = ["STT ผลิต / STT-made","ผลิตจากบร
 const VEHICLE_TYPES = ["รถกึ่งพ่วง (Semi-Trailer)","รถสิบล้อ (10-wheel)","รถหกล้อ (6-wheel)"];
 const PRODUCT_TYPES = ["Petroleum (น้ำมัน)","Chemical (เคมี)"];
 const WATER_CONDITIONS = ["รถใหม่ / New","ครบกำหนด 3 ปี / 3-year due","ผ่านการขนส่งผลิตภัณฑ์ / Used","Chemical","Petroleum","Truck (10/6 ล้อ)","Semi-Trailer","ไม่มีประวัติการสร้าง / No build history"];
-const SEAL_SLOTS = ["ซีลแป้นวัดน้ำ / Gauge plate seal","ซีลฝา Manhole / Manhole seal","ซีล Over fill","ซีล Pressure relief valve","ซีลหลอดแก้วลูกลอยหัว API / API float glass","ซีลหลอดแก้วลูกลอยหัว Vapor / Vapor float glass","ร้อยซีล PV Vent"];
+const SEAL_SLOTS = ["ร้อยซีลแป้นวัดน้ำ / Gauge plate","ร้อยซีลฝา Manhole","ร้อยซีล Overfill","ร้อยซีลลูกลอยบริเวณหัว API","ร้อยซีลหลอดแก้วลูกลอยหัว Vapor","ร้อยซีลก้านริเวอลิ่ง / Riveting rod","ร้อยซีล Emergency Valve (ก้น Tank)","ร้อยซีล PV Vent"];
 const CHK_FM = [
  {no:"1",txt:"ตรวจเช็คแรงดันลมยางไม่ต่ำกว่า 120 PSI",photo:true},
  {no:"2",txt:"ทดสอบการทำงานของลม Control And Supply"},
@@ -247,11 +247,12 @@ const CHK_FM = [
  {no:"9",txt:"ร้อยซีลจุดต่างๆ ตามข้อกำหนด"},
  {no:"9.1",txt:"ร้อยซีลแป้นวัดน้ำ"},
  {no:"9.2",txt:"ร้อยซีลฝา Manhole"},
- {no:"9.3",txt:"ร้อยซีล Over fill"},
- {no:"9.4",txt:"ร้อยซีล Pressure relief valve"},
- {no:"9.5",txt:"ร้อยซีลหลอดแก้วลูกลอยหัว API"},
- {no:"9.6",txt:"ร้อยซีลหลอดแก้วลูกลอยหัว Vapor"},
- {no:"9.7",txt:"ร้อยซีล PV Vent"},
+ {no:"9.3",txt:"ร้อยซีล Overfill"},
+ {no:"9.4",txt:"ร้อยซีลลูกลอยบริเวณหัว API"},
+ {no:"9.5",txt:"ร้อยซีลหลอดแก้วลูกลอยหัว Vapor"},
+ {no:"9.6",txt:"ร้อยซีลก้านริเวอลิ่ง"},
+ {no:"9.7",txt:"ร้อยซีล Emergency Valve (ก้น Tank)"},
+ {no:"9.8",txt:"ร้อยซีล PV Vent"},
  {no:"10",txt:"ล้างภายในพร้อมเช็คให้แห้ง"},
  {no:"11",txt:"อัดแรงดันเข้าภายในแทงก์เพื่อไล่น้ำออก"},
  {no:"12",txt:"ติดตั้ง Name Plate วัดน้ำ"}
