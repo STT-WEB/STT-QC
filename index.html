@@ -807,7 +807,7 @@ function buildReportPages(r){
   const blankDate='วันที่ ......./......./.......';
   const sbox=(role,nm,dateText)=>`<div class="sign-box"><div class="sign-line">${role}</div><div class="sign-nm"></div><div class="sign-paren">${nm?('( '+nm+' )'):'( ............................. )'}</div><div class="sign-date">${dateText}</div></div>`;
   const ldate = d.review_date? new Date(d.review_date).toLocaleDateString('th-TH') : '';
-  chkHtml+=`<div class="sign-block keep"><div class="sign-row">${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)',insp1,'วันที่ '+cdate)}${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)',insp2,insp2?('วันที่ '+cdate):blankDate)}</div><div class="sign-row">${sbox('หัวหน้าตรวจสอบ Report และกระบวนการ (QC Lead)',esc(d.reviewer||''),ldate?('วันที่ '+ldate):blankDate)}${sbox('ผู้ร่วมตรวจสอบ (Witnessed by)','',blankDate)}</div><div class="sign-row">${sbox('ผู้รับรอง (Approved by)','',blankDate)}</div></div>`;
+  chkHtml+=`<div class="sign-block keep"><div class="sign-row">${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)',insp1,'วันที่ '+cdate)}${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)',insp2,insp2?('วันที่ '+cdate):blankDate)}${sbox('หัวหน้าตรวจสอบ Report และกระบวนการ (QC Lead)',esc(d.reviewer||''),ldate?('วันที่ '+ldate):blankDate)}</div><div class="sign-row">${sbox('ผู้ร่วมตรวจสอบ (Witnessed by)','',blankDate)}${sbox('ผู้รับรอง (Approved by)','',blankDate)}</div></div>`;
   // ===== ภายใน (ไม่พิมพ์): ประวัติ/Tracking =====
   if(d.reviewer || (d.history&&d.history.length)){
     chkHtml+=`<div class="no-print" style="margin-top:14px"><h2>การเคลื่อนไหวเอกสาร (Tracking) — เฉพาะภายใน</h2>`;
