@@ -108,13 +108,16 @@ table.data th{background:#f8fafc;font-weight:700}
 .cond-grid label{display:flex;align-items:center;gap:6px;font-size:13px;padding:6px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
 .cond-grid input{width:auto}
 .report{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+.rep-table{width:100%;border-collapse:collapse}.rep-table td{padding:0;vertical-align:top}
 .rep-foot{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin-top:14px;padding-top:8px;font-size:12px;color:var(--ink-soft)}
 .rep-sec{margin-bottom:16px}.comp-blk{margin-bottom:12px}
 .sign-block{margin-top:22px}
 .sign-row{display:flex;gap:16px;margin-bottom:18px}
 .sign-box{flex:1;min-width:0;text-align:center}
 .sign-line{font-size:12px;color:#222;line-height:1.25;min-height:30px}
-.sign-nm{border-top:1px dotted #555;margin-top:38px;padding-top:6px;font-size:13px;min-height:20px;font-weight:600}
+.sign-nm{border-top:1px dotted #555;margin-top:40px}
+.sign-paren{font-size:12px;margin-top:5px;color:#333}
+.sign-date{font-size:11px;color:#555;margin-top:3px}
 .lh{display:flex;gap:12px;align-items:flex-start;border-bottom:3px solid var(--stt-red);padding-bottom:8px;margin-bottom:8px}
 .lh-mark{flex:0 0 auto;text-align:center;line-height:1}
 .lh-img{height:54px;width:auto;display:block}
@@ -138,15 +141,20 @@ table.data th{background:#f8fafc;font-weight:700}
 .rev-cell img{width:100%;display:block;aspect-ratio:1;object-fit:cover}
 .rev-cell .seg{display:flex;width:100%}
 .rev-cell .seg button{flex:1}
-@page{ size:A4; margin: 34mm 9mm 13mm 9mm; }
+@page{ size:A4; margin:0; }
 @media print{
   .appbar,.no-print,.stepper,.crumb,.toast{display:none!important}
   body{background:#fff}.wrap{max-width:none;padding:0;margin:0}
   .card{box-shadow:none;border:1px solid #999;page-break-inside:avoid}
   .report{border:none;box-shadow:none;border-radius:0;padding:0;margin:0}
-  .rep-head{position:fixed;top:0;left:0;right:0;background:#fff}
-  .rep-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ccc;margin:0;padding-top:3px}
-  .rep-content{padding-top:1mm}
+  /* หัว/ท้ายกระดาษซ้ำทุกหน้าด้วยกลไก table (ไม่มี URL เบราว์เซอร์ เพราะ margin:0) */
+  .rep-table{width:100%;border-collapse:collapse}
+  .rep-table > thead{display:table-header-group}
+  .rep-table > tfoot{display:table-footer-group}
+  .rep-table > thead > tr > td, .rep-table > tbody > tr > td{padding:0 9mm}
+  .rep-table > tfoot > tr > td{padding:0 9mm 4mm}
+  .rep-head{padding-top:5mm;background:#fff}
+  .rep-foot{background:#fff;border-top:1px solid #ccc;margin-top:6mm;padding-top:3px}
   .lh{margin-bottom:4px;padding-bottom:5px}
   .lh-img{height:52px}.lh-name{font-size:16px}.page-head{margin:3px 0 0}
   h2{font-size:14px;margin:8px 0 5px;page-break-after:avoid}
@@ -796,7 +804,10 @@ function buildReportPages(r){
   if(d.remark) chkHtml+=`<div class="guide-box" style="margin-top:10px"><b>หมายเหตุ:</b> ${esc(d.remark)}</div>`;
   chkHtml+=`</div>`;
   // ===== ช่องเซ็น (มาตรฐาน อยู่ด้วยกัน) =====
-  chkHtml+=`<div class="sign-block keep"><div class="sign-row"><div class="sign-box"><div class="sign-line">ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)</div><div class="sign-nm">${insp1}</div><div class="muted">วันที่ ${cdate}</div></div><div class="sign-box"><div class="sign-line">ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)</div><div class="sign-nm">${insp2}</div></div><div class="sign-box"><div class="sign-line">หัวหน้าตรวจสอบ Report และกระบวนการ (QC Lead)</div><div class="sign-nm">${esc(d.reviewer||'')}</div></div></div><div class="sign-row"><div class="sign-box"><div class="sign-line">ผู้ร่วมตรวจสอบ (Witnessed by)</div><div class="sign-nm"></div></div><div class="sign-box"><div class="sign-line">ผู้รับรอง (Approved by)</div><div class="sign-nm"></div></div><div class="sign-box"><div class="sign-line">Factory Manager</div><div class="sign-nm"></div></div></div></div>`;
+  const paren=nm=>nm?('( '+nm+' )'):'( ............................. )';
+  const dline='<div class="sign-date">วันที่ ......./......./.......</div>';
+  const sbox=(role,nm)=>`<div class="sign-box"><div class="sign-line">${role}</div><div class="sign-nm"></div><div class="sign-paren">${paren(nm)}</div>${dline}</div>`;
+  chkHtml+=`<div class="sign-block keep"><div class="sign-row">${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)',insp1)}${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)',insp2)}${sbox('หัวหน้าตรวจสอบ Report และกระบวนการ (QC Lead)',esc(d.reviewer||''))}</div><div class="sign-row">${sbox('ผู้ร่วมตรวจสอบ (Witnessed by)','')}${sbox('ผู้รับรอง (Approved by)','')}</div></div>`;
   // ===== ภายใน (ไม่พิมพ์): ประวัติ/Tracking =====
   if(d.reviewer || (d.history&&d.history.length)){
     chkHtml+=`<div class="no-print" style="margin-top:14px"><h2>การเคลื่อนไหวเอกสาร (Tracking) — เฉพาะภายใน</h2>`;
@@ -807,7 +818,7 @@ function buildReportPages(r){
   body+=chkHtml;
   const head=`<div class="rep-head">${LETTERHEAD}<div class="page-head"><div class="t1">REPORT การวัดน้ำ / Water Gauging Report</div><div style="text-align:right"><div class="docno" style="font-size:17px;color:var(--stt-red-dark);font-weight:800">${esc(r.doc_no)}</div>${docStatusPill(r)}</div></div></div>`;
   const foot=`<div class="rep-foot"><div>ผู้จัดทำ/ผู้วัดน้ำ: <b>${maker}</b></div><div>วันที่จัดทำ: ${cdate}</div></div>`;
-  return `<div class="report">${head}<div class="rep-content">${body}</div>${foot}</div>`;
+  return `<div class="report"><table class="rep-table"><thead><tr><td>${head}</td></tr></thead><tfoot><tr><td>${foot}</td></tr></tfoot><tbody><tr><td><div class="rep-content">${body}</div></td></tr></tbody></table></div>`;
 }
 async function DetailView(id){
   let r; try{r=await DB.getReport(id);}catch(e){$("#page").innerHTML='<p>โหลดไม่ได้</p>';return;}
