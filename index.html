@@ -107,9 +107,14 @@ table.data th{background:#f8fafc;font-weight:700}
 .cond-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px}
 .cond-grid label{display:flex;align-items:center;gap:6px;font-size:13px;padding:6px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
 .cond-grid input{width:auto}
-.sign-grid{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:24px}
-.sign-box{flex:1;min-width:150px;text-align:center}
-.sign-line{border-top:1px dotted #555;margin-top:46px;padding-top:6px;font-size:13px}
+.report{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+.rep-foot{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin-top:14px;padding-top:8px;font-size:12px;color:var(--ink-soft)}
+.rep-sec{margin-bottom:16px}.comp-blk{margin-bottom:12px}
+.sign-block{margin-top:22px}
+.sign-row{display:flex;gap:16px;margin-bottom:18px}
+.sign-box{flex:1;min-width:0;text-align:center}
+.sign-line{font-size:12px;color:#222;line-height:1.25;min-height:30px}
+.sign-nm{border-top:1px dotted #555;margin-top:38px;padding-top:6px;font-size:13px;min-height:20px;font-weight:600}
 .lh{display:flex;gap:12px;align-items:flex-start;border-bottom:3px solid var(--stt-red);padding-bottom:8px;margin-bottom:8px}
 .lh-mark{flex:0 0 auto;text-align:center;line-height:1}
 .lh-img{height:54px;width:auto;display:block}
@@ -119,38 +124,44 @@ table.data th{background:#f8fafc;font-weight:700}
 .lh-name{font-weight:900;font-size:18px;color:#111;letter-spacing:.5px;font-style:italic}
 .lh-tag{font-weight:700;font-size:13px;color:#222}
 .lh-hash{font-size:9.5px;color:#555;word-break:break-word}.lh-addr{font-size:9.5px;color:#444}
-.page{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px;display:flex;flex-direction:column}
-.page-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;margin:6px 0 12px}
 .page-head .t1{font-weight:800;color:var(--stt-red-dark);font-size:15px}
-.page-body{flex:1}
-.page-foot{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin-top:14px;padding-top:8px;font-size:12px;color:var(--ink-soft)}
 .rep-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.rep-photos.sm{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
 .rep-photos .c{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.rep-photos .c.land{grid-column:1/-1}
 .rep-photos .c .lab{font-size:11px;font-weight:700;text-align:center;background:#f3f4f6;padding:4px}
 .rep-photos .c img{width:100%;display:block;aspect-ratio:1;object-fit:cover}
+.rep-photos .c.land img{aspect-ratio:16/10}
 .rev-cell{border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .rev-cell .lab{font-size:11px;font-weight:700;text-align:center;background:#f3f4f6;padding:4px}
 .rev-cell img{width:100%;display:block;aspect-ratio:1;object-fit:cover}
 .rev-cell .seg{display:flex;width:100%}
 .rev-cell .seg button{flex:1}
-@page{ size:A4; margin:0; }
+@page{ size:A4; margin: 34mm 9mm 13mm 9mm; }
 @media print{
   .appbar,.no-print,.stepper,.crumb,.toast{display:none!important}
   body{background:#fff}.wrap{max-width:none;padding:0;margin:0}
   .card{box-shadow:none;border:1px solid #999;page-break-inside:avoid}
-  .page{border:none;border-radius:0;box-shadow:none;margin:0;padding:12mm 12mm 10mm;min-height:100vh;page-break-after:always}
-  .page:last-child{page-break-after:auto}
-  .page-head{margin-bottom:8px}
-  h2{font-size:15px;margin:10px 0 6px}
-  .rep-photos{grid-template-columns:repeat(2,1fr);gap:14px}
-  .rep-photos .c{page-break-inside:avoid;border:1px solid #888;border-radius:6px}
-  .rep-photos .c .lab{font-size:12px;font-weight:700;padding:6px;background:#f0f0f0;color:#000}
-  .rep-photos .c img{aspect-ratio:auto;height:auto;width:100%;max-height:340px;object-fit:contain;background:#fff}
-  .lh-img{height:64px}
-  .wm-wrap{max-width:380px}.wm-base{max-height:240px;width:auto;object-fit:contain}
+  .report{border:none;box-shadow:none;border-radius:0;padding:0;margin:0}
+  .rep-head{position:fixed;top:0;left:0;right:0;background:#fff}
+  .rep-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ccc;margin:0;padding-top:3px}
+  .rep-content{padding-top:1mm}
+  .lh{margin-bottom:4px;padding-bottom:5px}
+  .lh-img{height:52px}.lh-name{font-size:16px}.page-head{margin:3px 0 0}
+  h2{font-size:14px;margin:8px 0 5px;page-break-after:avoid}
+  .grp{page-break-after:avoid}
+  .keep,.sign-block,.rep-photos .c,table.data,.chk-item,.comp-blk>.keep{page-break-inside:avoid}
+  .rep-photos,.rep-photos.sm{grid-template-columns:repeat(4,1fr);gap:6px}
+  .rep-photos .c{border:1px solid #888;border-radius:5px}
+  .rep-photos .c.land{grid-column:span 2}
+  .rep-photos .c .lab{font-size:9.5px;font-weight:700;padding:3px;background:#f0f0f0;color:#000}
+  .rep-photos .c img{aspect-ratio:1;height:auto;width:100%;object-fit:cover;background:#fff}
+  .rep-photos .c.land img{aspect-ratio:16/10}
+  table.data{font-size:11px}table.data th,table.data td{padding:3px 5px}
+  .sign-row{gap:12px;margin-bottom:14px}.sign-nm{margin-top:30px}
   .model-grid{align-items:center;gap:7mm}
-  .model-cell{max-width:120mm}.model-cell .wm-wrap{max-width:120mm}.model-cell .wm-base{max-height:68mm;width:auto;max-width:120mm}
-  table.data{font-size:12px}table.data th,table.data td{padding:4px 6px}
+  .model-cell{max-width:120mm}.model-cell .wm-wrap{max-width:120mm}.model-cell .wm-base{max-height:62mm;width:auto;max-width:120mm}
 }
 </style>
 </head>
@@ -317,7 +328,7 @@ function allPhotos(d){
     (c.plates||[]).forEach((p,j)=>{ if(p.ph) out.push({key:"c"+i+"_p"+j, sec:"ช่องวัดน้ำ", label:"ช่อง"+(i+1)+" แป้น"+(j+1)+" รูป1"+(p.vol?(" ("+p.vol+"ล.)"):""), url:p.ph}); if(p.ph2) out.push({key:"c"+i+"_pb"+j, sec:"ช่องวัดน้ำ", label:"ช่อง"+(i+1)+" แป้น"+(j+1)+" รูป2", url:p.ph2}); if(p.ph_seal) out.push({key:"c"+i+"_ps"+j, sec:"ช่องวัดน้ำ", label:"ช่อง"+(i+1)+" แป้น"+(j+1)+" ซีล", url:p.ph_seal}); });
     COMP_EXTRA.forEach(s=>{ if(c[s.k]) out.push({key:"c"+i+"_"+s.k, sec:"ช่องวัดน้ำ", label:"ช่อง"+(i+1)+" "+thaiOnly(s.l), url:c[s.k]}); });
   });
-  (d.checklist||[]).forEach((it,i)=>{ if(it&&it.ph) out.push({key:"chk"+i, sec:"ตรวจก่อนวัดน้ำ", label:(CHK_FM[i]?thaiOnly(CHK_FM[i].txt):("ข้อ "+(i+1))), url:it.ph}); });
+  (d.checklist||[]).forEach((it,i)=>{ if(it&&it.ph) out.push({key:"chk"+i, sec:"ตรวจก่อนวัดน้ำ", label:(CHK_FM[i]?thaiOnly(CHK_FM[i].txt):("ข้อ "+(i+1)))+" รูป1", url:it.ph}); if(it&&it.ph2) out.push({key:"chk"+i+"_b", sec:"ตรวจก่อนวัดน้ำ", label:(CHK_FM[i]?thaiOnly(CHK_FM[i].txt):("ข้อ "+(i+1)))+" รูป2", url:it.ph2}); });
   SEAL_SLOTS.forEach((lab,idx)=>{ if(d.seal_slots&&d.seal_slots[idx]) out.push({key:"s"+idx, sec:"จุดร้อยซีล", label:thaiOnly(lab), url:d.seal_slots[idx]}); });
   CHASSIS_SLOTS.forEach((lab,idx)=>{ if(d.chassis_slots&&d.chassis_slots[idx]) out.push({key:"h"+idx, sec:"Chassis", label:thaiOnly(lab), url:d.chassis_slots[idx]}); });
   return out;
@@ -361,7 +372,7 @@ function HowtoView(){
 let DRAFT=null, CUR=0, STEPS=[], EMP_NAMES=[];
 function blankPlate(){return{vol:"",u:"",bot:"",ph:"",ph2:"",seal_no:"",temp:"",level_bottom:"",ref_height:"",diff:"",ph_seal:""};}
 function blankComp(){return{n_plate:1,plates:[blankPlate()],h:"",void_l:"",seal_plate:"",seal_cap:"STT",ph_seal:"",ph_name:""};}
-function blankChk(){return{st:"",fd:"",fdate:"",fby:"",note:"",ph:""};}
+function blankChk(){return{st:"",fd:"",fdate:"",fby:"",note:"",ph:"",ph2:""};}
 function isOil(){ return String((DRAFT&&DRAFT.product)||"").toLowerCase().indexOf("petroleum")>=0 || String((DRAFT&&DRAFT.product)||"").indexOf("น้ำมัน")>=0; }
 function addYears(ds,y){ try{ const d=new Date(ds); d.setFullYear(d.getFullYear()+y); return d.toISOString().slice(0,10); }catch(e){ return ""; } }
 function migrateComp(c){ if(!c) return blankComp(); if(Array.isArray(c.plates)) { c.n_plate=c.n_plate||c.plates.length||1; if(typeof c.seal_cap==="undefined")c.seal_cap="STT"; return c; }
@@ -373,10 +384,11 @@ function NewReportView(){
   if(!DRAFT){ DRAFT=newDraft(); CUR=0; }
   buildSteps();
   if(!EMP_NAMES.length){ DB.employeeNames().then(n=>{ EMP_NAMES=n||[]; const dl=document.getElementById("emp-list-g"); if(dl) dl.innerHTML=EMP_NAMES.map(x=>`<option value="${esc(x)}">`).join(""); }).catch(()=>{}); }
-  $("#page").innerHTML=`<div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก? / Exit?')){DRAFT=null;go('home');}">${t('cancel')}</div><h1>${t('newTitle')}</h1><div id="docbanner"></div><div class="stepper" id="stepper"></div><div id="stepbody"></div><div class="row no-print" style="margin-top:16px"><button class="btn grey" id="btnPrev" onclick="stepPrev()">${t('prev')}</button><button class="btn sec" onclick="saveCore(false)">${t('saveDraftBtn')}</button><div style="flex:1"></div><button class="btn" id="btnNext" onclick="stepNext()">${t('next')}</button></div>`;
+  $("#page").innerHTML=`<div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก? / Exit?')){DRAFT=null;go('home');}">${t('cancel')}</div><h1>${t('newTitle')}</h1><div id="docbanner"></div>${rejectBanner()}<div class="stepper" id="stepper"></div><div id="stepbody"></div><div class="row no-print" style="margin-top:16px"><button class="btn grey" id="btnPrev" onclick="stepPrev()">${t('prev')}</button><button class="btn sec" onclick="saveCore(false)">${t('saveDraftBtn')}</button><div style="flex:1"></div><button class="btn" id="btnNext" onclick="stepNext()">${t('next')}</button></div>`;
   refreshDocBanner(); drawStepper(); drawStep();
 }
 function refreshDocBanner(){ const el=document.getElementById("docbanner"); if(!el)return; const info=(DRAFT&&(DRAFT.job_no||DRAFT.customer))?` <span class="muted" style="font-weight:600">• Job ${esc(DRAFT.job_no||'-')} • ${esc(DRAFT.customer||'-')}</span>`:''; el.innerHTML = (DRAFT&&DRAFT.doc_no)?`<div class="docnote">📄 ${t('docNoLabel')}: <b>${esc(DRAFT.doc_no)}</b>${info}</div>`:`<div class="docnote pending">📄 ${t('docNoNone')}${info}</div>`; }
+function rejectBanner(){ try{ if(!DRAFT||!DRAFT.review_photos) return ''; const bad=allPhotos(DRAFT).filter(p=>DRAFT.review_photos[p.key]==='no'); if(!bad.length) return ''; return `<div class="banner" style="background:#fef2f2;border:1px solid #fca5a5;color:#991b1b"><b>❗ หัวหน้าให้แก้ไข/ถ่ายรูปใหม่ ${bad.length} จุด:</b><br>${bad.map(p=>'• '+esc(p.label)).join('<br>')}<br><span style="font-size:12px">แก้จุดข้างบนแล้วกด "ส่งขอ Approve" อีกครั้ง</span></div>`; }catch(e){ return ''; } }
 function drawStepper(){ $("#stepper").innerHTML=STEPS.map((s,i)=>`<div class="step ${i===CUR?'active':''} ${i<CUR?'done':''}" onclick="jumpStep(${i})"><div class="circ">${i<CUR?'✓':s.ic}</div><div class="lbl">${i+1}. ${t('step_'+s.key)}</div></div>`).join(""); }
 function jumpStep(i){ collectStep(); CUR=i; drawStepper(); drawStep(); window.scrollTo(0,0); }
 function camImgErr(img){ try{ img.style.display='none'; const s=document.createElement('span'); s.className='add'; s.style.fontSize='12px'; s.style.color='#16a34a'; s.textContent='✓ มีรูปแล้ว'; img.parentNode.appendChild(s); }catch(e){} }
@@ -447,7 +459,7 @@ function stepChecklist(start,end,phase){
     let extra='';
     if(it.st==='fail') extra=`<div class="fixbox"><input data-chk="${i}" data-fk="fd" placeholder="${t('fixDetail')}" value="${esc(it.fd)}"><input type="date" data-chk="${i}" data-fk="fdate" value="${esc(it.fdate)}"><input data-chk="${i}" data-fk="fby" placeholder="${t('fixBy')}" value="${esc(it.fby)}"></div>`;
     else if(it.st==='na') extra=`<div class="fixbox" style="background:#f1f5f9;border-color:#cbd5e1"><input data-chk="${i}" data-fk="note" placeholder="หมายเหตุ (จำเป็นเมื่อ 'ไม่ตรวจ') *" value="${esc(it.note||'')}"></div>`;
-    const photo = d.photo?`<div class="slot-grid" style="max-width:150px;margin-top:8px">${slotHtml("chk",i,i,"รูปลมยาง ≥120 PSI",it.ph)}</div>`:'';
+    const photo = d.photo?`<div class="slot-grid" style="max-width:300px;margin-top:8px">${slotHtml("chk",i,i,"ลมยาง รูป1",it.ph)}${slotHtml("chk2",i,i,"ลมยาง รูป2",it.ph2)}</div>`:'';
     rows+=`<div class="chk-item"><div class="no">${d.no}</div><div class="desc">${esc(d.txt)}${extra}${photo}</div><div class="seg" data-i="${i}"><button data-v="pass" class="${it.st==='pass'?'on-ok':''}">${t('chkPass')}</button><button data-v="na" class="${it.st==='na'?'on-na':''}">${t('chkNA')}</button><button data-v="fail" class="${it.st==='fail'?'on-bad':''}">${t('chkFail')}</button></div></div>`;
   }
   return `<div class="card"><div class="guide-box">✓ <b>${title} (FM-SAL-0102):</b> ${note} • ติ๊ก ผ่าน / – / ไม่ผ่าน • "ไม่ผ่าน"→วันที่+ชื่อผู้แก้ไข • "ไม่ตรวจ"→ใส่หมายเหตุ</div>${rows}</div>`;
@@ -489,6 +501,7 @@ function slotHtml(target,a,b,label,url){
   else if(target==="plate2") attr=`data-target="plate2" data-ci="${a}" data-pi="${b}"`;
   else if(target==="plate_seal") attr=`data-target="plate_seal" data-ci="${a}" data-pi="${b}"`;
   else if(target==="chk") attr=`data-target="chk" data-idx="${b}"`;
+  else if(target==="chk2") attr=`data-target="chk2" data-idx="${b}"`;
   else attr=`data-target="${target}" data-idx="${b}"`;
   return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" ${attr} onclick="openCamera(this)">${url?`<img src="${esc(imgSrc(url))}" onerror="camImgErr(this)">`:`<span class="add">📷</span>`}</div>${url?`<button class="del" ${attr} data-del="1">×</button>`:''}</div>`;
 }
@@ -513,7 +526,8 @@ function slotLabel(ds){
   if(ds.target==="plate") return "ช่อง"+(+ds.ci+1)+"_แป้น"+(+ds.pi+1)+"_รูป1_"+tag;
   if(ds.target==="plate2") return "ช่อง"+(+ds.ci+1)+"_แป้น"+(+ds.pi+1)+"_รูป2_"+tag;
   if(ds.target==="plate_seal") return "ช่อง"+(+ds.ci+1)+"_แป้น"+(+ds.pi+1)+"_ซีล_"+tag;
-  if(ds.target==="chk") return "ลมยาง120PSI_"+tag;
+  if(ds.target==="chk") return "ลมยาง120PSI_รูป1_"+tag;
+  if(ds.target==="chk2") return "ลมยาง120PSI_รูป2_"+tag;
   if(ds.target==="seal_slots") return "ซีล_"+thaiOnly(SEAL_SLOTS[+ds.idx]||"")+"_"+tag;
   if(ds.target==="chassis_slots") return "chassis_"+thaiOnly(CHASSIS_SLOTS[+ds.idx]||"")+"_"+tag;
   return tag;
@@ -524,6 +538,7 @@ function storeSlot(ds,url){
   else if(ds.target==="plate2"){ DRAFT.comps[+ds.ci].plates[+ds.pi].ph2=url; }
   else if(ds.target==="plate_seal"){ DRAFT.comps[+ds.ci].plates[+ds.pi].ph_seal=url; }
   else if(ds.target==="chk"){ DRAFT.checklist[+ds.idx].ph=url; }
+  else if(ds.target==="chk2"){ DRAFT.checklist[+ds.idx].ph2=url; }
   else { DRAFT[ds.target]=DRAFT[ds.target]||{}; DRAFT[ds.target][ds.idx]=url; }
 }
 /* ===== กล้องในแอป (ถ่ายสดเท่านั้น) ===== */
@@ -565,11 +580,14 @@ function switchCam(){ CAM.facing=CAM.facing==='environment'?'user':'environment'
 function closeCamera(){ if(CAM.stream){ CAM.stream.getTracks().forEach(t=>t.stop()); CAM.stream=null; } const o=document.getElementById('camov'); if(o) o.remove(); }
 async function captureCam(){
   const v=document.getElementById('camv'); if(!v||!v.videoWidth){ return toast('กล้องยังไม่พร้อม รอสักครู่'); }
-  const cv=document.createElement('canvas'); cv.width=v.videoWidth; cv.height=v.videoHeight; cv.getContext('2d').drawImage(v,0,0,cv.width,cv.height);
-  toast(t('uploading'));
-  const blob=await new Promise(res=>cv.toBlob(res,'image/jpeg',0.85));
-  let url; try{ url=await uploadImage(blob,CAM.label,true); }catch(err){ return toast('อัปโหลดไม่สำเร็จ: '+(err.message||err)); }
-  storeSlot(CAM.ds,url); closeCamera(); drawStep(); toast("เพิ่มรูปแล้ว ✓");
+  // ย่อรูปก่อนอัป (max 1280px) เพื่อให้อัป/เซฟเร็วขึ้นมาก
+  const MAX=1280; let w=v.videoWidth, h=v.videoHeight; const sc=Math.min(1, MAX/Math.max(w,h)); w=Math.round(w*sc); h=Math.round(h*sc);
+  const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(v,0,0,w,h);
+  // ปิดกล้องทันที + อัปเบื้องหลัง ให้รู้สึกเร็ว
+  const ds=CAM.ds, label=CAM.label; closeCamera(); toast(t('uploading'));
+  const blob=await new Promise(res=>cv.toBlob(res,'image/jpeg',0.72));
+  let url; try{ url=await uploadImage(blob,label,true); }catch(err){ return toast('อัปโหลดไม่สำเร็จ: '+(err.message||err)); }
+  storeSlot(ds,url); drawStep(); toast("เพิ่มรูปแล้ว ✓");
 }
 function collectStep(){
   const k=curKey();
@@ -614,6 +632,7 @@ async function saveCore(isFinal){
   // log edit (เมื่อแก้ไขรายงานที่บันทึกแล้ว)
   if(DRAFT._editLog){ DRAFT.history=[...(DRAFT.history||[]),{type:'แก้ไข/ถ่ายรูปใหม่',by:USER.name,date:new Date().toISOString(),detail:'พนักงานแก้ไขข้อมูล/ถ่ายรูปใหม่'}]; if(DRAFT._wasReviewed) DRAFT.review_status="pending"; DRAFT._editLog=false; }
   if(isFinal && DRAFT.review_status!=='accepted'){ DRAFT.review_status='pending'; DRAFT.history=[...(DRAFT.history||[]),{type:'ขอ Approve',by:USER.name,date:new Date().toISOString(),detail:'พนักงานส่งขออนุมัติ'}]; }
+  if(!isFinal){ DRAFT.history=[...(DRAFT.history||[]),{type:(DRAFT.id?'บันทึก':'สร้างเอกสาร'),by:USER.name,date:new Date().toISOString(),detail:'บันทึก/แก้ไขข้อมูล'}]; }
   toast(t('saving'));
   let saved; try{ saved=await DB.saveReport(buildRec(isFinal)); }catch(e){ return toast("บันทึกไม่สำเร็จ — เช็คการเชื่อมต่อ"); }
   DRAFT.id=saved.id; DRAFT.doc_no=saved.doc_no;
@@ -735,46 +754,60 @@ function buildReportPages(r){
   const d=r.data||{};
   const comp=(d.comps||[]);
   const conds=Array.isArray(d.conditions)?d.conditions:(d.conditions?String(d.conditions).split(/,\s*/):[]);
-  const maker=esc(r.created_by||"-");
   const cdate=r.created_at? new Date(r.created_at).toLocaleDateString('th-TH') : (r.measure_date||"-");
   const triple=v=>v==='pass'?'<span class="pill ok">ผ่าน</span>':v==='fail'?'<span class="pill bad">ไม่ผ่าน</span>':v==='na'?'<span class="pill na">–</span>':'<span class="pill draft">-</span>';
-  const pages=[];
-  const lh=d.lowhigh||{}; const gaugers=(d.gaugers||[]).filter(Boolean); const oilR=String(r.product||"").toLowerCase().indexOf("petroleum")>=0||String(r.product||"").indexOf("น้ำมัน")>=0;
+  const lh=d.lowhigh||{}; const gaugersArr=(d.gaugers||[]).filter(Boolean); const oilR=String(r.product||"").toLowerCase().indexOf("petroleum")>=0||String(r.product||"").indexOf("น้ำมัน")>=0;
+  const insp1=esc(gaugersArr[0]||''); const insp2=esc(gaugersArr[1]||'');
+  const maker= gaugersArr.length? esc(gaugersArr.join(", ")) : esc(r.created_by||"-");
   const mimgs=(d.model_imgs&&d.model_imgs.length)?d.model_imgs:(d.model_img?[d.model_img]:[]);
-  pages.push(`<h2>ข้อมูลทั่วไป</h2><div class="row"><div style="flex:1;min-width:200px"><div><b>ลูกค้า:</b> ${esc(r.customer)}</div><div><b>ที่อยู่:</b> ${esc(r.address||'-')}</div><div><b>Job:</b> ${esc(thaiOnly(r.job_type))} ${esc(r.job_no||'')} • <b>S/N:</b> ${esc(r.sa||'-')}</div><div><b>วันที่วัดน้ำ:</b> ${esc(r.measure_date||'-')} • <b>หมดอายุ:</b> ${esc(d.expiry_date||'-')}</div>${gaugers.length?`<div><b>ผู้วัดน้ำ:</b> ${esc(gaugers.join(", "))}</div>`:''}<div><b>สถานที่วัดน้ำ:</b> ${esc(r.location||'-')}</div>${r.tank_origin?`<div><b>ประเภทแท็งค์:</b> ${esc(thaiOnly(r.tank_origin))}</div>`:''}</div><div style="flex:1;min-width:200px"><div><b>ทะเบียนหัว/หาง:</b> ${esc(r.plate_head||'-')} / ${esc(r.plate_tank||'-')}</div><div><b>คัสซีหัว/หาง:</b> ${esc(r.chassis_head||'-')} / ${esc(r.chassis_tank||'-')}</div><div><b>ความจุ:</b> ${esc(r.capacity||'-')} ลิตร • ${esc(thaiOnly(r.product))}</div><div><b>ประเภทรถ:</b> ${esc(thaiOnly(r.vehicle_type))} • รุ่น ${esc(r.model_no||'-')}</div></div></div>${oilR?`<div style="margin-top:8px"><b>Low-High (มม.):</b> A=${esc(lh.a||'-')} • B=${esc(lh.b||'-')} • C=${esc(lh.c||'-')} • D=${esc(lh.d||'-')}</div>`:''}${(conds.length)?`<div style="margin-top:8px"><b>เงื่อนไขการวัดน้ำ:</b> ${esc(conds.map(thaiOnly).join(", "))}</div>`:''}<div class="guide-box" style="margin-top:12px">${esc(WATER_TERM)}</div>`);
-  for(let i=0;i<mimgs.length;i+=3){ const chunk=mimgs.slice(i,i+3); pages.push(`<h2>Diagram / Model ถัง${mimgs.length>1?` (${i+1}-${Math.min(i+3,mimgs.length)}/${mimgs.length})`:''}</h2><div class="model-grid">${chunk.map(u=>`<div class="model-cell"><div class="wm-wrap"><img class="wm-base" src="${esc(imgSrc(u))}"><img class="wm-logo" src="logo.png" onerror="this.style.display='none'"></div></div>`).join("")}</div>`); }
   const cal=d.cal||{};
-  let mtbl=`<h2>${oilR?'ข้อมูลการวัดน้ำ':'Calibration Certificate / ผลสอบเทียบ'} (${comp.length} ${oilR?'ช่อง':'comp'})</h2>`;
-  if(!oilR) mtbl+=`<div class="row" style="margin-bottom:6px"><div style="flex:1;min-width:200px"><div><b>Certificate No.:</b> ${esc(r.doc_no||'-')}</div><div><b>Calibration Date:</b> ${esc(r.measure_date||'-')} • <b>Exp.:</b> ${esc(d.expiry_date||'-')}</div></div><div style="flex:1;min-width:200px"><div><b>Reference Height (Front/Rear):</b> ${esc(cal.ref_front||'-')} / ${esc(cal.ref_rear||'-')} มม.</div><div><b>Seal support No.:</b> ${esc(cal.seal_support_no||'-')}</div></div></div>`;
-  comp.forEach((c,i)=>{ const pls=c.plates||[];
-    if(oilR) mtbl+=`<div style="margin-bottom:10px"><div class="grp">ช่องที่ ${i+1} (${pls.length} แป้น) — ซีลแป้น: ${esc(c.seal_plate||'-')} • ซีลฝา: ${esc(c.seal_cap||'-')} • H(ก้น→ฝาบน): ${esc(c.h||'-')} • Void: ${esc(c.void_l||'-')} ล.</div><div class="tbl-scroll"><table class="data"><tr><th class="rowlabel">แป้นที่</th>${pls.map((_,j)=>`<th>${j+1}</th>`).join("")}</tr><tr><td class="rowlabel">ปริมาตร (ล.)</td>${pls.map(p=>`<td>${esc(p.vol)}</td>`).join("")}</tr><tr><td class="rowlabel">U: แป้น→ฝาบน (มม.)</td>${pls.map(p=>`<td>${esc(p.u)}</td>`).join("")}</tr><tr><td class="rowlabel">ก้น→แป้น (มม.)</td>${pls.map(p=>`<td>${esc(p.bot)}</td>`).join("")}</tr></table></div></div>`;
-    else mtbl+=`<div style="margin-bottom:10px"><div class="grp">Comp ${i+1} (${pls.length} จุด)</div><div class="tbl-scroll"><table class="data"><tr><th class="rowlabel">Point</th><th>Volume (ล.)</th><th>Seal No.</th><th>Temp (°C)</th><th>Level from Bottom</th><th>Ref. Height</th><th>Diff.</th></tr>${pls.map((p,j)=>`<tr><td class="rowlabel">${j+1}</td><td>${esc(p.vol)}</td><td>${esc(p.seal_no)}</td><td>${esc(p.temp)}</td><td>${esc(p.level_bottom)}</td><td>${esc(p.ref_height)}</td><td>${esc(p.diff)}</td></tr>`).join("")}</table></div></div>`;
+  const cell=(lab,u,land)=>`<div class="c ${land?'land':''}"><div class="lab">${esc(lab)}</div><a href="${esc(u)}" target="_blank"><img src="${esc(imgSrc(u))}"></a></div>`;
+  let body='';
+  // ===== ข้อมูลทั่วไป =====
+  body+=`<div class="rep-sec"><h2>ข้อมูลทั่วไป</h2><div class="row"><div style="flex:1;min-width:200px"><div><b>ลูกค้า:</b> ${esc(r.customer)}</div><div><b>ที่อยู่:</b> ${esc(r.address||'-')}</div><div><b>Job:</b> ${esc(thaiOnly(r.job_type))} ${esc(r.job_no||'')} • <b>S/N:</b> ${esc(r.sa||'-')}</div><div><b>วันที่วัดน้ำ:</b> ${esc(r.measure_date||'-')} • <b>หมดอายุ:</b> ${esc(d.expiry_date||'-')}</div>${gaugersArr.length?`<div><b>ผู้วัดน้ำ:</b> ${esc(gaugersArr.join(", "))}</div>`:''}<div><b>สถานที่วัดน้ำ:</b> ${esc(r.location||'-')}</div>${r.tank_origin?`<div><b>ประเภทแท็งค์:</b> ${esc(thaiOnly(r.tank_origin))}</div>`:''}</div><div style="flex:1;min-width:200px"><div><b>ทะเบียนหัว/หาง:</b> ${esc(r.plate_head||'-')} / ${esc(r.plate_tank||'-')}</div><div><b>คัสซีหัว/หาง:</b> ${esc(r.chassis_head||'-')} / ${esc(r.chassis_tank||'-')}</div><div><b>ความจุ:</b> ${esc(r.capacity||'-')} ลิตร • ${esc(thaiOnly(r.product))}</div><div><b>ประเภทรถ:</b> ${esc(thaiOnly(r.vehicle_type))} • รุ่น ${esc(r.model_no||'-')}</div></div></div>${oilR?`<div style="margin-top:8px"><b>Low-High (มม.):</b> A=${esc(lh.a||'-')} • B=${esc(lh.b||'-')} • C=${esc(lh.c||'-')} • D=${esc(lh.d||'-')}</div>`:''}${(conds.length)?`<div style="margin-top:8px"><b>เงื่อนไขการวัดน้ำ:</b> ${esc(conds.map(thaiOnly).join(", "))}</div>`:''}<div class="guide-box" style="margin-top:10px">${esc(WATER_TERM)}</div></div>`;
+  // ===== Diagram =====
+  if(mimgs.length) body+=`<div class="rep-sec"><h2>Diagram / Model ถัง</h2><div class="model-grid">${mimgs.map(u=>`<div class="model-cell keep"><div class="wm-wrap"><img class="wm-base" src="${esc(imgSrc(u))}"><img class="wm-logo" src="logo.png" onerror="this.style.display='none'"></div></div>`).join("")}</div></div>`;
+  // ===== ข้อมูลการวัดน้ำ (ตาราง + รูป อยู่ด้วยกัน) =====
+  body+=`<div class="rep-sec"><h2>${oilR?'ข้อมูลการวัดน้ำ':'Calibration Certificate / ผลสอบเทียบ'} (${comp.length} ${oilR?'ช่อง':'comp'})</h2>`;
+  if(!oilR) body+=`<div class="row" style="margin-bottom:6px"><div style="flex:1;min-width:200px"><div><b>Certificate No.:</b> ${esc(r.doc_no||'-')}</div><div><b>Calibration Date:</b> ${esc(r.measure_date||'-')} • <b>Exp.:</b> ${esc(d.expiry_date||'-')}</div></div><div style="flex:1;min-width:200px"><div><b>Reference Height (Front/Rear):</b> ${esc(cal.ref_front||'-')} / ${esc(cal.ref_rear||'-')} มม.</div><div><b>Seal support No.:</b> ${esc(cal.seal_support_no||'-')}</div></div></div>`;
+  comp.forEach((c,i)=>{ const pls=c.plates||[]; const unit=oilR?"แป้นที่ ":"จุดที่ ";
+    let tbl;
+    if(oilR) tbl=`<div class="keep"><div class="grp">ช่องที่ ${i+1} (${pls.length} แป้น) — ซีลแป้นวัดน้ำ: ${esc(c.seal_plate||'-')} • ซีลฝาถัง: ${esc(c.seal_cap||'-')} • H(ก้น→ฝาบน): ${esc(c.h||'-')} • Void: ${esc(c.void_l||'-')} ล.</div><table class="data"><tr><th class="rowlabel">แป้นที่</th>${pls.map((_,j)=>`<th>${j+1}</th>`).join("")}</tr><tr><td class="rowlabel">ปริมาตร (ล.)</td>${pls.map(p=>`<td>${esc(p.vol)}</td>`).join("")}</tr><tr><td class="rowlabel">ระยะแป้นถึงฝาบน (U)</td>${pls.map(p=>`<td>${esc(p.u)}</td>`).join("")}</tr><tr><td class="rowlabel">ระยะก้นถังถึงแป้น</td>${pls.map(p=>`<td>${esc(p.bot)}</td>`).join("")}</tr></table></div>`;
+    else tbl=`<div class="keep"><div class="grp">Comp ${i+1} (${pls.length} จุด)</div><table class="data"><tr><th class="rowlabel">Point</th><th>Volume (ล.)</th><th>Seal No.</th><th>Temp (°C)</th><th>Level from Bottom</th><th>Ref. Height</th><th>Diff.</th></tr>${pls.map((p,j)=>`<tr><td class="rowlabel">${j+1}</td><td>${esc(p.vol)}</td><td>${esc(p.seal_no)}</td><td>${esc(p.temp)}</td><td>${esc(p.level_bottom)}</td><td>${esc(p.ref_height)}</td><td>${esc(p.diff)}</td></tr>`).join("")}</table></div>`;
+    const items=[]; pls.forEach((p,j)=>{ if(p.ph) items.push([unit+(j+1)+" รูป1"+(p.vol?(" ("+p.vol+"ล.)"):""),p.ph]); if(p.ph2) items.push([unit+(j+1)+" รูป2",p.ph2]); if(p.ph_seal) items.push([unit+(j+1)+" ซีล",p.ph_seal]); });
+    const extras=oilR?COMP_EXTRA:[{k:"ph_name",l:"Name Plate"}]; extras.forEach(s=>{ if(c[s.k]) items.push([thaiOnly(s.l),c[s.k]]); });
+    const photos=items.length?`<div class="rep-photos sm">${items.map(x=>cell(x[0],x[1])).join("")}</div>`:'';
+    body+=`<div class="comp-blk">${tbl}${photos}</div>`;
   });
-  pages.push(mtbl);
-  comp.forEach((c,i)=>{ const items=[]; const unit=oilR?"แป้นที่ ":"จุดที่ "; (c.plates||[]).forEach((p,j)=>{ if(p.ph) items.push({l:unit+(j+1)+" รูป1"+(p.vol?(" ("+p.vol+"ล.)"):""),u:p.ph}); if(p.ph2) items.push({l:unit+(j+1)+" รูป2",u:p.ph2}); if(p.ph_seal) items.push({l:unit+(j+1)+" ซีล",u:p.ph_seal}); }); const extras=oilR?COMP_EXTRA:[{k:"ph_name",l:"Name Plate"}]; extras.forEach(s=>{ if(c[s.k]) items.push({l:thaiOnly(s.l),u:c[s.k]}); }); if(items.length){ const ph=items.map(x=>`<div class="c"><div class="lab">${esc(x.l)}</div><a href="${esc(x.u)}" target="_blank"><img src="${esc(imgSrc(x.u))}"></a></div>`).join(""); pages.push(`<h2>รูป${oilR?'ช่องที่ ':'Comp '}${i+1}</h2><div class="rep-photos">${ph}</div>`); } });
-  const tirePh=(d.checklist&&d.checklist[0]&&d.checklist[0].ph)||"";
-  if(tirePh) pages.push(`<h2>ตรวจเช็คแรงดันลมยาง (≥120 PSI)</h2><div class="rep-photos"><div class="c"><div class="lab">ลมยาง ≥120 PSI</div><a href="${esc(tirePh)}" target="_blank"><img src="${esc(imgSrc(tirePh))}"></a></div></div>`);
-  const sealPh=SEAL_SLOTS.map((lab,idx)=>(d.seal_slots&&d.seal_slots[idx])?`<div class="c"><div class="lab">${esc(thaiOnly(lab))}</div><a href="${esc(d.seal_slots[idx])}" target="_blank"><img src="${esc(imgSrc(d.seal_slots[idx]))}"></a></div>`:'').join("");
-  if(sealPh) pages.push(`<h2>จุดร้อยซีล / Seals</h2><div class="rep-photos">${sealPh}</div>`);
-  const chPh=CHASSIS_SLOTS.map((lab,idx)=>(d.chassis_slots&&d.chassis_slots[idx])?`<div class="c"><div class="lab">${esc(thaiOnly(lab))}</div><a href="${esc(d.chassis_slots[idx])}" target="_blank"><img src="${esc(imgSrc(d.chassis_slots[idx]))}"></a></div>`:'').join("");
-  if(chPh) pages.push(`<h2>Chassis / Name Plate</h2><div class="rep-photos">${chPh}</div>`);
+  body+=`</div>`;
+  // ===== ลมยาง 2 รูป =====
+  const tireImgs=[]; const c0=d.checklist&&d.checklist[0]; if(c0){ if(c0.ph) tireImgs.push(["ลมยาง ≥120 PSI รูป1",c0.ph]); if(c0.ph2) tireImgs.push(["ลมยาง ≥120 PSI รูป2",c0.ph2]); }
+  if(tireImgs.length) body+=`<div class="rep-sec"><h2>ตรวจเช็คแรงดันลมยาง (≥120 PSI)</h2><div class="rep-photos sm">${tireImgs.map(x=>cell(x[0],x[1])).join("")}</div></div>`;
+  // ===== ซีล =====
+  const sealPh=SEAL_SLOTS.map((lab,idx)=>(d.seal_slots&&d.seal_slots[idx])?cell(thaiOnly(lab),d.seal_slots[idx]):'').join("");
+  if(sealPh) body+=`<div class="rep-sec"><h2>จุดร้อยซีล / Seals</h2><div class="rep-photos sm">${sealPh}</div></div>`;
+  // ===== Chassis (รูป 45° แนวนอน) =====
+  const chPh=CHASSIS_SLOTS.map((lab,idx)=>{ const u=d.chassis_slots&&d.chassis_slots[idx]; if(!u) return ''; const land=thaiOnly(lab).indexOf('45')>=0; return cell(thaiOnly(lab),u,land); }).join("");
+  if(chPh) body+=`<div class="rep-sec"><h2>Chassis / Name Plate</h2><div class="rep-photos sm">${chPh}</div></div>`;
+  // ===== Checklist =====
   const cl=d.checklist||[];
-  let chkHtml='<h2>ผลการตรวจสอบ (FM-SAL-0102)</h2>';
+  let chkHtml='<div class="rep-sec"><h2>ผลการตรวจสอบ (FM-SAL-0102)</h2>';
   cl.forEach((it,i)=>{ if(i===0) chkHtml+=`<div class="grp">ก่อนวัดน้ำ (ข้อ 1-8)</div>`; if(i===CHK_PRE) chkHtml+=`<div class="grp">หลังวัดน้ำ (ข้อ 9-12)</div>`; const st=(it&&it.st)?it.st:''; const fix=(st==='fail')?`<div class="muted">แก้ไข: ${esc(it.fd||'-')} • วันที่ ${esc(it.fdate||'-')} • โดย ${esc(it.fby||'-')}</div>`:((st==='na'&&it.note)?`<div class="muted">หมายเหตุ: ${esc(it.note)}</div>`:''); chkHtml+=`<div class="chk-item"><div class="no">${(CHK_FM[i]&&CHK_FM[i].no)||(i+1)}</div><div class="desc">${esc((CHK_FM[i]&&CHK_FM[i].txt)||'')}${fix}</div>${triple(st)}</div>`; });
-  if(d.remark) chkHtml+=`<div class="guide-box" style="margin-top:12px"><b>หมายเหตุ:</b> ${esc(d.remark)}</div>`;
-  // การตรวจสอบโดยหัวหน้า + ประวัติ
+  if(d.remark) chkHtml+=`<div class="guide-box" style="margin-top:10px"><b>หมายเหตุ:</b> ${esc(d.remark)}</div>`;
+  chkHtml+=`</div>`;
+  // ===== ช่องเซ็น (มาตรฐาน อยู่ด้วยกัน) =====
+  chkHtml+=`<div class="sign-block keep"><div class="sign-row"><div class="sign-box"><div class="sign-line">ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)</div><div class="sign-nm">${insp1}</div><div class="muted">วันที่ ${cdate}</div></div><div class="sign-box"><div class="sign-line">ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)</div><div class="sign-nm">${insp2}</div></div><div class="sign-box"><div class="sign-line">หัวหน้าตรวจสอบ Report และกระบวนการ (QC Lead)</div><div class="sign-nm">${esc(d.reviewer||'')}</div></div></div><div class="sign-row"><div class="sign-box"><div class="sign-line">ผู้ร่วมตรวจสอบ (Witnessed by)</div><div class="sign-nm"></div></div><div class="sign-box"><div class="sign-line">ผู้รับรอง (Approved by)</div><div class="sign-nm"></div></div><div class="sign-box"><div class="sign-line">Factory Manager</div><div class="sign-nm"></div></div></div></div>`;
+  // ===== ภายใน (ไม่พิมพ์): ประวัติ/Tracking =====
   if(d.reviewer || (d.history&&d.history.length)){
-    chkHtml+=`<div class="no-print"><h2 style="margin-top:14px">การตรวจสอบ Report และกระบวนการ (หัวหน้า) — เฉพาะภายใน</h2>`;
-    if(d.reviewer) chkHtml+=`<div><b>${'หัวหน้าผู้ตรวจสอบ'}:</b> ${esc(d.reviewer)} • วันที่ ${esc(d.review_date? new Date(d.review_date).toLocaleString('th-TH'):'-')} • ผล: ${reviewPill(d.review_status)}</div>`;
-    if(d.history&&d.history.length){ chkHtml+=`<div style="margin-top:6px"><b>ประวัติการตรวจ/แก้ไข (${d.history.length} ครั้ง):</b>`+d.history.map((x,i)=>`<div class="muted">${i+1}. [${esc(x.type)}] โดย ${esc(x.by)} — ${esc(x.date? new Date(x.date).toLocaleString('th-TH'):'')}${x.detail?(' — '+esc(x.detail)):''}</div>`).join("")+`</div>`; }
+    chkHtml+=`<div class="no-print" style="margin-top:14px"><h2>การเคลื่อนไหวเอกสาร (Tracking) — เฉพาะภายใน</h2>`;
+    if(d.reviewer) chkHtml+=`<div><b>Approve โดย:</b> ${esc(d.reviewer)} • วันที่ ${esc(d.review_date? new Date(d.review_date).toLocaleString('th-TH'):'-')} • ผล: ${reviewPill(d.review_status)}</div>`;
+    if(d.history&&d.history.length){ chkHtml+=`<div style="margin-top:6px"><b>ประวัติการเคลื่อนไหว (${d.history.length} ครั้ง):</b>`+d.history.map((x,i)=>`<div class="muted">${i+1}. [${esc(x.type)}] โดย ${esc(x.by)} — ${esc(x.date? new Date(x.date).toLocaleString('th-TH'):'')}${x.detail?(' — '+esc(x.detail)):''}</div>`).join("")+`</div>`; }
     chkHtml+=`</div>`;
   }
-  chkHtml+=`<div class="sign-grid"><div class="sign-box"><div class="sign-line">ผู้ตรวจสอบ (QC Inspector)</div><div style="margin-top:4px">${maker}</div><div class="muted">วันที่ ${cdate}</div></div><div class="sign-box"><div class="sign-line">หัวหน้าตรวจสอบ Report และกระบวนการ (QC Lead)</div><div style="margin-top:4px">${esc(d.reviewer||'')}</div></div><div class="sign-box"><div class="sign-line">ผู้ร่วมตรวจสอบ (Witnessed by)</div></div><div class="sign-box"><div class="sign-line">ผู้รับรอง (Approved by)</div></div><div class="sign-box"><div class="sign-line">Factory Manager</div></div></div>`;
-  pages.push(chkHtml);
-  const total=pages.length;
-  const head=`${LETTERHEAD}<div class="page-head"><div class="t1">REPORT การวัดน้ำ / Water Gauging Report</div><div style="text-align:right"><div class="docno" style="font-size:17px;color:var(--stt-red-dark);font-weight:800">${esc(r.doc_no)}</div>${statusPill(r.status)}</div></div>`;
-  const foot=n=>`<div class="page-foot"><div>ผู้จัดทำ: <b>${maker}</b></div><div>วันที่จัดทำ: ${cdate}</div><div>หน้า ${n} / ${total}</div></div>`;
-  return pages.map((c,i)=>`<div class="page">${head}<div class="page-body">${c}</div>${foot(i+1)}</div>`).join("");
+  body+=chkHtml;
+  const head=`<div class="rep-head">${LETTERHEAD}<div class="page-head"><div class="t1">REPORT การวัดน้ำ / Water Gauging Report</div><div style="text-align:right"><div class="docno" style="font-size:17px;color:var(--stt-red-dark);font-weight:800">${esc(r.doc_no)}</div>${docStatusPill(r)}</div></div></div>`;
+  const foot=`<div class="rep-foot"><div>ผู้จัดทำ/ผู้วัดน้ำ: <b>${maker}</b></div><div>วันที่จัดทำ: ${cdate}</div></div>`;
+  return `<div class="report">${head}<div class="rep-content">${body}</div>${foot}</div>`;
 }
 async function DetailView(id){
   let r; try{r=await DB.getReport(id);}catch(e){$("#page").innerHTML='<p>โหลดไม่ได้</p>';return;}
