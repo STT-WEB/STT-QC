@@ -47,10 +47,11 @@ h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:0 0 12px}
 .tile .ic{font-size:34px;margin-bottom:8px}.tile .nm{font-weight:700}.tile .tag{position:absolute;top:8px;right:8px}
 .docnote{background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:14px}
 .docnote b{color:var(--stt-red-dark);font-size:17px}.docnote.pending{background:#f8fafc;border-color:var(--line);color:var(--ink-soft)}
-.stepper{display:flex;overflow-x:auto;gap:6px;padding:6px 2px 12px;margin-bottom:6px}
-.step{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;min-width:78px;text-align:center;opacity:.5;cursor:pointer}
+.stepper{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 4px;padding:6px 2px 10px;margin-bottom:4px}
+.step{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;min-width:74px;text-align:center;opacity:.78;cursor:pointer;border-radius:10px;padding:4px 2px}
+.step:hover,.step:active{background:var(--stt-red-soft)}
 .step.active{opacity:1}.step.done{opacity:1}
-.step .circ{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--line);background:#fff;color:var(--ink-soft);font-size:16px}
+.step .circ{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--line);background:#fff;color:var(--ink-soft);font-size:17px}
 .step.active .circ{border-color:var(--stt-red);color:var(--stt-red);background:var(--stt-red-soft)}
 .step.done .circ{border-color:var(--ok);background:var(--ok);color:#fff}
 .step .lbl{font-size:11px;margin-top:5px;line-height:1.2}
@@ -433,7 +434,7 @@ function NewReportView(){
   if(!DRAFT){ DRAFT=newDraft(); CUR=0; }
   buildSteps();
   if(!EMP_NAMES.length){ DB.employeeNames().then(n=>{ EMP_NAMES=n||[]; const dl=document.getElementById("emp-list-g"); if(dl) dl.innerHTML=EMP_NAMES.map(x=>`<option value="${esc(x)}">`).join(""); }).catch(()=>{}); }
-  $("#page").innerHTML=`<div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก? / Exit?')){DRAFT=null;go('home');}">${t('cancel')}</div><h1>${t('newTitle')}</h1><div id="docbanner"></div>${rejectBanner()}<div class="stepper" id="stepper"></div><div id="stepbody"></div><div class="row no-print" style="margin-top:16px"><button class="btn grey" id="btnPrev" onclick="stepPrev()">${t('prev')}</button><button class="btn sec" onclick="saveCore(false)">${t('saveDraftBtn')}</button><div style="flex:1"></div><button class="btn" id="btnNext" onclick="stepNext()">${t('next')}</button></div>`;
+  $("#page").innerHTML=`<div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก? / Exit?')){DRAFT=null;go('home');}">${t('cancel')}</div><h1>${t('newTitle')}</h1><div id="docbanner"></div>${rejectBanner()}<div class="stepper" id="stepper"></div><div class="no-print" style="font-size:12px;color:var(--stt-red-dark);background:var(--stt-red-soft);border-radius:8px;padding:6px 10px;margin-bottom:10px">👆 แตะวงกลมขั้นตอนด้านบน เพื่อกระโดดไปแก้/ถ่ายรูปใหม่แต่ละขั้นได้ทันที (ไม่ต้องกดถัดไปทีละขั้น)</div><div id="stepbody"></div><div class="row no-print" style="margin-top:16px"><button class="btn grey" id="btnPrev" onclick="stepPrev()">${t('prev')}</button><button class="btn sec" onclick="saveCore(false)">${t('saveDraftBtn')}</button><div style="flex:1"></div><button class="btn" id="btnNext" onclick="stepNext()">${t('next')}</button></div>`;
   refreshDocBanner(); drawStepper(); drawStep();
 }
 function refreshDocBanner(){ const el=document.getElementById("docbanner"); if(!el)return; const info=(DRAFT&&(DRAFT.job_no||DRAFT.customer))?` <span class="muted" style="font-weight:600">• Job ${esc(DRAFT.job_no||'-')} • ${esc(DRAFT.customer||'-')}</span>`:''; el.innerHTML = (DRAFT&&DRAFT.doc_no)?`<div class="docnote">📄 ${t('docNoLabel')}: <b>${esc(DRAFT.doc_no)}</b>${info}</div>`:`<div class="docnote pending">📄 ${t('docNoNone')}${info}</div>`; }
