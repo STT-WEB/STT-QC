@@ -51,6 +51,8 @@ h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:0 0 12px}
 .step{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;min-width:74px;text-align:center;opacity:.78;cursor:pointer;border-radius:10px;padding:4px 2px}
 .step:hover,.step:active{background:var(--stt-red-soft)}
 .step.active{opacity:1}.step.done{opacity:1}
+.step.active{background:var(--stt-red-soft);box-shadow:inset 0 0 0 1.5px var(--stt-red)}
+.step.active .lbl{color:var(--stt-red-dark);font-weight:700}
 .step .circ{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--line);background:#fff;color:var(--ink-soft);font-size:17px}
 .step.active .circ{border-color:var(--stt-red);color:var(--stt-red);background:var(--stt-red-soft)}
 .step.done .circ{border-color:var(--ok);background:var(--ok);color:#fff}
@@ -439,7 +441,20 @@ function NewReportView(){
 }
 function refreshDocBanner(){ const el=document.getElementById("docbanner"); if(!el)return; const info=(DRAFT&&(DRAFT.job_no||DRAFT.customer))?` <span class="muted" style="font-weight:600">• Job ${esc(DRAFT.job_no||'-')} • ${esc(DRAFT.customer||'-')}</span>`:''; el.innerHTML = (DRAFT&&DRAFT.doc_no)?`<div class="docnote">📄 ${t('docNoLabel')}: <b>${esc(DRAFT.doc_no)}</b>${info}</div>`:`<div class="docnote pending">📄 ${t('docNoNone')}${info}</div>`; }
 function rejectBanner(){ try{ if(!DRAFT||!DRAFT.review_photos) return ''; const bad=allPhotos(DRAFT).filter(p=>DRAFT.review_photos[p.key]==='no'); if(!bad.length) return ''; return `<div class="banner" style="background:#fef2f2;border:1px solid #fca5a5;color:#991b1b"><b>❗ หัวหน้าให้แก้ไข/ถ่ายรูปใหม่ ${bad.length} จุด:</b><br>${bad.map(p=>'• '+esc(p.label)).join('<br>')}<br><span style="font-size:12px">แก้จุดข้างบนแล้วกด "ส่งขอ Approve" อีกครั้ง</span></div>`; }catch(e){ return ''; } }
-function drawStepper(){ $("#stepper").innerHTML=STEPS.map((s,i)=>`<div class="step ${i===CUR?'active':''} ${i<CUR?'done':''}" onclick="jumpStep(${i})"><div class="circ">${i<CUR?'✓':s.ic}</div><div class="lbl">${i+1}. ${t('step_'+s.key)}</div></div>`).join(""); }
+function chkRangeDone(s,e){ for(let i=s;i<e;i++){ const x=DRAFT.checklist[i]; if(!x||!x.st) return false; if(x.st==='fail'&&(!x.fdate||!x.fby)) return false; if(x.st==='na'&&!(x.note&&x.note.trim())) return false; } return true; }
+function tableDone(){ const oil=isOil(); if(!DRAFT.comps||!DRAFT.comps.length) return false; for(const c of DRAFT.comps){ const pls=c.plates||[]; if(!pls.length) return false; for(const p of pls){ if(!String(p.vol||'').trim()) return false; if(oil){ if(!String(p.u||'').trim()||!String(p.bot||'').trim()) return false; } else { if(!String(p.seal_no||'').trim()||!String(p.level_bottom||'').trim()) return false; } } if(oil){ if(!String(c.h||'').trim()||!String(c.seal_plate||'').trim()) return false; } } return true; }
+function slotsDone(target,labels){ const st=DRAFT[target]||{}; for(let i=0;i<labels.length;i++){ if(!st[i]) return false; } return true; }
+function stepDone(key){
+  if(key==='job') return !!(DRAFT.customer&&DRAFT.customer.trim()&&DRAFT.sa&&DRAFT.sa.trim());
+  if(key==='precheck') return chkRangeDone(0,CHK_PRE);
+  if(key==='postcheck') return chkRangeDone(CHK_PRE,CHK_FM.length);
+  if(key==='table') return tableDone();
+  if(key==='seal') return slotsDone('seal_slots',SEAL_SLOTS);
+  if(key==='chassis') return slotsDone('chassis_slots',CHASSIS_SLOTS);
+  if(key==='summary') return STEPS.every(s=>s.key==='summary'||stepDone(s.key));
+  return false;
+}
+function drawStepper(){ $("#stepper").innerHTML=STEPS.map((s,i)=>{ const dn=stepDone(s.key); return `<div class="step ${i===CUR?'active':''} ${dn?'done':''}" onclick="jumpStep(${i})"><div class="circ">${dn?'✓':s.ic}</div><div class="lbl">${i+1}. ${t('step_'+s.key)}</div></div>`; }).join(""); }
 function jumpStep(i){ collectStep(); CUR=i; drawStepper(); drawStep(); window.scrollTo(0,0); }
 function camImgErr(img){ try{ img.style.display='none'; const s=document.createElement('span'); s.className='add'; s.style.fontSize='12px'; s.style.color='#16a34a'; s.textContent='✓ มีรูปแล้ว'; img.parentNode.appendChild(s); }catch(e){} }
 function curKey(){ return STEPS[CUR].key; }
@@ -454,7 +469,7 @@ function drawStep(){
   else if(k==="seal") b.innerHTML=stepSlots("seal_slots",SEAL_SLOTS,"🔒 จุดร้อยซีล / Seals","ถ่ายให้ครบตามหัวข้อ (ตามข้อกำหนด)");
   else if(k==="chassis") b.innerHTML=stepSlots("chassis_slots",CHASSIS_SLOTS,"🚛 Chassis / Name Plate","ถ่าย 6 รูป: หน้ารถ(เห็นทะเบียน), Chassis No.หัว, ท้ายรถ(เห็นทะเบียน), Chassis No.หาง, รูป 45°, Name Plate");
   else if(k==="summary") b.innerHTML=stepSummary();
-  refreshDocBanner(); bindStep();
+  refreshDocBanner(); drawStepper(); bindStep();
 }
 function gv(id){const e=document.getElementById(id);return e?e.value:"";}
 function stepJob(){
