@@ -89,10 +89,17 @@ table.data th{background:#f8fafc;font-weight:700}
 .slot .ph{aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .slot .ph img{width:100%;height:100%;object-fit:cover}.slot .ph .add{color:var(--ink-soft);font-size:24px}
 .slot .del{position:absolute;top:24px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:50%;width:22px;height:22px;font-size:13px;line-height:1}
+.slot-acts{display:flex;gap:3px;padding:4px}.sa-btn{flex:1;border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 2px;font-size:11px;font-weight:700;color:var(--ink);cursor:pointer}
+.sa-btn:hover{background:var(--stt-red-soft);border-color:var(--stt-red);color:var(--stt-red-dark)}
 .up-note{font-size:11px;color:var(--ink-soft);margin-top:6px}
 .camov{position:fixed;inset:0;background:#000;z-index:300;display:flex;flex-direction:column}
 .camov video{flex:1;width:100%;min-height:0;object-fit:contain;background:#000}
 .camov .camhint{position:absolute;top:46%;left:0;right:0;text-align:center;color:#fff;font-size:14px;padding:0 20px}
+.camov .camctl{position:absolute;top:12px;left:0;right:0;display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;padding:0 12px;z-index:2}
+.camov .cambtn{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:7px 14px;font-size:13px;font-weight:700}
+.camov .cambtn.on{background:#f59e0b;border-color:#f59e0b;color:#111}
+.camov .camzoom{background:rgba(0,0,0,.45);color:#fff;border-radius:20px;padding:6px 12px;font-size:12px;display:flex;align-items:center;gap:6px}
+.camov .camzoom input[type=range]{width:120px}
 .camov .cambar{display:flex;gap:10px;justify-content:center;padding:16px;background:#111}
 .rep-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;cursor:pointer;background:#fff}
 .rep-item:hover{border-color:var(--stt-red);background:var(--stt-red-soft)}
@@ -568,8 +575,10 @@ function slotHtml(target,a,b,label,url){
   else if(target==="chk") attr=`data-target="chk" data-idx="${b}"`;
   else if(target==="chk2") attr=`data-target="chk2" data-idx="${b}"`;
   else attr=`data-target="${target}" data-idx="${b}"`;
-  return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" ${attr} onclick="openCamera(this)">${url?`<img src="${esc(imgSrc(url))}" onerror="camImgErr(this)">`:`<span class="add">📷</span>`}</div>${url?`<button class="del" ${attr} data-del="1">×</button>`:''}</div>`;
+  if(url) return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" onclick="viewPhoto('${esc(url)}')"><img src="${esc(imgSrc(url))}" onerror="camImgErr(this)"></div><div class="slot-acts"><button class="sa-btn" onclick="viewPhoto('${esc(url)}')" type="button">👁 ดู</button><button class="sa-btn" ${attr} onclick="openCamera(this)" type="button">📷 ถ่ายใหม่</button><button class="sa-btn" ${attr} data-del="1" type="button">🗑</button></div></div>`;
+  return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" ${attr} onclick="openCamera(this)"><span class="add">📷</span></div></div>`;
 }
+function viewPhoto(u){ try{ window.open(u,'_blank'); }catch(e){ toast('เปิดรูปไม่ได้'); } }
 function stepSummary(){
   const fails=DRAFT.checklist.filter(x=>x.st==='fail').length;
   const gg=(DRAFT.gaugers||[]).filter(Boolean);
@@ -583,7 +592,7 @@ function bindStep(){
   document.querySelectorAll("#stepbody input[data-chk]").forEach(inp=>{ inp.addEventListener("input",()=>{DRAFT.checklist[+inp.dataset.chk][inp.dataset.fk]=inp.value;}); });
   document.querySelectorAll(".seg[data-i]").forEach(seg=>{ seg.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{ const i=+seg.dataset.i,v=btn.dataset.v; DRAFT.checklist[i].st=v; drawStep(); }); });
   /* ถ่ายรูปผ่านกล้องในแอป (openCamera) — ไม่ใช้ file input แล้ว เพื่อบังคับถ่ายสด */
-  document.querySelectorAll(".del[data-del]").forEach(btn=>{ btn.onclick=()=>{ storeSlot(btn.dataset,""); drawStep(); }; });
+  document.querySelectorAll("#stepbody [data-del]").forEach(btn=>{ btn.onclick=()=>{ if(!confirm('ลบรูปนี้?')) return; storeSlot(btn.dataset,""); drawStep(); }; });
 }
 function slotLabel(ds){
   const tag=(DRAFT.doc_no||DRAFT.sa||"STT");
@@ -607,11 +616,12 @@ function storeSlot(ds,url){
   else { DRAFT[ds.target]=DRAFT[ds.target]||{}; DRAFT[ds.target][ds.idx]=url; }
 }
 /* ===== กล้องในแอป (ถ่ายสดเท่านั้น) ===== */
-let CAM={stream:null,ds:null,label:"",facing:"environment"};
+let CAM={stream:null,ds:null,label:"",facing:"environment",torch:false};
+const CAMBAR='<div class="camctl" id="camctl"></div><div class="cambar"><button class="btn grey" onclick="closeCamera()">ยกเลิก</button><button class="btn" onclick="captureCam()">📸 ถ่าย</button><button class="btn sec" onclick="switchCam()">🔄 สลับกล้อง</button></div>';
 function openCamera(elem){
   const ds=elem.dataset; CAM.ds={target:ds.target,ci:ds.ci,pi:ds.pi,key:ds.key,idx:ds.idx}; CAM.label=slotLabel(CAM.ds); CAM.facing="environment";
   const ov=document.createElement('div'); ov.id='camov'; ov.className='camov';
-  ov.innerHTML='<video id="camv" autoplay playsinline muted></video><div class="camhint" id="camhint">กำลังเปิดกล้อง... (อนุญาตให้ใช้กล้อง)</div><div class="cambar"><button class="btn grey" onclick="closeCamera()">ยกเลิก</button><button class="btn" onclick="captureCam()">📸 ถ่าย</button><button class="btn sec" onclick="switchCam()">🔄 สลับกล้อง</button></div>';
+  ov.innerHTML='<video id="camv" autoplay playsinline muted></video><div class="camhint" id="camhint">กำลังเปิดกล้อง... (อนุญาตให้ใช้กล้อง)</div>'+CAMBAR;
   document.body.appendChild(ov);
   startCam();
 }
@@ -620,11 +630,23 @@ async function startCam(){
     if(CAM.stream) CAM.stream.getTracks().forEach(t=>t.stop());
     if(!window.isSecureContext) return showCamError('secure');
     if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) return showCamError('nodev');
-    CAM.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:CAM.facing}},audio:false});
+    CAM.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:CAM.facing},width:{ideal:1920},height:{ideal:1080}},audio:false});
     const v=document.getElementById('camv'); if(v) v.srcObject=CAM.stream;
     const h=document.getElementById('camhint'); if(h) h.style.display='none';
+    CAM.torch=false;
+    try{ const tr=CAM.stream.getVideoTracks()[0]; if(tr&&tr.applyConstraints) tr.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(()=>{}); }catch(e){}
+    setupCamControls();
   }catch(e){ showCamError((e&&e.name)||(e&&e.message)||'err'); }
 }
+function setupCamControls(){
+  try{ const ctl=document.getElementById('camctl'); if(!ctl||!CAM.stream) return; const tr=CAM.stream.getVideoTracks()[0]; const caps=(tr&&tr.getCapabilities)?tr.getCapabilities():{}; let html='';
+    if(caps && caps.torch) html+='<button class="cambtn" id="torchbtn" onclick="toggleTorch()">🔦 ไฟแฟลช</button>';
+    if(caps && caps.zoom){ const z=caps.zoom; const cur=(tr.getSettings&&tr.getSettings().zoom)||z.min; html+='<span class="camzoom">🔍 ซูม <input type="range" min="'+z.min+'" max="'+z.max+'" step="'+(z.step||0.1)+'" value="'+cur+'" oninput="applyZoom(this.value)"></span>'; }
+    ctl.innerHTML=html;
+  }catch(e){}
+}
+function toggleTorch(){ try{ const tr=CAM.stream&&CAM.stream.getVideoTracks()[0]; if(!tr) return; CAM.torch=!CAM.torch; tr.applyConstraints({advanced:[{torch:CAM.torch}]}).catch(()=>toast('อุปกรณ์นี้ไม่รองรับแฟลช')); const b=document.getElementById('torchbtn'); if(b) b.classList.toggle('on',CAM.torch); }catch(e){} }
+function applyZoom(v){ try{ const tr=CAM.stream&&CAM.stream.getVideoTracks()[0]; if(tr) tr.applyConstraints({advanced:[{zoom:Number(v)}]}).catch(()=>{}); }catch(e){} }
 function showCamError(kind){
   if(CAM.stream){ CAM.stream.getTracks().forEach(t=>t.stop()); CAM.stream=null; }
   const ov=document.getElementById('camov'); if(!ov) return;
@@ -638,7 +660,7 @@ function showCamError(kind){
 }
 function startCamReopen(){
   const ov=document.getElementById('camov'); if(!ov) return;
-  ov.innerHTML='<video id="camv" autoplay playsinline muted></video><div class="camhint" id="camhint">กำลังเปิดกล้อง...</div><div class="cambar"><button class="btn grey" onclick="closeCamera()">ยกเลิก</button><button class="btn" onclick="captureCam()">📸 ถ่าย</button><button class="btn sec" onclick="switchCam()">🔄 สลับกล้อง</button></div>';
+  ov.innerHTML='<video id="camv" autoplay playsinline muted></video><div class="camhint" id="camhint">กำลังเปิดกล้อง...</div>'+CAMBAR;
   startCam();
 }
 function switchCam(){ CAM.facing=CAM.facing==='environment'?'user':'environment'; startCam(); }
@@ -646,11 +668,11 @@ function closeCamera(){ if(CAM.stream){ CAM.stream.getTracks().forEach(t=>t.stop
 async function captureCam(){
   const v=document.getElementById('camv'); if(!v||!v.videoWidth){ return toast('กล้องยังไม่พร้อม รอสักครู่'); }
   // ย่อรูปก่อนอัป (max 1280px) เพื่อให้อัป/เซฟเร็วขึ้นมาก
-  const MAX=1280; let w=v.videoWidth, h=v.videoHeight; const sc=Math.min(1, MAX/Math.max(w,h)); w=Math.round(w*sc); h=Math.round(h*sc);
-  const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(v,0,0,w,h);
+  const MAX=1600; let w=v.videoWidth, h=v.videoHeight; const sc=Math.min(1, MAX/Math.max(w,h)); w=Math.round(w*sc); h=Math.round(h*sc);
+  const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const ctx=cv.getContext('2d'); ctx.imageSmoothingQuality='high'; ctx.drawImage(v,0,0,w,h);
   // ปิดกล้องทันที + อัปเบื้องหลัง ให้รู้สึกเร็ว
   const ds=CAM.ds, label=CAM.label; closeCamera(); toast(t('uploading'));
-  const blob=await new Promise(res=>cv.toBlob(res,'image/jpeg',0.72));
+  const blob=await new Promise(res=>cv.toBlob(res,'image/jpeg',0.85));
   let url; try{ url=await uploadImage(blob,label,true); }catch(err){ return toast('อัปโหลดไม่สำเร็จ: '+(err.message||err)); }
   storeSlot(ds,url); drawStep(); toast("เพิ่มรูปแล้ว ✓");
 }
