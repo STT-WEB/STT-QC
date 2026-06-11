@@ -459,7 +459,7 @@ function stepDone(key){
   if(key==='precheck') return chkRangeDone(0,CHK_PRE);
   if(key==='postcheck') return chkRangeDone(CHK_PRE,CHK_FM.length);
   if(key==='table') return tableDone();
-  if(key==='seal') return slotsDone('seal_slots',SEAL_SLOTS);
+  if(key==='seal') return isOil()? slotsDone('seal_slots',SEAL_SLOTS) : true;
   if(key==='chassis') return slotsDone('chassis_slots',CHASSIS_SLOTS);
   if(key==='summary') return STEPS.every(s=>s.key==='summary'||stepDone(s.key));
   return false;
@@ -476,7 +476,7 @@ function drawStep(){
   else if(k==="precheck") b.innerHTML=stepChecklist(0,CHK_PRE,'pre');
   else if(k==="postcheck") b.innerHTML=stepChecklist(CHK_PRE,CHK_FM.length,'post');
   else if(k==="table") b.innerHTML=stepTable();
-  else if(k==="seal") b.innerHTML=stepSlots("seal_slots",SEAL_SLOTS,"🔒 จุดร้อยซีล / Seals","ถ่ายให้ครบตามหัวข้อ (ตามข้อกำหนด)");
+  else if(k==="seal") b.innerHTML=stepSlots("seal_slots",SEAL_SLOTS,"🔒 จุดร้อยซีล / Seals",isOil()?"รถน้ำมัน: ถ่ายให้ครบทั้ง 8 จุดตามข้อกำหนด":"รถเคมี: ถ่ายเท่าที่มีจริง ไม่บังคับครบทุกจุด (Report จะโชว์เฉพาะรูปที่ถ่าย)");
   else if(k==="chassis") b.innerHTML=stepSlots("chassis_slots",CHASSIS_SLOTS,"🚛 Chassis / Name Plate","ถ่าย 6 รูป: หน้ารถ(เห็นทะเบียน), Chassis No.หัว, ท้ายรถ(เห็นทะเบียน), Chassis No.หาง, รูป 45°, Name Plate");
   else if(k==="summary") b.innerHTML=stepSummary();
   refreshDocBanner(); drawStepper(); bindStep();
