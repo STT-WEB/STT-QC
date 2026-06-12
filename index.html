@@ -385,6 +385,7 @@ function HomeView(){
 function openWater(){
   CURVIEW="water"; window.scrollTo(0,0);
   $("#page").innerHTML=`<div class="crumb" onclick="go('home')">${t('backHome')}</div><h1>💧 ${t('modWater')}</h1><div class="tiles" style="margin-top:14px"><div class="tile active" onclick="go('new')"><div class="ic">➕</div><div class="nm">${t('newRep')}</div></div><div class="tile active" onclick="go('search')"><div class="ic">🔍</div><div class="nm">${t('searchRep')}</div></div>${canReview()?`<div class="tile active" onclick="go('approve')"><span class="tag pill warn" id="apvbadge"></span><div class="ic">✅</div><div class="nm">รอ Approve (หัวหน้า)</div></div>`:''}${canReview()?`<div class="tile active" onclick="go('provertank')"><div class="ic">🛢️</div><div class="nm">Prover Tank (มาตรฐาน)</div></div>`:''}<div class="tile active" onclick="go('howto')"><div class="ic">📖</div><div class="nm">${t('howtoTile')}</div></div></div>`;
+  loadProver();
   if(canReview()) DB.searchReports("").then(rows=>{ const n=(rows||[]).filter(r=>r.status!=='draft'&&r.review_status!=='accepted').length; const b=document.getElementById("apvbadge"); if(b&&n) b.textContent=n+" รอ"; }).catch(()=>{});
 }
 /* ===== คู่มือการใช้งานแอป (2 บทบาท + ภาพ SVG) ===== */
@@ -935,6 +936,7 @@ function buildReportPages(r){
   return `<div class="report"><table class="rep-table"><thead><tr><td>${head}</td></tr></thead><tfoot><tr><td>${foot}</td></tr></tfoot><tbody><tr><td><div class="rep-content">${body}</div></td></tr></tbody></table></div>`;
 }
 async function DetailView(id){
+  await loadProver();
   let r; try{r=await DB.getReport(id);}catch(e){$("#page").innerHTML='<p>โหลดไม่ได้</p>';return;}
   if(!r){$("#page").innerHTML='<p>ไม่พบรายงาน</p>';return;}
   const logs=await DB.printLogs(id).catch(()=>[]);
@@ -978,4 +980,10 @@ function showInAppGate(){
   const ov=document.createElement('div'); ov.id='inappgate';
   ov.style.cssText='position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#D81E2C,#A6121E);display:flex;align-items:center;justify-content:center;padding:22px';
   ov.innerHTML='<div style="background:#fff;color:#1f2937;border-radius:18px;padding:24px;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)"><div style="font-size:42px">🌐</div><h2 style="color:#D81E2C;margin:6px 0 8px">เปิดในเบราว์เซอร์ก่อนนะ</h2><p style="font-size:14px;line-height:1.6;color:#374151">ตอนนี้เปิดผ่านแอป '+(isLine?'LINE':'อื่น')+' ซึ่ง <b>กล้องอาจถ่ายรูปไม่ได้</b><br>เปิดในเบราว์เซอร์ (Chrome/Safari) เพื่อใช้งานเต็มที่</p><button onclick="openExternalBrowser()" style="width:100%;background:#D81E2C;color:#fff;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:800;margin-top:6px">เปิดในเบราว์เซอร์ →</button><div style="font-size:12.5px;color:#6b7280;margin-top:12px;text-align:left;line-height:1.8"><b>ถ้าปุ่มไม่ทำงาน เปิดเอง:</b><br>• <b>Android:</b> แตะ <b>⋮</b> มุมขวาบน → <b>เปิดในเบราว์เซอร์อื่น</b><br>• <b>iPhone:</b> แตะ <b>↗ / ⋯</b> → <b>เปิดใน Safari</b></div><a href="javascript:void(0)" onclick="document.getElementById(\'inappgate\').remove();try{LS.set(\'skip_inapp\',true)}catch(e){}" style="display:inline-block;margin-top:14px;font-size:12px;color:#9ca3af">ใช้ต่อทางนี้ (กล้องอาจใช้ไม่ได้)</a></div>';
-  docu
+  document.body.appendChild(ov);
+}
+if(inAppBrowser()) setTimeout(showInAppGate,60);
+render("home");
+</script>
+</body>
+</html>
