@@ -460,7 +460,7 @@ function stepDone(key){
   if(key==='postcheck') return chkRangeDone(CHK_PRE,CHK_FM.length);
   if(key==='table') return tableDone();
   if(key==='seal') return isOil()? slotsDone('seal_slots',SEAL_SLOTS) : true;
-  if(key==='chassis') return slotsDone('chassis_slots',CHASSIS_SLOTS);
+  if(key==='chassis'){ const st=DRAFT.chassis_slots||{}; for(let i=0;i<CHASSIS_SLOTS.length;i++){ if(!isSemi()&&i===3) continue; if(!st[i]) return false; } return true; }
   if(key==='summary') return STEPS.every(s=>s.key==='summary'||stepDone(s.key));
   return false;
 }
@@ -477,7 +477,7 @@ function drawStep(){
   else if(k==="postcheck") b.innerHTML=stepChecklist(CHK_PRE,CHK_FM.length,'post');
   else if(k==="table") b.innerHTML=stepTable();
   else if(k==="seal") b.innerHTML=stepSlots("seal_slots",SEAL_SLOTS,"🔒 จุดร้อยซีล / Seals",isOil()?"รถน้ำมัน: ถ่ายให้ครบทั้ง 8 จุดตามข้อกำหนด":"รถเคมี: ถ่ายเท่าที่มีจริง ไม่บังคับครบทุกจุด (Report จะโชว์เฉพาะรูปที่ถ่าย)");
-  else if(k==="chassis") b.innerHTML=stepSlots("chassis_slots",CHASSIS_SLOTS,"🚛 Chassis / Name Plate","ถ่าย 6 รูป: หน้ารถ(เห็นทะเบียน), Chassis No.หัว, ท้ายรถ(เห็นทะเบียน), Chassis No.หาง, รูป 45°, Name Plate");
+  else if(k==="chassis") b.innerHTML=stepSlots("chassis_slots",CHASSIS_SLOTS,"🚛 Chassis / Name Plate",isSemi()?"ถ่าย 6 รูป: หน้ารถ(เห็นทะเบียน), Chassis No.หัว, ท้ายรถ(เห็นทะเบียน), Chassis No.หาง, รูป 45°, Name Plate":"รถ 10/6 ล้อ (ไม่มีหาง): ถ่าย 5 รูป — ตัด Chassis No.หาง ออก",isSemi()?[]:[3]);
   else if(k==="summary") b.innerHTML=stepSummary();
   refreshDocBanner(); drawStepper(); bindStep();
 }
@@ -506,6 +506,7 @@ function stepJob(){
   </div>`;
 }
 function isOtherMaker(){ return String((DRAFT&&DRAFT.tank_origin)||'').indexOf('อื่น')>=0; }
+function isSemi(){ const v=String((DRAFT&&DRAFT.vehicle_type)||''); return v.toLowerCase().indexOf('semi')>=0 || v.indexOf('กึ่งพ่วง')>=0 || v.indexOf('พ่วง')>=0; }
 function onTankOriginChange(){ collectStep(); drawStep(); }
 function onJobTypeChange(){ collectStep(); drawStep(); }
 function onProductChange(){ collectStep(); drawStep(); }
@@ -564,9 +565,9 @@ function compCard(c,i){
     ${compFields}
     <div class="slot-grid">${extras.map(s=>slotHtml("comp",i,s.k,s.l,c[s.k])).join("")}</div></div>`;
 }
-function stepSlots(target,labels,title,hint){
-  const store=DRAFT[target]||{};
-  return `<div class="card"><div class="guide-box">📷 <b>${title}</b><br>${hint}</div><div class="slot-grid">${labels.map((lab,idx)=>slotHtml(target,idx,idx,lab,store[idx])).join("")}</div></div>`;
+function stepSlots(target,labels,title,hint,hide){
+  const store=DRAFT[target]||{}; hide=hide||[];
+  return `<div class="card"><div class="guide-box">📷 <b>${title}</b><br>${hint}</div><div class="slot-grid">${labels.map((lab,idx)=>hide.indexOf(idx)>=0?'':slotHtml(target,idx,idx,lab,store[idx])).join("")}</div></div>`;
 }
 function slotHtml(target,a,b,label,url){
   let attr;
