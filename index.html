@@ -968,7 +968,7 @@ function reAlert(r){ alertSale(r,[]); }
 window.addEventListener('error',function(e){ try{ toast('ผิดพลาด: '+(e.message||'')); }catch(_){} });
 window.addEventListener('unhandledrejection',function(e){ try{ toast('ผิดพลาด: '+((e.reason&&e.reason.message)||e.reason||'')); }catch(_){} });
 /* ===== เปิดผ่านแอป LINE/อื่น → เด้งไปเบราว์เซอร์จริง (กล้องถึงจะใช้ได้) ===== */
-function inAppBrowser(){ const ua=navigator.userAgent||''; return /Line\//i.test(ua)||/FBAN|FBAV|FB_IAB|Instagram|Messenger|;wv\)/i.test(ua); }
+function inAppBrowser(){ const ua=navigator.userAgent||''; return /Line\//i.test(ua)||/FBAN|FBAV|FB_IAB|Instagram|Messenger/i.test(ua); }
 function openExternalBrowser(){ const url=location.href.split('#')[0]; const sep=url.indexOf('?')>=0?'&':'?'; const ua=navigator.userAgent||'';
   if(/Line\//i.test(ua)){ location.href=url+sep+'openExternalBrowser=1'; return; }
   if(/Android/i.test(ua)){ try{ const u=url.replace(/^https?:\/\//,''); location.href='intent://'+u+'#Intent;scheme=https;package=com.android.chrome;end'; return; }catch(e){} }
@@ -983,7 +983,7 @@ function showInAppGate(){
   document.body.appendChild(ov);
 }
 if(inAppBrowser()) setTimeout(showInAppGate,60);
-render("home");
+try{ render("home"); }catch(e){ try{ document.getElementById("root").innerHTML='<div style="padding:24px;color:#b91c1c">เกิดข้อผิดพลาด: '+(e&&e.message||e)+' — รีเฟรช (Ctrl+Shift+R) หรือเปิดใน Chrome/Safari</div>'; }catch(_){} }
 </script>
 </body>
 </html>
