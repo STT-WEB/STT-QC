@@ -140,6 +140,10 @@ table.data th{background:#f8fafc;font-weight:700}
 .r2-l4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .rep-meas{font-size:11px}
 .rep-meas th{font-size:10px;line-height:1.2;background:var(--stt-red-soft);color:var(--stt-red-dark);font-weight:700}
+.r2-chk{flex-wrap:nowrap;padding:6px 6px}
+.r2-chk .no{height:22px;min-width:22px;margin-top:0}
+.r2-chk .desc{font-size:12.5px;min-width:0}
+.r2-note{flex:0 1 auto;align-self:center;text-align:right;font-size:11px;color:#666;margin-left:8px;max-width:42%}
 .lh{display:flex;gap:12px;align-items:flex-start;border-bottom:3px solid var(--stt-red);padding-bottom:8px;margin-bottom:8px}
 .lh-mark{flex:0 0 auto;text-align:center;line-height:1}
 .lh-img{height:54px;width:auto;display:block}
@@ -196,6 +200,12 @@ table.data th{background:#f8fafc;font-weight:700}
   .r2-ib{padding:3px 7px}
   .r2-meta{font-size:10.5px}
   .rep-meas th,.rep-meas td{padding:2px 3px;font-size:9px}
+  .r2-chkpage{page-break-inside:avoid}
+  .r2-chkpage .chk-item{padding:2.5px 5px}
+  .r2-chkpage .chk-item .desc{font-size:10.5px}
+  .r2-chkpage .chk-item .no{height:17px;min-width:17px;font-size:9px}
+  .r2-chkpage .grp{margin:4px 0 2px;font-size:11px}
+  .r2-note{font-size:9.5px}
   .model-grid{align-items:center;gap:7mm}
   .model-cell{max-width:120mm}.model-cell .wm-wrap{max-width:120mm}.model-cell .wm-base{max-height:62mm;width:auto;max-width:120mm}
 }
@@ -942,8 +952,8 @@ function buildReportPages(r){
   body+=`<div class="sign-block keep"><div class="sign-row">${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)',insp1,'วันที่ '+cdate)}${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)',insp2,insp2?('วันที่ '+cdate):blankDate)}${sbox('หัวหน้าตรวจสอบ (QC Lead)',esc(d.reviewer||''),ldate?('วันที่ '+ldate):blankDate)}</div><div class="sign-row" style="padding:0 14%">${sbox('ผู้ร่วมตรวจสอบ (Witnessed by)','',blankDate)}${sbox('ผู้รับรอง (Approved by)','',blankDate)}</div></div>`;
   // ===== หน้า 2: Checklist (ไม่มีเซ็น) =====
   const cl=d.checklist||[];
-  body+=`<div class="r2-break"><div class="r2-sec">ผลการตรวจสอบ (FM-SAL-0102)</div>`;
-  cl.forEach((it,i)=>{ if(i===0) body+=`<div class="grp">ก่อนวัดน้ำ (ข้อ 1-8)</div>`; if(i===CHK_PRE) body+=`<div class="grp">หลังวัดน้ำ (ข้อ 9-12)</div>`; const st=(it&&it.st)?it.st:''; const fix=(st==='fail')?`<div class="muted">แก้ไข: ${esc(it.fd||'-')} • วันที่ ${esc(it.fdate||'-')} • โดย ${esc(it.fby||'-')}</div>`:((st==='na'&&it.note)?`<div class="muted">หมายเหตุ: ${esc(it.note)}</div>`:''); body+=`<div class="chk-item"><div class="no">${(CHK_FM[i]&&CHK_FM[i].no)||(i+1)}</div><div class="desc">${esc((CHK_FM[i]&&CHK_FM[i].txt)||'')}${fix}</div>${triple(st)}</div>`; });
+  body+=`<div class="r2-break r2-chkpage"><div class="r2-sec">ผลการตรวจสอบ (FM-SAL-0102)</div>`;
+  cl.forEach((it,i)=>{ if(i===0) body+=`<div class="grp">ก่อนวัดน้ำ (ข้อ 1-8)</div>`; if(i===CHK_PRE) body+=`<div class="grp">หลังวัดน้ำ (ข้อ 9-12)</div>`; const st=(it&&it.st)?it.st:''; const note=(st==='fail')?`<div class="r2-note">แก้ไข: ${esc(it.fd||'-')} • ${esc(it.fdate||'-')} • ${esc(it.fby||'-')}</div>`:((st==='na'&&it.note)?`<div class="r2-note">หมายเหตุ: ${esc(it.note)}</div>`:''); body+=`<div class="chk-item r2-chk"><div class="no">${(CHK_FM[i]&&CHK_FM[i].no)||(i+1)}</div><div class="desc">${esc((CHK_FM[i]&&CHK_FM[i].txt)||'')}</div>${triple(st)}${note}</div>`; });
   if(d.remark) body+=`<div class="guide-box" style="margin-top:10px"><b>หมายเหตุ:</b> ${esc(d.remark)}</div>`;
   body+=`</div>`;
   // ===== หน้า 3: รูปภาพแยกหัวข้อ =====
