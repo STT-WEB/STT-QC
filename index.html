@@ -185,8 +185,10 @@ table.data th{background:#f8fafc;font-weight:700}
   .lh-img{height:52px}.lh-name{font-size:16px}.page-head{margin:3px 0 0}
   h2{font-size:14px;margin:8px 0 5px;page-break-after:avoid}
   .grp{page-break-after:avoid}
-  .keep,.sign-row,.rep-photos .c,table.data,.chk-item,.comp-blk>.keep{page-break-inside:avoid}
-  .rep-meas{page-break-inside:auto}
+  .keep,.sign-block,.rep-photos .c,table.data,.chk-item,.comp-blk>.keep{page-break-inside:avoid}
+  table.rep-meas{page-break-inside:auto}
+  .r2-page1{display:flex;flex-direction:column;min-height:230mm}
+  .r2-page1 .sign-block{margin-top:auto}
   .rep-photos,.rep-photos.sm{grid-template-columns:repeat(4,1fr);gap:6px}
   .rep-photos .c{border:1px solid #888;border-radius:5px}
   .rep-photos .c.land{grid-column:span 2}
@@ -912,7 +914,7 @@ function buildReportPages(r){
   let body='';
   // ===== หน้า 1: Calibration Report =====
   const ib=(l,v)=>`<div class="r2-ib"><div class="l">${l}</div><div class="v">${String(v==null?'':v).trim()?v:'-'}</div></div>`;
-  body+=`<div class="r2-sec">ข้อมูลทั่วไป (Tank Information)</div><div class="r2-ig">`
+  body+=`<div class="r2-page1"><div class="r2-sec">ข้อมูลทั่วไป (Tank Information)</div><div class="r2-ig">`
     +ib('ลูกค้า / Customer',esc(r.customer))
     +ib('ที่อยู่ / Address',esc(r.address))
     +ib('Job No.',esc(r.job_no))
@@ -953,7 +955,7 @@ function buildReportPages(r){
   body+=`<div class="sign-block"><div class="sign-row">${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)',insp1,'วันที่ '+cdate)}${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)',insp2,insp2?('วันที่ '+cdate):blankDate)}${sbox('หัวหน้าตรวจสอบ (QC Lead)',esc(d.reviewer||''),ldate?('วันที่ '+ldate):blankDate)}</div><div class="sign-row" style="padding:0 14%">${sbox('ผู้ร่วมตรวจสอบ (Witnessed by)','',blankDate)}${sbox('ผู้รับรอง (Approved by)','',blankDate)}</div></div>`;
   // ===== หน้า 2: Checklist (ไม่มีเซ็น) =====
   const cl=d.checklist||[];
-  body+=`<div class="r2-break r2-chkpage"><div class="r2-sec">ผลการตรวจสอบ (FM-SAL-0102)</div>`;
+  body+=`</div><div class="r2-break r2-chkpage"><div class="r2-sec">ผลการตรวจสอบ (FM-SAL-0102)</div>`;
   cl.forEach((it,i)=>{ if(i===0) body+=`<div class="grp">ก่อนวัดน้ำ (ข้อ 1-8)</div>`; if(i===CHK_PRE) body+=`<div class="grp">หลังวัดน้ำ (ข้อ 9-12)</div>`; const st=(it&&it.st)?it.st:''; const note=(st==='fail')?`<div class="r2-note">แก้ไข: ${esc(it.fd||'-')} • ${esc(it.fdate||'-')} • ${esc(it.fby||'-')}</div>`:((st==='na'&&it.note)?`<div class="r2-note">หมายเหตุ: ${esc(it.note)}</div>`:''); body+=`<div class="chk-item r2-chk"><div class="no">${(CHK_FM[i]&&CHK_FM[i].no)||(i+1)}</div><div class="desc">${esc((CHK_FM[i]&&CHK_FM[i].txt)||'')}</div>${triple(st)}${note}</div>`; });
   if(d.remark) body+=`<div class="guide-box" style="margin-top:10px"><b>หมายเหตุ:</b> ${esc(d.remark)}</div>`;
   body+=`</div>`;
