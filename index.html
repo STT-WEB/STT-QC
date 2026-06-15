@@ -185,7 +185,8 @@ table.data th{background:#f8fafc;font-weight:700}
   .lh-img{height:52px}.lh-name{font-size:16px}.page-head{margin:3px 0 0}
   h2{font-size:14px;margin:8px 0 5px;page-break-after:avoid}
   .grp{page-break-after:avoid}
-  .keep,.sign-block,.rep-photos .c,table.data,.chk-item,.comp-blk>.keep{page-break-inside:avoid}
+  .keep,.sign-row,.rep-photos .c,table.data,.chk-item,.comp-blk>.keep{page-break-inside:avoid}
+  .rep-meas{page-break-inside:auto}
   .rep-photos,.rep-photos.sm{grid-template-columns:repeat(4,1fr);gap:6px}
   .rep-photos .c{border:1px solid #888;border-radius:5px}
   .rep-photos .c.land{grid-column:span 2}
@@ -949,7 +950,7 @@ function buildReportPages(r){
   const blankDate='วันที่ ......./......./.......';
   const sbox=(role,nm,dateText)=>`<div class="sign-box"><div class="sign-line">${role}</div><div class="sign-nm"></div><div class="sign-paren">${nm?('( '+nm+' )'):'(.......................................................................)'}</div><div class="sign-date">${dateText}</div></div>`;
   const ldate=d.review_date? new Date(d.review_date).toLocaleDateString('th-TH'):'';
-  body+=`<div class="sign-block keep"><div class="sign-row">${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)',insp1,'วันที่ '+cdate)}${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)',insp2,insp2?('วันที่ '+cdate):blankDate)}${sbox('หัวหน้าตรวจสอบ (QC Lead)',esc(d.reviewer||''),ldate?('วันที่ '+ldate):blankDate)}</div><div class="sign-row" style="padding:0 14%">${sbox('ผู้ร่วมตรวจสอบ (Witnessed by)','',blankDate)}${sbox('ผู้รับรอง (Approved by)','',blankDate)}</div></div>`;
+  body+=`<div class="sign-block"><div class="sign-row">${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)',insp1,'วันที่ '+cdate)}${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)',insp2,insp2?('วันที่ '+cdate):blankDate)}${sbox('หัวหน้าตรวจสอบ (QC Lead)',esc(d.reviewer||''),ldate?('วันที่ '+ldate):blankDate)}</div><div class="sign-row" style="padding:0 14%">${sbox('ผู้ร่วมตรวจสอบ (Witnessed by)','',blankDate)}${sbox('ผู้รับรอง (Approved by)','',blankDate)}</div></div>`;
   // ===== หน้า 2: Checklist (ไม่มีเซ็น) =====
   const cl=d.checklist||[];
   body+=`<div class="r2-break r2-chkpage"><div class="r2-sec">ผลการตรวจสอบ (FM-SAL-0102)</div>`;
@@ -959,7 +960,7 @@ function buildReportPages(r){
   // ===== หน้า 3: รูปภาพแยกหัวข้อ =====
   let plPhotos='';
   comp.forEach((c,ci)=>{ const pls=c.plates||[]; pls.forEach((p,j)=>{ if(p.ph) plPhotos+=cell('ช่อง '+(ci+1)+' · แป้น '+(j+1)+(p.vol?(' ('+p.vol+'ล.)'):''),p.ph); if(p.ph2) plPhotos+=cell('ช่อง '+(ci+1)+' · แป้น '+(j+1)+' รูป 2',p.ph2); if(p.ph_seal) plPhotos+=cell('ช่อง '+(ci+1)+' · แป้น '+(j+1)+' ซีล',p.ph_seal); }); const extras=oilR?COMP_EXTRA:[{k:"ph_sealsupport",l:"Seal support"},{k:"ph_name",l:"Name Plate"}]; extras.forEach(s=>{ if(c[s.k]) plPhotos+=cell('ช่อง '+(ci+1)+' · '+thaiOnly(s.l),c[s.k]); }); });
-  mimgs.forEach((u,i)=>{ plPhotos+=cell('รูป Model + ลายน้ำ'+(mimgs.length>1?(' '+(i+1)):''),u); });
+  // รูป Model ไม่ใส่ในรายงาน (ตามที่ Beer ขอ)
   let ph3='';
   if(plPhotos) ph3+=`<div class="r2-sec">รูปการวัดน้ำรายแป้น (เรียงตามช่อง)</div><div class="rep-photos sm">${plPhotos}</div>`;
   const sealPh=SEAL_SLOTS.map((lab,idx)=>(d.seal_slots&&d.seal_slots[idx])?cell(thaiOnly(lab),d.seal_slots[idx]):'').join("");
