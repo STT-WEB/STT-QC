@@ -130,6 +130,16 @@ table.data th{background:#f8fafc;font-weight:700}
 .sign-nm{border-top:1px dotted #555;margin-top:40px}
 .sign-paren{font-size:12px;margin-top:5px;color:#333}
 .sign-date{font-size:11px;color:#555;margin-top:3px}
+.r2-meta{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin:6px 0 2px}
+.r2-meta .ttl{text-align:center;flex:1}
+.r2-sec{font-weight:700;background:var(--stt-red-soft);color:var(--stt-red-dark);padding:3px 9px;border-radius:5px;margin:11px 0 5px;font-size:13px}
+.r2-ig{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+.r2-ib{border:1px solid var(--line);border-radius:6px;padding:4px 9px}
+.r2-ib .l{font-size:10.5px;color:var(--ink-soft)}
+.r2-ib .v{font-weight:600;font-size:12.5px;word-break:break-word}
+.r2-l4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.rep-meas{font-size:11px}
+.rep-meas th{font-size:10px;line-height:1.2;background:var(--stt-red-soft);color:var(--stt-red-dark);font-weight:700}
 .lh{display:flex;gap:12px;align-items:flex-start;border-bottom:3px solid var(--stt-red);padding-bottom:8px;margin-bottom:8px}
 .lh-mark{flex:0 0 auto;text-align:center;line-height:1}
 .lh-img{height:54px;width:auto;display:block}
@@ -180,6 +190,12 @@ table.data th{background:#f8fafc;font-weight:700}
   .rep-photos .c.land img{aspect-ratio:16/10}
   table.data{font-size:11px}table.data th,table.data td{padding:3px 5px}
   .sign-row{gap:12px;margin-bottom:14px}.sign-nm{margin-top:30px}
+  .r2-break{page-break-before:always}
+  .r2-sec{page-break-after:avoid}
+  .r2-ig,.r2-l4{page-break-inside:avoid}
+  .r2-ib{padding:3px 7px}
+  .r2-meta{font-size:10.5px}
+  .rep-meas th,.rep-meas td{padding:2px 3px;font-size:9px}
   .model-grid{align-items:center;gap:7mm}
   .model-cell{max-width:120mm}.model-cell .wm-wrap{max-width:120mm}.model-cell .wm-base{max-height:62mm;width:auto;max-width:120mm}
 }
@@ -883,55 +899,74 @@ function buildReportPages(r){
   const cal=d.cal||{};
   const cell=(lab,u,land)=>`<div class="c ${land?'land':''}"><div class="lab">${esc(lab)}</div><a href="${esc(u)}" target="_blank"><img src="${esc(imgSrc(u))}"></a></div>`;
   let body='';
-  // ===== ข้อมูลทั่วไป =====
-  body+=`<div class="rep-sec"><h2>ข้อมูลทั่วไป</h2><div class="row"><div style="flex:1;min-width:200px"><div><b>ลูกค้า:</b> ${esc(r.customer)}</div><div><b>ที่อยู่:</b> ${esc(r.address||'-')}</div><div><b>Job:</b> ${esc(thaiOnly(r.job_type))} ${esc(r.job_no||'')} • <b>S/N:</b> ${esc(r.sa||'-')}</div><div><b>วันที่วัดน้ำ:</b> ${esc(r.measure_date||'-')} • <b>หมดอายุ:</b> ${esc(d.expiry_date||'-')}</div>${gaugersArr.length?`<div><b>ผู้วัดน้ำ:</b> ${esc(gaugersArr.join(", "))}</div>`:''}<div><b>สถานที่วัดน้ำ:</b> ${esc(r.location||'-')}</div>${r.tank_origin?`<div><b>ผู้ผลิตแท็งค์:</b> ${esc(thaiOnly(r.tank_origin))}${r.tank_maker_name?(' — '+esc(r.tank_maker_name)):''}</div>`:''}${r.prover_tank?`<div><b>Prover Tank S/N (STD):</b> ${esc(r.prover_tank)}</div>`:''}${(r.tire_front||r.tire_rear)?`<div><b>ลมยาง (PSI):</b> ล้อหน้า ${esc(r.tire_front||'-')} / ล้อหลัง ${esc(r.tire_rear||'-')}</div>`:''}</div><div style="flex:1;min-width:200px"><div><b>ทะเบียนหัว/หาง:</b> ${esc(r.plate_head||'-')} / ${esc(r.plate_tank||'-')}</div><div><b>คัสซีหัว/หาง:</b> ${esc(r.chassis_head||'-')} / ${esc(r.chassis_tank||'-')}</div><div><b>ความจุ:</b> ${esc(r.capacity||'-')} ลิตร • ${esc(thaiOnly(r.product))}</div><div><b>ประเภทรถ:</b> ${esc(thaiOnly(r.vehicle_type))} • รุ่น ${esc(r.model_no||'-')}</div></div></div>${oilR?`<div style="margin-top:8px"><b>Low-High (มม.):</b> A=${esc(lh.a||'-')} • B=${esc(lh.b||'-')} • C=${esc(lh.c||'-')} • D=${esc(lh.d||'-')}</div>`:''}${(conds.length)?`<div style="margin-top:8px"><b>เงื่อนไขการวัดน้ำ:</b> ${esc(conds.map(thaiOnly).join(", "))}</div>`:''}<div class="guide-box" style="margin-top:10px">${esc(WATER_TERM)}</div></div>`;
-  // ===== Prover Tank (มาตรฐาน) =====
+  // ===== หน้า 1: Calibration Report =====
+  const ib=(l,v)=>`<div class="r2-ib"><div class="l">${l}</div><div class="v">${String(v==null?'':v).trim()?v:'-'}</div></div>`;
+  body+=`<div class="r2-sec">ข้อมูลทั่วไป (Tank Information)</div><div class="r2-ig">`
+    +ib('ลูกค้า / Customer',esc(r.customer))
+    +ib('ที่อยู่ / Address',esc(r.address))
+    +ib('Job No.',esc(r.job_no))
+    +ib('รุ่น / Model No.',esc(r.model_no))
+    +ib('เลข Serial No. (S/N)',esc(r.sa))
+    +ib('ผู้ผลิตแท็งค์ / Tank maker',esc(thaiOnly(r.tank_origin))+(r.tank_maker_name?(' — '+esc(r.tank_maker_name)):''))
+    +ib('ทะเบียนหัวลาก',esc(r.plate_head))
+    +ib('ทะเบียนหาง',esc(r.plate_tank))
+    +ib('คัสซีหัวลาก',esc(r.chassis_head))
+    +ib('คัสซีหาง',esc(r.chassis_tank))
+    +ib('ความจุ · ผลิตภัณฑ์ · ประเภทรถ',esc(r.capacity)+' ลิตร · '+esc(thaiOnly(r.product))+' · '+esc(thaiOnly(r.vehicle_type)))
+    +ib('ผู้วัดน้ำ / Gauged by',esc(gaugersArr.join(", ")))
+    +`<div class="r2-ib" style="grid-column:1/-1"><div class="l">สถานที่วัดน้ำ / Gauging location</div><div class="v">${esc(r.location)||'-'}</div></div>`
+  +`</div>`;
+  body+=`<div class="r2-sec">ระยะมาตรฐาน &amp; แรงดันลมยาง</div>`;
+  if(oilR) body+=`<div class="r2-l4">`
+    +ib('A: ระยะจากพื้นถึงหลังถัง (หัวถัง)',lh.a?esc(lh.a)+' มม.':'')
+    +ib('B: ระยะจากพื้นถึงหลังถัง (ท้ายถัง)',lh.b?esc(lh.b)+' มม.':'')
+    +ib('C: ระยะจากพื้นถึงคิงพิน (หัวถัง)',lh.c?esc(lh.c)+' มม.':'')
+    +ib('D: ระยะจากพื้นถึงคัสซี (ท้ายถัง)',lh.d?esc(lh.d)+' มม.':'')
+  +`</div>`;
+  body+=`<div class="r2-l4" style="margin-top:5px">`
+    +ib('แรงดันลมยาง ล้อหน้า',r.tire_front?esc(r.tire_front)+' PSI':'')
+    +ib('แรงดันลมยาง ล้อหลัง',r.tire_rear?esc(r.tire_rear)+' PSI':'')
+  +`</div>`;
   const ptL=LS.get('provertanks',[]);
-  if(ptL.length) body+=`<div class="rep-sec"><h2>Prover Tank (Standard) — แท็งค์มาตรฐานที่ใช้สอบเทียบ</h2><div class="tbl-scroll"><table class="data"><tr><th>Model Tank</th><th>S/N</th><th>Calibration Date</th><th>Next Calibration</th></tr>${ptL.map(p=>`<tr><td>${esc(p.model||'-')}</td><td>${esc(p.s_n||'-')}</td><td>${esc(p.cal_date||'-')}</td><td>${esc(p.next_cal||'-')}</td></tr>`).join("")}</table></div></div>`;
-  // ===== Diagram =====
-  if(mimgs.length) body+=`<div class="rep-sec"><h2>Diagram / Model ถัง</h2><div class="model-grid">${mimgs.map(u=>`<div class="model-cell keep"><div class="wm-wrap"><img class="wm-base" src="${esc(imgSrc(u))}"><img class="wm-logo" src="logo.png" onerror="this.style.display='none'"></div></div>`).join("")}</div></div>`;
-  // ===== ข้อมูลการวัดน้ำ (ตาราง + รูป อยู่ด้วยกัน) =====
-  body+=`<div class="rep-sec"><h2>${oilR?'ข้อมูลการวัดน้ำ':'Calibration Certificate / ผลสอบเทียบ'} (${comp.length} ${oilR?'ช่อง':'comp'})</h2>`;
-  if(!oilR) body+=`<div class="row" style="margin-bottom:6px"><div style="flex:1;min-width:200px"><div><b>Certificate No.:</b> ${esc(r.doc_no||'-')}</div><div><b>Calibration Date:</b> ${esc(r.measure_date||'-')} • <b>Exp.:</b> ${esc(d.expiry_date||'-')}</div></div><div style="flex:1;min-width:200px"><div><b>Reference Height (Front):</b> ${esc(cal.ref_front||'-')} มม. (ระยะคอ Manhole - ก้นแท็งค์)</div></div></div>`;
-  comp.forEach((c,i)=>{ const pls=c.plates||[]; const unit=oilR?"แป้นที่ ":"จุดที่ ";
-    let tbl;
-    if(oilR) tbl=`<div class="keep"><div class="grp">ช่องที่ ${i+1} (${pls.length} แป้น) — ซีลฝาถัง: ${esc(c.seal_cap||'-')} • H ก้น→ฝา Manhole (ความสูงรวม): ${esc(c.h||'-')} • Void: ${esc(c.void_l||'-')} ล.</div><table class="data"><tr><th class="rowlabel">ระดับแป้นที่</th>${pls.map((_,j)=>`<th>${j+1}</th>`).join("")}</tr><tr><td class="rowlabel">ปริมาตร (ล.)</td>${pls.map(p=>`<td>${esc(p.vol)}</td>`).join("")}</tr><tr><td class="rowlabel">ระยะแป้น→ฝา Manhole บน (U)</td>${pls.map(p=>`<td>${esc(p.u)}</td>`).join("")}</tr><tr><td class="rowlabel">ระยะก้นถัง→แป้น</td>${pls.map(p=>`<td>${esc(p.bot)}</td>`).join("")}</tr></table></div>`;
-    else tbl=`<div class="keep"><div class="grp">Comp ${i+1} (${pls.length} จุด)</div><table class="data"><tr><th class="rowlabel">ระดับแป้นที่</th><th>ปริมาตร (ล.)</th><th>ระยะแป้น→ฝา Manhole (U)</th><th>ก้นถัง→แป้น</th><th>ก้นถัง→ฝา Manhole (H)</th><th>Seal No.</th></tr>${pls.map((p,j)=>`<tr><td class="rowlabel">${j+1}</td><td>${esc(p.vol)}</td><td>${esc(p.diff)}</td><td>${esc(p.level_bottom)}</td><td>${esc(p.ref_height)}</td><td>${esc(p.seal_no)}</td></tr>`).join("")}</table></div>`;
-    const items=[]; pls.forEach((p,j)=>{ if(p.ph) items.push([unit+(j+1)+" รูป1"+(p.vol?(" ("+p.vol+"ล.)"):""),p.ph]); if(p.ph2) items.push([unit+(j+1)+" รูป2",p.ph2]); if(p.ph_seal) items.push([unit+(j+1)+" ซีล",p.ph_seal]); });
-    const extras=oilR?COMP_EXTRA:[{k:"ph_sealsupport",l:"Seal support"},{k:"ph_name",l:"Name Plate"}]; extras.forEach(s=>{ if(c[s.k]) items.push([thaiOnly(s.l),c[s.k]]); });
-    const photos=items.length?`<div class="rep-photos sm">${items.map(x=>cell(x[0],x[1])).join("")}</div>`:'';
-    body+=`<div class="comp-blk">${tbl}${photos}</div>`;
-  });
-  body+=`</div>`;
-  // ===== ลมยาง 2 รูป =====
-  const tireImgs=[]; const c0=d.checklist&&d.checklist[0]; if(c0){ if(c0.ph) tireImgs.push(["ลมยาง ≥120 PSI รูป1",c0.ph]); if(c0.ph2) tireImgs.push(["ลมยาง ≥120 PSI รูป2",c0.ph2]); }
-  if(tireImgs.length) body+=`<div class="rep-sec"><h2>ตรวจเช็คแรงดันลมยาง (≥120 PSI)</h2><div class="rep-photos sm">${tireImgs.map(x=>cell(x[0],x[1])).join("")}</div></div>`;
-  // ===== ซีล =====
-  const sealPh=SEAL_SLOTS.map((lab,idx)=>(d.seal_slots&&d.seal_slots[idx])?cell(thaiOnly(lab),d.seal_slots[idx]):'').join("");
-  if(sealPh) body+=`<div class="rep-sec"><h2>จุดร้อยซีล / Seals</h2><div class="rep-photos sm">${sealPh}</div></div>`;
-  // ===== Chassis (รูป 45° แนวนอน) =====
-  const chPh=CHASSIS_SLOTS.map((lab,idx)=>{ const u=d.chassis_slots&&d.chassis_slots[idx]; if(!u) return ''; const land=thaiOnly(lab).indexOf('45')>=0; return cell(thaiOnly(lab),u,land); }).join("");
-  if(chPh) body+=`<div class="rep-sec"><h2>Chassis / Name Plate</h2><div class="rep-photos sm">${chPh}</div></div>`;
-  // ===== Checklist =====
-  const cl=d.checklist||[];
-  let chkHtml='<div class="rep-sec"><h2>ผลการตรวจสอบ (FM-SAL-0102)</h2>';
-  cl.forEach((it,i)=>{ if(i===0) chkHtml+=`<div class="grp">ก่อนวัดน้ำ (ข้อ 1-8)</div>`; if(i===CHK_PRE) chkHtml+=`<div class="grp">หลังวัดน้ำ (ข้อ 9-12)</div>`; const st=(it&&it.st)?it.st:''; const fix=(st==='fail')?`<div class="muted">แก้ไข: ${esc(it.fd||'-')} • วันที่ ${esc(it.fdate||'-')} • โดย ${esc(it.fby||'-')}</div>`:((st==='na'&&it.note)?`<div class="muted">หมายเหตุ: ${esc(it.note)}</div>`:''); chkHtml+=`<div class="chk-item"><div class="no">${(CHK_FM[i]&&CHK_FM[i].no)||(i+1)}</div><div class="desc">${esc((CHK_FM[i]&&CHK_FM[i].txt)||'')}${fix}</div>${triple(st)}</div>`; });
-  if(d.remark) chkHtml+=`<div class="guide-box" style="margin-top:10px"><b>หมายเหตุ:</b> ${esc(d.remark)}</div>`;
-  chkHtml+=`</div>`;
-  // ===== ช่องเซ็น (มาตรฐาน อยู่ด้วยกัน) =====
+  const ptSn=r.prover_tank?esc(r.prover_tank):(ptL.length?ptL.map(p=>esc(p.s_n||'')).filter(Boolean).join(' · '):'');
+  if(ptSn) body+=`<div class="r2-sec">Prover Tank (Standard) — S/N แท็งค์มาตรฐาน</div><div class="r2-ib"><div class="v">${ptSn}</div></div>`;
+  body+=`<div class="r2-sec">ตารางผลการวัดน้ำ (เรียงตามช่อง Compartment)</div>`;
+  const hcol=oilR?'ระยะจากก้นถังถึงฝา Manhole บน (มม.) — ความสูงรวม':'ระยะจากก้นถังถึงฝา Manhole บน (มม.) (H)';
+  let rows='';
+  comp.forEach((c,ci)=>{ const pls=(c.plates&&c.plates.length)?c.plates:[{}]; const n=pls.length; pls.forEach((p,j)=>{ let row='<tr>'; if(j===0) row+=`<td rowspan="${n}">${ci+1}</td>`; row+=`<td>${j+1}</td><td>${esc(p.vol)}</td>`; if(oilR){ row+=`<td>${esc(p.u)}</td><td>${esc(p.bot)}</td>`; if(j===0) row+=`<td rowspan="${n}">${esc(c.h)}</td>`; } else { row+=`<td>${esc(p.diff)}</td><td>${esc(p.level_bottom)}</td><td>${esc(p.ref_height)}</td>`; } if(j===0) row+=`<td rowspan="${n}">${esc(c.void_l)}</td>`; row+=`<td>${esc(p.seal_no)}</td>`; if(j===0) row+=`<td rowspan="${n}">${esc(c.seal_cap)}</td>`; rows+=row+'</tr>'; }); });
+  body+=`<table class="data rep-meas"><thead><tr><th>ช่อง<br>(Compartment)</th><th>ระดับแป้น</th><th>ปริมาตร (ลิตร)</th><th>ระยะจากแป้นถึงฝา Manhole บน (มม.)</th><th>ระยะจากก้นถังถึงแป้น (มม.)</th><th>${hcol}</th><th>Void (ลิตร)</th><th>หมายเลขซีลแป้นวัดน้ำ (Seal No.)</th><th>หมายเลขซีลฝาถัง</th></tr></thead><tbody>${rows}</tbody></table>`;
+  // ===== ลายเซ็น 5 คน (หน้า 1 เท่านั้น) =====
   const blankDate='วันที่ ......./......./.......';
-  const sbox=(role,nm,dateText,hint)=>`<div class="sign-box"><div class="sign-line">${role}</div>${hint?`<div style="font-size:10px;color:#888;font-style:italic;margin-top:1px">${hint}</div>`:''}<div class="sign-nm"></div><div class="sign-paren">${nm?('( '+nm+' )'):'(.......................................................................)'}</div><div class="sign-date">${dateText}</div></div>`;
-  const ldate = d.review_date? new Date(d.review_date).toLocaleDateString('th-TH') : '';
-  chkHtml+=`<div class="sign-block keep"><div class="sign-row">${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)',insp1,'วันที่ '+cdate)}${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)',insp2,insp2?('วันที่ '+cdate):blankDate)}${sbox('หัวหน้าตรวจสอบ Report และกระบวนการ (QC Lead)',esc(d.reviewer||''),ldate?('วันที่ '+ldate):blankDate)}</div><div class="sign-row">${sbox('ผู้ร่วมตรวจสอบ (Witnessed by)','',blankDate,'ลงลายมือชื่อ')}${sbox('ผู้อนุมัติขั้นสุดท้าย / ผู้รับรอง (Approved by)','',blankDate,'เซ็นสด + เขียนชื่อตัวบรรจง')}</div></div>`;
+  const sbox=(role,nm,dateText)=>`<div class="sign-box"><div class="sign-line">${role}</div><div class="sign-nm"></div><div class="sign-paren">${nm?('( '+nm+' )'):'(.......................................................................)'}</div><div class="sign-date">${dateText}</div></div>`;
+  const ldate=d.review_date? new Date(d.review_date).toLocaleDateString('th-TH'):'';
+  body+=`<div class="sign-block keep"><div class="sign-row">${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 1 (QC Inspector)',insp1,'วันที่ '+cdate)}${sbox('ผู้วัดน้ำ/ผู้ตรวจสอบ 2 (QC Inspector)',insp2,insp2?('วันที่ '+cdate):blankDate)}${sbox('หัวหน้าตรวจสอบ (QC Lead)',esc(d.reviewer||''),ldate?('วันที่ '+ldate):blankDate)}</div><div class="sign-row" style="padding:0 14%">${sbox('ผู้ร่วมตรวจสอบ (Witnessed by)','',blankDate)}${sbox('ผู้รับรอง (Approved by)','',blankDate)}</div></div>`;
+  // ===== หน้า 2: Checklist (ไม่มีเซ็น) =====
+  const cl=d.checklist||[];
+  body+=`<div class="r2-break"><div class="r2-sec">ผลการตรวจสอบ (FM-SAL-0102)</div>`;
+  cl.forEach((it,i)=>{ if(i===0) body+=`<div class="grp">ก่อนวัดน้ำ (ข้อ 1-8)</div>`; if(i===CHK_PRE) body+=`<div class="grp">หลังวัดน้ำ (ข้อ 9-12)</div>`; const st=(it&&it.st)?it.st:''; const fix=(st==='fail')?`<div class="muted">แก้ไข: ${esc(it.fd||'-')} • วันที่ ${esc(it.fdate||'-')} • โดย ${esc(it.fby||'-')}</div>`:((st==='na'&&it.note)?`<div class="muted">หมายเหตุ: ${esc(it.note)}</div>`:''); body+=`<div class="chk-item"><div class="no">${(CHK_FM[i]&&CHK_FM[i].no)||(i+1)}</div><div class="desc">${esc((CHK_FM[i]&&CHK_FM[i].txt)||'')}${fix}</div>${triple(st)}</div>`; });
+  if(d.remark) body+=`<div class="guide-box" style="margin-top:10px"><b>หมายเหตุ:</b> ${esc(d.remark)}</div>`;
+  body+=`</div>`;
+  // ===== หน้า 3: รูปภาพแยกหัวข้อ =====
+  let plPhotos='';
+  comp.forEach((c,ci)=>{ const pls=c.plates||[]; pls.forEach((p,j)=>{ if(p.ph) plPhotos+=cell('ช่อง '+(ci+1)+' · แป้น '+(j+1)+(p.vol?(' ('+p.vol+'ล.)'):''),p.ph); if(p.ph2) plPhotos+=cell('ช่อง '+(ci+1)+' · แป้น '+(j+1)+' รูป 2',p.ph2); if(p.ph_seal) plPhotos+=cell('ช่อง '+(ci+1)+' · แป้น '+(j+1)+' ซีล',p.ph_seal); }); const extras=oilR?COMP_EXTRA:[{k:"ph_sealsupport",l:"Seal support"},{k:"ph_name",l:"Name Plate"}]; extras.forEach(s=>{ if(c[s.k]) plPhotos+=cell('ช่อง '+(ci+1)+' · '+thaiOnly(s.l),c[s.k]); }); });
+  mimgs.forEach((u,i)=>{ plPhotos+=cell('รูป Model + ลายน้ำ'+(mimgs.length>1?(' '+(i+1)):''),u); });
+  let ph3='';
+  if(plPhotos) ph3+=`<div class="r2-sec">รูปการวัดน้ำรายแป้น (เรียงตามช่อง)</div><div class="rep-photos sm">${plPhotos}</div>`;
+  const sealPh=SEAL_SLOTS.map((lab,idx)=>(d.seal_slots&&d.seal_slots[idx])?cell(thaiOnly(lab),d.seal_slots[idx]):'').join("");
+  if(sealPh) ph3+=`<div class="r2-sec">จุดร้อยซีล / Seals</div><div class="rep-photos sm">${sealPh}</div>`;
+  const chPh=CHASSIS_SLOTS.map((lab,idx)=>{ const u=d.chassis_slots&&d.chassis_slots[idx]; if(!u) return ''; const land=thaiOnly(lab).indexOf('45')>=0; return cell(thaiOnly(lab),u,land); }).join("");
+  let tirePh=''; const c0=d.checklist&&d.checklist[0]; if(c0){ if(c0.ph) tirePh+=cell('ลมยาง ล้อหน้า (≥120 PSI)',c0.ph); if(c0.ph2) tirePh+=cell('ลมยาง ล้อหลัง (≥120 PSI)',c0.ph2); }
+  if(chPh||tirePh) ph3+=`<div class="r2-sec">Chassis / Name Plate · ลมยาง</div><div class="rep-photos sm">${chPh}${tirePh}</div>`;
+  if(ph3) body+=`<div class="r2-break">${ph3}</div>`;
   // ===== ภายใน (ไม่พิมพ์): ประวัติ/Tracking =====
   if(d.reviewer || (d.history&&d.history.length)){
-    chkHtml+=`<div class="no-print" style="margin-top:14px"><h2>การเคลื่อนไหวเอกสาร (Tracking) — เฉพาะภายใน</h2>`;
-    if(d.reviewer) chkHtml+=`<div><b>Approve โดย:</b> ${esc(d.reviewer)} • วันที่ ${esc(d.review_date? new Date(d.review_date).toLocaleString('th-TH'):'-')} • ผล: ${reviewPill(d.review_status)}</div>`;
-    if(d.history&&d.history.length){ chkHtml+=`<div style="margin-top:6px"><b>ประวัติการเคลื่อนไหว (${d.history.length} ครั้ง):</b>`+d.history.map((x,i)=>`<div class="muted">${i+1}. [${esc(x.type)}] โดย ${esc(x.by)} — ${esc(x.date? new Date(x.date).toLocaleString('th-TH'):'')}${x.detail?(' — '+esc(x.detail)):''}</div>`).join("")+`</div>`; }
-    chkHtml+=`</div>`;
+    body+=`<div class="no-print" style="margin-top:14px"><h2>การเคลื่อนไหวเอกสาร (Tracking) — เฉพาะภายใน</h2>`;
+    if(d.reviewer) body+=`<div><b>Approve โดย:</b> ${esc(d.reviewer)} • วันที่ ${esc(d.review_date? new Date(d.review_date).toLocaleString('th-TH'):'-')} • ผล: ${reviewPill(d.review_status)}</div>`;
+    if(d.history&&d.history.length){ body+=`<div style="margin-top:6px"><b>ประวัติการเคลื่อนไหว (${d.history.length} ครั้ง):</b>`+d.history.map((x,i)=>`<div class="muted">${i+1}. [${esc(x.type)}] โดย ${esc(x.by)} — ${esc(x.date? new Date(x.date).toLocaleString('th-TH'):'')}${x.detail?(' — '+esc(x.detail)):''}</div>`).join("")+`</div>`; }
+    body+=`</div>`;
   }
-  body+=chkHtml;
-  const head=`<div class="rep-head">${LETTERHEAD}<div class="page-head"><div class="t1">REPORT การวัดน้ำ / Water Gauging Report</div><div style="text-align:right"><div class="docno" style="font-size:17px;color:var(--stt-red-dark);font-weight:800">${esc(r.doc_no)}</div>${docStatusPill(r)}</div></div></div>`;
+  const revno=(d.revise!=null&&d.revise!=='')?esc(d.revise):'0';
+  const head=`<div class="rep-head">${LETTERHEAD}<div class="r2-meta"><div style="font-size:11.5px"><div>Calibration date : <b>${esc(r.measure_date||'-')}</b></div><div>เลขที่เอกสาร (No.) : <b>${esc(r.doc_no||'-')}</b></div><div>Revise (Rev.) : <b>${revno}</b></div><div>Next Calibration : <b>${esc(d.expiry_date||'-')}</b></div></div><div class="ttl"><div style="font-weight:800;font-size:16px;color:var(--stt-red-dark)">Calibration Report</div><div style="font-size:11px;color:var(--ink-soft)">รายงานผลการวัดน้ำ</div></div><div style="text-align:right;min-width:90px">${docStatusPill(r)}</div></div></div>`;
   const foot=`<div class="rep-foot"><div>ผู้จัดทำ/ผู้วัดน้ำ: <b>${maker}</b></div><div>วันที่จัดทำ: ${cdate}</div></div>`;
   return `<div class="report"><table class="rep-table"><thead><tr><td>${head}</td></tr></thead><tfoot><tr><td>${foot}</td></tr></tfoot><tbody><tr><td><div class="rep-content">${body}</div></td></tr></tbody></table></div>`;
 }
