@@ -273,7 +273,9 @@ function t(k){ const o=T[k]; if(!o) return k; return o[LANG]||o.en||o.th; }
 function setLang(l){ LANG=l; try{localStorage.setItem("sttqc_lang",l);}catch(e){} rerender(); }
 function langBar(dark){ return `<div class="langbar ${dark?'dark':''}">${LANGS.map(function(p){return `<button class="${LANG===p[0]?'on':''}" onclick="setLang('${p[0]}')">${p[1]}</button>`;}).join("")}</div>`; }
 function thaiOnly(s){ return String(s||"").split(" / ")[0]; }
-function imgSrc(u){ u=String(u||""); const m=u.match(/\/d\/([-\w]+)/)||u.match(/[?&]id=([-\w]+)/); return m? ("https://drive.google.com/thumbnail?id="+m[1]+"&sz=w1200") : u; }
+function imgId(u){ u=String(u||""); const m=u.match(/\/d\/([-\w]+)/)||u.match(/[?&]id=([-\w]+)/); return m?m[1]:""; }
+function imgSrc(u){ const id=imgId(u); return id?("https://lh3.googleusercontent.com/d/"+id+"=w1200"):String(u||""); }
+function imgFB(img){ try{ var id=img.getAttribute('data-id')||''; var step=+(img.getAttribute('data-step')||'0'); if(id&&step<1){ img.setAttribute('data-step','1'); img.src="https://drive.google.com/thumbnail?id="+id+"&sz=w1200"; return; } if(id&&step<2){ img.setAttribute('data-step','2'); img.src="https://drive.google.com/uc?export=view&id="+id; return; } if(img.getAttribute('data-mark')==='1'){ camImgErr(img); } else { img.style.display='none'; } }catch(e){} }
 function canReview(){ return USER && (USER.role==='admin' || USER.role==='lead'); }
 
 const LETTERHEAD = `<div class="lh">
@@ -530,7 +532,7 @@ function stepJob(){
     ${oil?`<div class="grp">ข้อมูล Low-High (เฉพาะรถน้ำมัน)</div><div class="row"><div class="field"><label>A: พื้น→หลังถัง ที่หัวถัง (มม.)</label><input id="f_lh_a" value="${esc((DRAFT.lowhigh||{}).a||'')}" inputmode="numeric"></div><div class="field"><label>B: พื้น→หลังถัง ที่ท้ายถัง (มม.)</label><input id="f_lh_b" value="${esc((DRAFT.lowhigh||{}).b||'')}" inputmode="numeric"></div><div class="field"><label>C: พื้น→คิงพิน ที่หัวถัง (มม.)</label><input id="f_lh_c" value="${esc((DRAFT.lowhigh||{}).c||'')}" inputmode="numeric"></div><div class="field"><label>D: พื้น→คัสซี ที่ท้ายถัง (มม.)</label><input id="f_lh_d" value="${esc((DRAFT.lowhigh||{}).d||'')}" inputmode="numeric"></div></div>`:`<div class="grp">ข้อมูลความสูง ตั้งแต่คอ Manhole - ก้นแท็งค์ (เฉพาะรถเคมี)</div><div class="row"><div class="field" style="flex:2"><label>Reference Height (Front) มม. — ระยะคอ Manhole ถึงก้นแท็งค์</label><input id="f_ref_front" value="${esc((DRAFT.cal||{}).ref_front||'')}" inputmode="numeric"></div></div>`}
     <div class="grp">รูป Model / Diagram ถัง (Admin อัปจากคอม สูงสุด 5 รูป — มีลายน้ำสุธีกันลอกแบบ)</div>
     <div class="field" style="flex:0 0 auto"><label>อัปโหลดรูป Model (เลือกได้หลายรูป) — ${(DRAFT.model_imgs||[]).length}/5</label><input type="file" accept="image/*" multiple id="f_model_file" onchange="uploadModelImg(this)" ${(DRAFT.model_imgs||[]).length>=5?'disabled':''}></div>
-    <div class="slot-grid" style="margin-top:6px">${(DRAFT.model_imgs||[]).length?(DRAFT.model_imgs||[]).map((u,i)=>`<div style="max-width:200px"><div class="wm-wrap"><img class="wm-base" src="${esc(imgSrc(u))}" onerror="camImgErr(this)"><img class="wm-logo" src="logo.png" onerror="this.style.display='none'"></div><button type="button" class="btn sm grey" style="margin-top:4px" onclick="rmModelImg(${i})">ลบรูปที่ ${i+1}</button></div>`).join(""):'<div class="muted">ยังไม่มีรูป Model</div>'}</div>
+    <div class="slot-grid" style="margin-top:6px">${(DRAFT.model_imgs||[]).length?(DRAFT.model_imgs||[]).map((u,i)=>`<div style="max-width:200px"><div class="wm-wrap"><img class="wm-base" src="${esc(imgSrc(u))}" data-id="${imgId(u)}" data-mark="1" onerror="imgFB(this)"><img class="wm-logo" src="logo.png" onerror="this.style.display='none'"></div><button type="button" class="btn sm grey" style="margin-top:4px" onclick="rmModelImg(${i})">ลบรูปที่ ${i+1}</button></div>`).join(""):'<div class="muted">ยังไม่มีรูป Model</div>'}</div>
     <label style="font-size:13px;font-weight:600;color:var(--ink-soft)">เงื่อนไขการวัดน้ำ / Conditions (เลือกได้หลายข้อ)</label><div class="cond-grid" style="margin-top:6px">${WATER_CONDITIONS.map(c=>`<label><input type="checkbox" class="f_cond" value="${esc(c)}" ${DRAFT.conditions.includes(c)?'checked':''}> ${esc(c)}</label>`).join("")}</div>
     <div class="grp">ผู้วัดน้ำ / Gauged by (1-2 คน)</div><div class="row"><div class="field"><label>ผู้วัดคนที่ 1</label><input id="f_gauger0" list="emp-list-g" placeholder="เลือกผู้วัดคนที่ 1" value="${esc((DRAFT.gaugers||[])[0]||'')}"></div><div class="field"><label>ผู้วัดคนที่ 2 (ถ้ามี)</label><input id="f_gauger1" list="emp-list-g" placeholder="เลือกผู้วัดคนที่ 2" value="${esc((DRAFT.gaugers||[])[1]||'')}"></div><datalist id="emp-list-g">${EMP_NAMES.map(n=>`<option value="${esc(n)}">`).join("")}</datalist></div>
   </div>`;
@@ -543,7 +545,7 @@ function onProductChange(){ collectStep(); drawStep(); }
 function onMeasureDate(){ DRAFT.measure_date=gv("f_measure_date"); const e=document.getElementById("f_expiry_date"); if(e&&DRAFT.measure_date) e.value=addYears(DRAFT.measure_date,3); }
 function onNComp(){ collectStep(); drawStep(); }
 async function uploadModelImg(input){ const files=Array.from(input.files||[]); if(!files.length) return; collectStep(); DRAFT.model_imgs=DRAFT.model_imgs||[]; const room=5-DRAFT.model_imgs.length; if(room<=0){ return toast("ใส่รูป Model ได้สูงสุด 5 รูป"); } const use=files.slice(0,room); toast(t('uploading'));
-  for(const f of use){ try{ const url=await uploadImage(f,"model_"+(DRAFT.doc_no||DRAFT.sa||"STT"),true); DRAFT.model_imgs.push(url); }catch(e){ toast("อัปโหลดรูป Model ไม่สำเร็จ"); } }
+  for(const f of use){ try{ const url=await uploadImage(f,"model_"+(DRAFT.doc_no||DRAFT.sa||"STT"),true); if(url) DRAFT.model_imgs.push(url); else toast("อัปโหลดรูป Model ไม่สำเร็จ (ไม่ได้ลิงก์)"); }catch(e){ toast("อัปโหลดรูป Model ไม่สำเร็จ"); } }
   drawStep(); toast("เพิ่มรูป Model แล้ว ✓ ("+DRAFT.model_imgs.length+"/5)"); }
 function rmModelImg(i){ DRAFT.model_imgs=DRAFT.model_imgs||[]; DRAFT.model_imgs.splice(i,1); drawStep(); }
 async function lookupVehicle(){
@@ -609,7 +611,7 @@ function slotHtml(target,a,b,label,url){
   else if(target==="chk") attr=`data-target="chk" data-idx="${b}"`;
   else if(target==="chk2") attr=`data-target="chk2" data-idx="${b}"`;
   else attr=`data-target="${target}" data-idx="${b}"`;
-  if(url) return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" onclick="viewPhoto('${esc(url)}')"><img src="${esc(imgSrc(url))}" onerror="camImgErr(this)"></div><div class="slot-acts"><button class="sa-btn" onclick="viewPhoto('${esc(url)}')" type="button">👁 ดู</button><button class="sa-btn" ${attr} onclick="openCamera(this)" type="button">📷 ถ่ายใหม่</button><button class="sa-btn" ${attr} data-del="1" type="button">🗑</button></div></div>`;
+  if(url) return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" onclick="viewPhoto('${esc(url)}')"><img src="${esc(imgSrc(url))}" data-id="${imgId(url)}" data-mark="1" onerror="imgFB(this)"></div><div class="slot-acts"><button class="sa-btn" onclick="viewPhoto('${esc(url)}')" type="button">👁 ดู</button><button class="sa-btn" ${attr} onclick="openCamera(this)" type="button">📷 ถ่ายใหม่</button><button class="sa-btn" ${attr} data-del="1" type="button">🗑</button></div></div>`;
   return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" ${attr} onclick="openCamera(this)"><span class="add">📷</span></div></div>`;
 }
 function viewPhoto(u){ try{ window.open(u,'_blank'); }catch(e){ toast('เปิดรูปไม่ได้'); } }
@@ -709,6 +711,7 @@ async function captureCam(){
   const ds=CAM.ds, label=CAM.label; closeCamera(); toast(t('uploading'));
   const blob=await new Promise(res=>cv.toBlob(res,'image/jpeg',0.85));
   let url; try{ url=await uploadImage(blob,label,true); }catch(err){ return toast('อัปโหลดไม่สำเร็จ: '+(err.message||err)); }
+  if(!url){ return toast('⚠️ อัปโหลดไม่สำเร็จ (ไม่ได้ลิงก์รูป) — กรุณาถ่ายใหม่อีกครั้ง'); }
   storeSlot(ds,url); drawStep(); toast("เพิ่มรูปแล้ว ✓");
 }
 function collectStep(){
@@ -878,7 +881,7 @@ function drawReview(){
     <h1>🔎 ${t('reviewTitle')}</h1>
     <div class="guide-box">${t('reviewerLabel')}: <b>${esc(USER.name)}</b> • เอกสาร ${esc(REVIEW.r.doc_no)} — ติ๊ก OK/ไม่OK ทุกรูป หรือกด "Accept ทั้งหมด" • ถ้ามีรูปไม่ผ่าน ระบบจะแจ้งกลุ่ม Line QC ให้ถ่ายใหม่ทันที</div>
     <div style="margin-bottom:10px"><button class="btn sm" onclick="reviewAcceptAll()">${t('acceptAll')}</button></div>
-    ${secs.map(sec=>`<div class="card"><div class="row" style="align-items:center"><h2 style="flex:1;margin:0">${esc(sec)}</h2><button class="btn sm sec" onclick="reviewAcceptSec('${esc(sec)}')">${t('acceptSec')}</button></div><div class="rep-photos" style="margin-top:10px">${photos.filter(p=>p.sec===sec).map(p=>`<div class="rev-cell"><div class="lab">${esc(p.label)}</div><a href="${esc(p.url)}" target="_blank"><img src="${esc(imgSrc(p.url))}"></a><div class="seg" data-rk="${esc(p.key)}"><button data-v="ok" class="${REVIEW.map[p.key]==='ok'?'on-ok':''}">OK</button><button data-v="no" class="${REVIEW.map[p.key]==='no'?'on-bad':''}">ไม่ OK</button></div></div>`).join("")}</div></div>`).join("")}
+    ${secs.map(sec=>`<div class="card"><div class="row" style="align-items:center"><h2 style="flex:1;margin:0">${esc(sec)}</h2><button class="btn sm sec" onclick="reviewAcceptSec('${esc(sec)}')">${t('acceptSec')}</button></div><div class="rep-photos" style="margin-top:10px">${photos.filter(p=>p.sec===sec).map(p=>`<div class="rev-cell"><div class="lab">${esc(p.label)}</div><a href="${esc(p.url)}" target="_blank"><img src="${esc(imgSrc(p.url))}" data-id="${imgId(p.url)}" data-mark="1" onerror="imgFB(this)"></a><div class="seg" data-rk="${esc(p.key)}"><button data-v="ok" class="${REVIEW.map[p.key]==='ok'?'on-ok':''}">OK</button><button data-v="no" class="${REVIEW.map[p.key]==='no'?'on-bad':''}">ไม่ OK</button></div></div>`).join("")}</div></div>`).join("")}
     <button class="btn block" onclick="saveReview()">${t('reviewSave')}</button>`;
   document.querySelectorAll(".seg[data-rk]").forEach(seg=>seg.querySelectorAll("button").forEach(b=>b.onclick=()=>{ REVIEW.map[seg.dataset.rk]=b.dataset.v; drawReview(); }));
 }
@@ -910,7 +913,7 @@ function buildReportPages(r){
   const maker= gaugersArr.length? esc(gaugersArr.join(", ")) : esc(r.created_by||"-");
   const mimgs=(d.model_imgs&&d.model_imgs.length)?d.model_imgs:(d.model_img?[d.model_img]:[]);
   const cal=d.cal||{};
-  const cell=(lab,u,land)=>`<div class="c ${land?'land':''}"><div class="lab">${esc(lab)}</div><a href="${esc(u)}" target="_blank"><img src="${esc(imgSrc(u))}"></a></div>`;
+  const cell=(lab,u,land)=>`<div class="c ${land?'land':''}"><div class="lab">${esc(lab)}</div><a href="${esc(u)}" target="_blank"><img src="${esc(imgSrc(u))}" data-id="${imgId(u)}" onerror="imgFB(this)"></a></div>`;
   let body='';
   // ===== หน้า 1: Calibration Report =====
   const ib=(l,v)=>`<div class="r2-ib"><div class="l">${l}</div><div class="v">${String(v==null?'':v).trim()?v:'-'}</div></div>`;
@@ -1011,7 +1014,10 @@ async function DetailView(id){
       ${logs.length?`<div style="margin-top:6px"><b>ประวัติการพิมพ์</b>${logs.map(l=>`<div class="muted">• ${esc(l.printed_by)} — ${new Date(l.printed_at).toLocaleString('th-TH')}</div>`).join("")}</div>`:''}
     </div>`;
 }
-async function doPrint(id){ await DB.logPrint(id,USER.name).catch(()=>{}); toast("บันทึกการพิมพ์โดย "+USER.name); setTimeout(()=>window.print(),350); }
+async function doPrint(id){
+  window.print();
+  setTimeout(function(){ if(confirm('พิมพ์ / บันทึก PDF เรียบร้อยแล้วใช่ไหม?\n\nกด "ตกลง" เพื่อบันทึกจำนวนการพิมพ์\nถ้าแค่เปิดดู (ยังไม่พิมพ์) ให้กด "ยกเลิก"')){ DB.logPrint(id,USER.name).catch(function(){}); toast('บันทึกการพิมพ์โดย '+USER.name); setTimeout(function(){ go('detail',id); },500); } }, 700);
+}
 function reAlert(r){ alertSale(r,[]); }
 window.addEventListener('error',function(e){ try{ toast('ผิดพลาด: '+(e.message||'')); }catch(_){} });
 window.addEventListener('unhandledrejection',function(e){ try{ toast('ผิดพลาด: '+((e.reason&&e.reason.message)||e.reason||'')); }catch(_){} });
