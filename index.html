@@ -369,7 +369,12 @@ async function uploadImage(file,name,fromCam){
   const b64=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(file);});
   if(DEMO) return b64;
   const folder=(DRAFT && (DRAFT.job_no||DRAFT.doc_no||DRAFT.sa))||"misc";
-  const res=await apiCall("uploadPhoto",{folder:folder,label:name||"",b64:b64});
+  let res=null;
+  for(let attempt=0; attempt<3; attempt++){
+    try{ res=await apiCall("uploadPhoto",{folder:folder,label:name||"",b64:b64}); if(res && res.url) break; }
+    catch(e){ /* network/timeout — ลองใหม่ */ }
+    if(attempt<2) await new Promise(r=>setTimeout(r, 900*(attempt+1)));
+  }
   if(res && res.folder && DRAFT) DRAFT.photo_folder=res.folder;
   return (res&&res.url)||"";
 }
@@ -516,7 +521,7 @@ function drawStep(){
 function gv(id){const e=document.getElementById(id);return e?e.value:"";}
 function stepJob(){
   const oil=isOil(); const other=isOtherMaker();
-  const plateCounts=Array.from({length:DRAFT.n_comp},(_,i)=>{ const c=DRAFT.comps[i]||blankComp(); return `<div class="field" style="min-width:110px"><label>ช่อง ${i+1}: จำนวนแป้น</label><input type="number" min="1" max="8" data-np="${i}" value="${c.n_plate||1}"></div>`; }).join("");
+  const plateCounts=Array.from({length:DRAFT.n_comp},(_,i)=>{ const c=DRAFT.comps[i]||blankComp(); return `<div class="field" style="min-width:110px"><label>ช่อง ${i+1}: จำนวนแป้น</label><input type="number" min="1" max="9" data-np="${i}" value="${c.n_plate||1}"></div>`; }).join("");
   return `<div class="card"><div class="guide-box">📋 <b>1.</b> กรอกข้อมูลงาน/รถ — <b>ดึงข้อมูลรถเดิม</b>จากช่องแรก (ดึงแล้วเติม น้ำมัน/เคมี + ข้อมูลรถ ให้อัตโนมัติ) • กด"บันทึก"เพื่อออกเลขเอกสาร</div>
     <div class="row">
       <div class="field" style="flex:1.4"><label>ดึงข้อมูลรถเดิม / Load existing (ทะเบียน/คัสซีหาง)</label><div class="row" style="gap:6px;flex-wrap:nowrap"><input id="f_lookup" placeholder="พิมพ์ทะเบียน/คัสซีหาง" style="flex:1;min-width:0"><button class="btn sm sec" type="button" style="flex:0 0 auto" onclick="lookupVehicle()">🔎</button></div></div>
@@ -624,7 +629,7 @@ function bindStep(){
   document.querySelectorAll("#stepbody input,#stepbody select,#stepbody textarea").forEach(el=>{ if(el.type==="file"||el.classList.contains("f_cond")||el.hasAttribute("data-pi")||el.hasAttribute("data-cc")||el.hasAttribute("data-np")||el.hasAttribute("data-chk")||el.hasAttribute("data-tire")) return; el.addEventListener("change",collectStep); });
   document.querySelectorAll("#stepbody input[data-pi]").forEach(inp=>{ inp.addEventListener("input",()=>{ DRAFT.comps[+inp.dataset.ci].plates[+inp.dataset.pi][inp.dataset.pk]=inp.value; }); });
   document.querySelectorAll("#stepbody input[data-cc]").forEach(inp=>{ inp.addEventListener("input",()=>{ DRAFT.comps[+inp.dataset.cc][inp.dataset.ck]=inp.value; }); });
-  document.querySelectorAll("#stepbody input[data-np]").forEach(inp=>{ inp.addEventListener("change",()=>{ const i=+inp.dataset.np; const np=Math.max(1,Math.min(8,+inp.value||1)); inp.value=np; if(DRAFT.comps[i]){ DRAFT.comps[i].n_plate=np; DRAFT.comps[i].plates=Array.from({length:np},(_,j)=>(DRAFT.comps[i].plates&&DRAFT.comps[i].plates[j])||blankPlate()); } }); });
+  document.querySelectorAll("#stepbody input[data-np]").forEach(inp=>{ inp.addEventListener("change",()=>{ const i=+inp.dataset.np; const np=Math.max(1,Math.min(9,+inp.value||1)); inp.value=np; if(DRAFT.comps[i]){ DRAFT.comps[i].n_plate=np; DRAFT.comps[i].plates=Array.from({length:np},(_,j)=>(DRAFT.comps[i].plates&&DRAFT.comps[i].plates[j])||blankPlate()); } }); });
   document.querySelectorAll("#stepbody input[data-chk]").forEach(inp=>{ inp.addEventListener("input",()=>{DRAFT.checklist[+inp.dataset.chk][inp.dataset.fk]=inp.value;}); });
   document.querySelectorAll("#stepbody input[data-tire]").forEach(inp=>{ inp.addEventListener("input",()=>{ if(inp.dataset.tire==='front') DRAFT.tire_front=inp.value; else DRAFT.tire_rear=inp.value; }); });
   document.querySelectorAll(".seg[data-i]").forEach(seg=>{ seg.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{ const i=+seg.dataset.i,v=btn.dataset.v; DRAFT.checklist[i].st=v; drawStep(); }); });
@@ -705,11 +710,11 @@ function closeCamera(){ if(CAM.stream){ CAM.stream.getTracks().forEach(t=>t.stop
 async function captureCam(){
   const v=document.getElementById('camv'); if(!v||!v.videoWidth){ return toast('กล้องยังไม่พร้อม รอสักครู่'); }
   // ย่อรูปก่อนอัป (max 1280px) เพื่อให้อัป/เซฟเร็วขึ้นมาก
-  const MAX=1600; let w=v.videoWidth, h=v.videoHeight; const sc=Math.min(1, MAX/Math.max(w,h)); w=Math.round(w*sc); h=Math.round(h*sc);
+  const MAX=1280; let w=v.videoWidth, h=v.videoHeight; const sc=Math.min(1, MAX/Math.max(w,h)); w=Math.round(w*sc); h=Math.round(h*sc);
   const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const ctx=cv.getContext('2d'); ctx.imageSmoothingQuality='high'; ctx.drawImage(v,0,0,w,h);
   // ปิดกล้องทันที + อัปเบื้องหลัง ให้รู้สึกเร็ว
   const ds=CAM.ds, label=CAM.label; closeCamera(); toast(t('uploading'));
-  const blob=await new Promise(res=>cv.toBlob(res,'image/jpeg',0.85));
+  const blob=await new Promise(res=>cv.toBlob(res,'image/jpeg',0.72));
   let url; try{ url=await uploadImage(blob,label,true); }catch(err){ return toast('อัปโหลดไม่สำเร็จ: '+(err.message||err)); }
   if(!url){ return toast('⚠️ อัปโหลดไม่สำเร็จ (ไม่ได้ลิงก์รูป) — กรุณาถ่ายใหม่อีกครั้ง'); }
   storeSlot(ds,url); drawStep(); toast("เพิ่มรูปแล้ว ✓");
@@ -723,7 +728,7 @@ function collectStep(){
     DRAFT.customer=gv("f_customer");DRAFT.address=gv("f_address");DRAFT.plate_head=gv("f_plate_head");DRAFT.plate_tank=gv("f_plate_tank");DRAFT.chassis_head=gv("f_chassis_head");DRAFT.chassis_tank=gv("f_chassis_tank");
     DRAFT.capacity=gv("f_capacity");DRAFT.vehicle_type=gv("f_vehicle_type");DRAFT.model_no=gv("f_model_no");if(document.getElementById("f_prover_tank")) DRAFT.prover_tank=gv("f_prover_tank");
     const nc=Math.max(1,Math.min(12,+gv("f_n_comp")||DRAFT.n_comp||1)); DRAFT.n_comp=nc; DRAFT.comps=Array.from({length:nc},(_,i)=>DRAFT.comps[i]||blankComp());
-    document.querySelectorAll("#stepbody input[data-np]").forEach(inp=>{ const i=+inp.dataset.np; if(DRAFT.comps[i]){ const np=Math.max(1,Math.min(8,+inp.value||1)); DRAFT.comps[i].n_plate=np; DRAFT.comps[i].plates=Array.from({length:np},(_,j)=>(DRAFT.comps[i].plates&&DRAFT.comps[i].plates[j])||blankPlate()); } });
+    document.querySelectorAll("#stepbody input[data-np]").forEach(inp=>{ const i=+inp.dataset.np; if(DRAFT.comps[i]){ const np=Math.max(1,Math.min(9,+inp.value||1)); DRAFT.comps[i].n_plate=np; DRAFT.comps[i].plates=Array.from({length:np},(_,j)=>(DRAFT.comps[i].plates&&DRAFT.comps[i].plates[j])||blankPlate()); } });
     if(isOil()) DRAFT.lowhigh={a:gv("f_lh_a"),b:gv("f_lh_b"),c:gv("f_lh_c"),d:gv("f_lh_d")};
     else DRAFT.cal={ref_front:gv("f_ref_front"),ref_rear:gv("f_ref_rear")};
     if(document.getElementById("f_location")) DRAFT.location=gv("f_location");
@@ -815,8 +820,9 @@ async function runSearch(){
   $("#results").innerHTML = rows.length? rows.map(r=>`<div class="rep-item" onclick="openReport('${esc(String(r.id))}')"><div style="flex:1"><div class="docno">${esc(r.doc_no)} ${r.status==='draft'?`<span class="muted">— ${t('resume')}</span>`:''}</div><div class="muted">${esc(r.customer)} • ${esc(r.plate_tank||'-')} • Job ${esc(r.job_no||'-')} • SA ${esc(r.sa||'-')}</div><div class="muted">${esc(r.created_by)} • ปริ้น ${r.print_count||0}</div></div>${docStatusPill(r)}</div>`).join("") : `<p class="muted">${t('noReport')}</p>`;
 }
 /* ===== Prover Tank (มาตรฐาน) — เก็บในเครื่อง (localStorage) ===== */
-const PT={ list:function(){return LS.get('provertanks',[]);}, save:function(a){ LS.set('provertanks',a); if(!DEMO) apiCall("saveProverTanks",{list:a}).catch(()=>toast("ซิงค์ขึ้นเซิร์ฟเวอร์ไม่สำเร็จ")); } };
-async function loadProver(){ if(DEMO) return; try{ const l=await apiCall("getProverTanks"); LS.set('provertanks',l||[]); }catch(e){} }
+function asArr(a){ return Array.isArray(a)?a:((a&&Array.isArray(a.list))?a.list:[]); }
+const PT={ list:function(){return asArr(LS.get('provertanks',[]));}, save:function(a){ LS.set('provertanks',a); if(!DEMO) apiCall("saveProverTanks",{list:a}).catch(()=>toast("ซิงค์ขึ้นเซิร์ฟเวอร์ไม่สำเร็จ")); } };
+async function loadProver(){ if(DEMO) return; try{ const l=await apiCall("getProverTanks"); LS.set('provertanks',asArr(l)); }catch(e){} }
 let PT_EDIT=-1;
 function ptDueClass(next){ if(!next) return 'draft'; const d=(new Date(next)-new Date())/86400000; if(d<0) return 'bad'; if(d<=30) return 'warn'; return 'ok'; }
 function ptDueText(next){ if(!next) return ''; const d=Math.round((new Date(next)-new Date())/86400000); if(d<0) return 'เลยกำหนด '+(-d)+' วัน'; return 'อีก '+d+' วัน'; }
@@ -943,8 +949,8 @@ function buildReportPages(r){
     +ib('แรงดันลมยาง ล้อหน้า',r.tire_front?esc(r.tire_front)+' PSI':'')
     +ib('แรงดันลมยาง ล้อหลัง',r.tire_rear?esc(r.tire_rear)+' PSI':'')
   +`</div>`;
-  const ptL=LS.get('provertanks',[]);
-  const ptSn=r.prover_tank?esc(r.prover_tank):(ptL.length?ptL.map(p=>esc(p.s_n||'')).filter(Boolean).join(' · '):'');
+  const ptRaw=LS.get('provertanks',[]); const ptL=Array.isArray(ptRaw)?ptRaw:((ptRaw&&Array.isArray(ptRaw.list))?ptRaw.list:[]);
+  const ptSn=r.prover_tank?esc(r.prover_tank):(ptL.length?ptL.map(p=>esc((p&&p.s_n)||'')).filter(Boolean).join(' · '):'');
   if(ptSn) body+=`<div class="r2-sec">Prover Tank (Standard) — S/N แท็งค์มาตรฐาน</div><div class="r2-ib"><div class="v">${ptSn}</div></div>`;
   body+=`<div class="r2-sec">ตารางผลการวัดน้ำ (เรียงตามช่อง Compartment)</div>`;
   const hcol=oilR?'ระยะจากก้นถังถึงฝา Manhole บน (มม.) — ความสูงรวม':'ระยะจากก้นถังถึงฝา Manhole บน (มม.) (H)';
@@ -987,7 +993,7 @@ function buildReportPages(r){
   return `<div class="report"><table class="rep-table"><thead><tr><td>${head}</td></tr></thead><tfoot><tr><td>${foot}</td></tr></tfoot><tbody><tr><td><div class="rep-content">${body}</div></td></tr></tbody></table></div>`;
 }
 async function DetailView(id){
-  await loadProver();
+  loadProver();
   let r; try{r=await DB.getReport(id);}catch(e){$("#page").innerHTML='<p>โหลดไม่ได้</p>';return;}
   if(!r){$("#page").innerHTML='<p>ไม่พบรายงาน</p>';return;}
   const logs=await DB.printLogs(id).catch(()=>[]);
