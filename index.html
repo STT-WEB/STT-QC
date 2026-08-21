@@ -468,7 +468,7 @@ function HowtoView(){
   <div>${steps.map((s,i)=>`<div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:30px;height:30px;border-radius:8px;background:var(--stt-red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto">${i+1}</div><h2 style="margin:0;font-size:16px">${esc(s.t.replace(/^\d+\.\s*/,''))}</h2></div>${s.svg?`<div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px">${s.svg}</div>`:''}<div style="margin-top:10px;font-size:14px;line-height:1.7">${s.d}</div></div>`).join("")}</div>
   ${GROLE==='staff'?`<button class="btn block" style="margin-top:8px" onclick="go('new')">เริ่มทำใบวัดน้ำ →</button>`:''}`;
 }
-let DRAFT=null, CUR=0, STEPS=[], EMP_NAMES=[];
+let DRAFT=null, CUR=0, STEPS=[], EMP_NAMES=[], LASTREP=null;
 function blankPlate(){return{vol:"",u:"",bot:"",ph:"",ph2:"",seal_no:"",temp:"",level_bottom:"",ref_height:"",diff:"",ph_seal:""};}
 function blankComp(){return{n_plate:1,plates:[blankPlate()],h:"",void_l:"",seal_plate:"",seal_cap:"STT",seal_support:"",ph_seal:"",ph_name:"",ph_sealsupport:""};}
 function blankChk(){return{st:"",fd:"",fdate:"",fby:"",note:"",ph:"",ph2:""};}
@@ -868,7 +868,13 @@ function resumeDraft(r){
   DRAFT={id:r.id,doc_no:r.doc_no,created_by:r.created_by||USER.name,job_type:r.job_type||"JM",sa:r.sa||"",job_no:r.job_no||"",measure_date:r.measure_date||new Date().toISOString().slice(0,10),expiry_date:d.expiry_date||addYears(r.measure_date||new Date().toISOString().slice(0,10),3),gaugers:d.gaugers||["",""],model_imgs:(d.model_imgs&&d.model_imgs.length)?d.model_imgs:(d.model_img?[d.model_img]:[]),lowhigh:d.lowhigh||{a:"",b:"",c:"",d:""},cal:d.cal||{cert_no:"",cal_date:"",cal_exp:"",ref_front:"",ref_rear:"",seal_support_no:""},customer:r.customer||"",address:r.address||"",plate_head:r.plate_head||"",plate_tank:r.plate_tank||"",chassis_head:r.chassis_head||"",chassis_tank:r.chassis_tank||"",capacity:r.capacity||"",vehicle_type:r.vehicle_type||VEHICLE_TYPES[0],product:r.product||PRODUCT_TYPES[0],model_no:r.model_no||"",tank_origin:r.tank_origin||TANK_ORIGINS[0],tank_maker_name:r.tank_maker_name||"",prover_tank:r.prover_tank||"",tire_front:r.tire_front||"",tire_rear:r.tire_rear||"",conditions:d.conditions||[],location:r.location||"บริษัท สุธี แท็งเกอร์ แอนด์ สเปเชียลทรัค จำกัด",n_comp:d.n_comp||comps.length,comps:comps,checklist:checklist,seal_slots:d.seal_slots||{},chassis_slots:d.chassis_slots||{},conclusion:d.conclusion||"pass",remark:d.remark||"",history:d.history||[],review_photos:d.review_photos||{},reviewer:d.reviewer||"",review_status:d.review_status||"",review_date:d.review_date||"",photo_folder:r.photo_folder||d.photo_folder||"",_editLog:(r.status!=='draft'),_wasReviewed:!!(d.reviewer)};
   CUR=0; go('new');
 }
-async function editReport(id){ let r; try{r=await DB.getReport(id);}catch(e){return toast("โหลดไม่ได้");} if(!r) return toast("ไม่พบรายงาน"); const rev=(r.data&&r.data.review_status)||r.review_status; if(rev==='accepted' && !canReview()) return toast("เอกสารถูกหัวหน้าตรวจรับแล้ว — แก้ไขได้เฉพาะหัวหน้า"); resumeDraft(r); }
+async function editReport(id){
+  const chk=(rr)=>{ const rev=(rr.data&&rr.data.review_status)||rr.review_status; if(rev==='accepted' && !canReview()){ toast("เอกสารถูกหัวหน้าตรวจรับแล้ว — แก้ไขได้เฉพาะหัวหน้า"); return false; } return true; };
+  if(LASTREP && String(LASTREP.id)===String(id)){ if(!chk(LASTREP)) return; return resumeDraft(LASTREP); }
+  toast("⏳ กำลังโหลดเพื่อแก้ไข...");
+  let r; try{r=await DB.getReport(id);}catch(e){return toast("โหลดไม่ได้");} if(!r) return toast("ไม่พบรายงาน");
+  LASTREP=r; if(!chk(r)) return; resumeDraft(r);
+}
 /* ===== Review (หัวหน้า) ===== */
 let REVIEW={id:null,r:null,photos:[],map:{}};
 async function ReviewView(id){
@@ -996,6 +1002,7 @@ async function DetailView(id){
   loadProver();
   let r; try{r=await DB.getReport(id);}catch(e){$("#page").innerHTML='<p>โหลดไม่ได้</p>';return;}
   if(!r){$("#page").innerHTML='<p>ไม่พบรายงาน</p>';return;}
+  LASTREP=r;
   const logs=await DB.printLogs(id).catch(()=>[]);
   const d=r.data||{};
   const approved=((d.review_status||r.review_status)==='accepted');
