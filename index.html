@@ -228,10 +228,17 @@ const CONFIG = {
 <script>
 const DEMO = CONFIG.SCRIPT_URL.startsWith("YOUR_");
 async function apiCall(action, payload){
-  const res = await fetch(CONFIG.SCRIPT_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify(Object.assign({action}, payload||{}))});
-  const j = await res.json();
-  if(!j.ok) throw new Error(j.error||"server error");
-  return j.data;
+  const READS={search:1,getReport:1,getVehicle:1,printLogs:1,getProverTanks:1};
+  const tries=READS[action]?3:1; let lastErr;
+  for(let i=0;i<tries;i++){
+    try{
+      const res = await fetch(CONFIG.SCRIPT_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify(Object.assign({action}, payload||{}))});
+      const j = await res.json();
+      if(!j.ok) throw new Error(j.error||"server error");
+      return j.data;
+    }catch(e){ lastErr=e; if(i<tries-1) await new Promise(r=>setTimeout(r, 800*(i+1))); }
+  }
+  throw lastErr;
 }
 const LANGS=[["th","ไทย"],["en","EN"],["my","မြန်မာ"],["lo","ລາວ"],["km","ខ្មែរ"]];
 let LANG = (typeof localStorage!=="undefined" && localStorage.getItem("sttqc_lang")) || "th";
@@ -816,7 +823,8 @@ function SearchView(){
 }
 async function runSearch(){
   const q=$("#q")?$("#q").value.trim():"";
-  let rows=[]; try{rows=await DB.searchReports(q);}catch(e){$("#results").innerHTML='<p class="muted">โหลดไม่ได้</p>';return;}
+  $("#results").innerHTML='<p class="muted">'+t('loading')+'</p>';
+  let rows=[]; try{rows=await DB.searchReports(q);}catch(e){$("#results").innerHTML='<div class="muted" style="padding:6px 0">⚠️ โหลดรายการไม่สำเร็จ (เซิร์ฟเวอร์ตอบช้า/เน็ตสะดุด)<br><span style="font-size:12px;color:#b91c1c">'+esc(String((e&&e.message)||e))+'</span></div><button class="btn sm" onclick="runSearch()">🔄 ลองใหม่</button>';return;}
   $("#results").innerHTML = rows.length? rows.map(r=>`<div class="rep-item" onclick="openReport('${esc(String(r.id))}')"><div style="flex:1"><div class="docno">${esc(r.doc_no)} ${r.status==='draft'?`<span class="muted">— ${t('resume')}</span>`:''}</div><div class="muted">${esc(r.customer)} • ${esc(r.plate_tank||'-')} • Job ${esc(r.job_no||'-')} • SA ${esc(r.sa||'-')}</div><div class="muted">${esc(r.created_by)} • ปริ้น ${r.print_count||0}</div></div>${docStatusPill(r)}</div>`).join("") : `<p class="muted">${t('noReport')}</p>`;
 }
 /* ===== Prover Tank (มาตรฐาน) — เก็บในเครื่อง (localStorage) ===== */
