@@ -423,7 +423,8 @@ async function doLogin(){
 }
 function HomeView(){
   const modules=[{ic:"💧",nm:t('modWater'),active:true},{ic:"🔍",nm:"ตรวจสภาพรถ"},{ic:"🎨",nm:"ตรวจงานสี"},{ic:"⚡",nm:"ตรวจงานไฟฟ้า"},{ic:"📦",nm:"ตรวจก่อนส่งมอบ"},{ic:"📊",nm:"รายงานสรุป"}];
-  $("#page").innerHTML=`<h1>${t('homeH1')}</h1><p class="muted">${t('homeP')}</p><div class="tiles" style="margin-top:14px">${modules.map(m=>`<div class="tile ${m.active?'active':'soon'}" ${m.active?'onclick="openWater()"':''}>${m.active?`<span class="tag pill ok">${t('ready')}</span>`:`<span class="tag pill draft">${t('soon')}</span>`}<div class="ic">${m.ic}</div><div class="nm">${m.nm}</div></div>`).join("")}</div>`;
+  const w=getWip(); const wipBanner=(w&&w.d&&(!w.by||w.by===((USER&&USER.name)||'')))?`<div class="banner" style="background:#fff7ed;border:1px solid #fdba74;color:#9a3412;cursor:pointer;margin-bottom:12px" onclick="resumeWip()">📝 มีใบวัดน้ำที่กรอกค้างไว้ (Job ${esc(w.d.job_no||'-')} • ${esc(w.d.customer||'-')}) — <b>แตะเพื่อทำต่อ</b> <a href="javascript:void(0)" onclick="event.stopPropagation();discardWip()" style="color:#9a3412;text-decoration:underline;margin-left:8px">ลบทิ้ง</a></div>`:'';
+  $("#page").innerHTML=`<h1>${t('homeH1')}</h1><p class="muted">${t('homeP')}</p>${wipBanner}<div class="tiles" style="margin-top:14px">${modules.map(m=>`<div class="tile ${m.active?'active':'soon'}" ${m.active?'onclick="openWater()"':''}>${m.active?`<span class="tag pill ok">${t('ready')}</span>`:`<span class="tag pill draft">${t('soon')}</span>`}<div class="ic">${m.ic}</div><div class="nm">${m.nm}</div></div>`).join("")}</div>`;
 }
 function openWater(){
   CURVIEW="water"; window.scrollTo(0,0);
@@ -487,10 +488,10 @@ function migrateComp(c){ if(!c) return blankComp(); if(Array.isArray(c.plates)) 
 function buildSteps(){ STEPS=[{key:"job",ic:"📋"},{key:"precheck",ic:"✓"},{key:"table",ic:"💧"},{key:"seal",ic:"🔒"},{key:"chassis",ic:"🚛"},{key:"postcheck",ic:"☑️"},{key:"summary",ic:"🏁"}]; }
 function newDraft(){ const md=new Date().toISOString().slice(0,10); return {id:null,doc_no:null,job_type:"JM",sa:"",job_no:"",measure_date:md,expiry_date:addYears(md,3),customer:"",address:"",plate_head:"",plate_tank:"",chassis_head:"",chassis_tank:"",capacity:"",vehicle_type:VEHICLE_TYPES[0],product:PRODUCT_TYPES[0],model_no:"",model_imgs:[],tank_origin:TANK_ORIGINS[0],tank_maker_name:"",prover_tank:"",tire_front:"",tire_rear:"",lowhigh:{a:"",b:"",c:"",d:""},cal:{cert_no:"",cal_date:"",cal_exp:"",ref_front:"",ref_rear:"",seal_support_no:""},gaugers:["",""],conditions:[],location:"บริษัท สุธี แท็งเกอร์ แอนด์ สเปเชียลทรัค จำกัด",n_comp:1,comps:Array.from({length:1},blankComp),checklist:CHK_FM.map(blankChk),seal_slots:{},chassis_slots:{},conclusion:"pass",remark:"",history:[],review_photos:{},reviewer:"",review_status:"",review_date:"",photo_folder:"",_editLog:false,_wasReviewed:false}; }
 function NewReportView(){
-  if(!DRAFT){ DRAFT=newDraft(); CUR=0; }
+  if(!DRAFT){ const w=getWip(); if(w&&w.d){ DRAFT=w.d; CUR=w.cur||0; } else { DRAFT=newDraft(); CUR=0; } }
   buildSteps();
   if(!EMP_NAMES.length){ DB.employeeNames().then(n=>{ EMP_NAMES=n||[]; const dl=document.getElementById("emp-list-g"); if(dl) dl.innerHTML=EMP_NAMES.map(x=>`<option value="${esc(x)}">`).join(""); }).catch(()=>{}); }
-  $("#page").innerHTML=`<div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก? / Exit?')){DRAFT=null;go('home');}">${t('cancel')}</div><h1>${t('newTitle')}</h1><div id="docbanner"></div>${rejectBanner()}<div class="stepper" id="stepper"></div><div class="no-print" style="font-size:12px;color:var(--stt-red-dark);background:var(--stt-red-soft);border-radius:8px;padding:6px 10px;margin-bottom:10px">👆 แตะวงกลมขั้นตอนด้านบน เพื่อกระโดดไปแก้/ถ่ายรูปใหม่แต่ละขั้นได้ทันที (ไม่ต้องกดถัดไปทีละขั้น)</div><div id="stepbody"></div><div class="row no-print" style="margin-top:16px"><button class="btn grey" id="btnPrev" onclick="stepPrev()">${t('prev')}</button><button class="btn sec" onclick="saveCore(false)">${t('saveDraftBtn')}</button><div style="flex:1"></div><button class="btn" id="btnNext" onclick="stepNext()">${t('next')}</button></div>`;
+  $("#page").innerHTML=`<div class="crumb" onclick="if(confirm('ออกโดยไม่บันทึก? / Exit?')){DRAFT=null;clearWip();go('home');}">${t('cancel')}</div><h1>${t('newTitle')}</h1><div id="docbanner"></div>${rejectBanner()}<div class="stepper" id="stepper"></div><div class="no-print" style="font-size:12px;color:var(--stt-red-dark);background:var(--stt-red-soft);border-radius:8px;padding:6px 10px;margin-bottom:10px">👆 แตะวงกลมขั้นตอนด้านบน เพื่อกระโดดไปแก้/ถ่ายรูปใหม่แต่ละขั้นได้ทันที (ไม่ต้องกดถัดไปทีละขั้น)</div><div id="stepbody"></div><div class="row no-print" style="margin-top:16px"><button class="btn grey" id="btnPrev" onclick="stepPrev()">${t('prev')}</button><button class="btn sec" onclick="saveCore(false)">${t('saveDraftBtn')}</button><div style="flex:1"></div><button class="btn" id="btnNext" onclick="stepNext()">${t('next')}</button></div>`;
   refreshDocBanner(); drawStepper(); drawStep();
 }
 function refreshDocBanner(){ const el=document.getElementById("docbanner"); if(!el)return; const info=(DRAFT&&(DRAFT.job_no||DRAFT.customer))?` <span class="muted" style="font-weight:600">• Job ${esc(DRAFT.job_no||'-')} • ${esc(DRAFT.customer||'-')}</span>`:''; el.innerHTML = (DRAFT&&DRAFT.doc_no)?`<div class="docnote">📄 ${t('docNoLabel')}: <b>${esc(DRAFT.doc_no)}</b>${info}</div>`:`<div class="docnote pending">📄 ${t('docNoNone')}${info}</div>`; }
@@ -544,7 +545,7 @@ function stepJob(){
     ${oil?`<div class="grp">ข้อมูล Low-High (เฉพาะรถน้ำมัน)</div><div class="row"><div class="field"><label>A: พื้น→หลังถัง ที่หัวถัง (มม.)</label><input id="f_lh_a" value="${esc((DRAFT.lowhigh||{}).a||'')}" inputmode="numeric"></div><div class="field"><label>B: พื้น→หลังถัง ที่ท้ายถัง (มม.)</label><input id="f_lh_b" value="${esc((DRAFT.lowhigh||{}).b||'')}" inputmode="numeric"></div><div class="field"><label>C: พื้น→คิงพิน ที่หัวถัง (มม.)</label><input id="f_lh_c" value="${esc((DRAFT.lowhigh||{}).c||'')}" inputmode="numeric"></div><div class="field"><label>D: พื้น→คัสซี ที่ท้ายถัง (มม.)</label><input id="f_lh_d" value="${esc((DRAFT.lowhigh||{}).d||'')}" inputmode="numeric"></div></div>`:`<div class="grp">ข้อมูลความสูง ตั้งแต่คอ Manhole - ก้นแท็งค์ (เฉพาะรถเคมี)</div><div class="row"><div class="field" style="flex:2"><label>Reference Height (Front) มม. — ระยะคอ Manhole ถึงก้นแท็งค์</label><input id="f_ref_front" value="${esc((DRAFT.cal||{}).ref_front||'')}" inputmode="numeric"></div></div>`}
     <div class="grp">รูป Model / Diagram ถัง (Admin อัปจากคอม สูงสุด 5 รูป — มีลายน้ำสุธีกันลอกแบบ)</div>
     <div class="field" style="flex:0 0 auto"><label>อัปโหลดรูป Model (เลือกได้หลายรูป) — ${(DRAFT.model_imgs||[]).length}/5</label><input type="file" accept="image/*" multiple id="f_model_file" onchange="uploadModelImg(this)" ${(DRAFT.model_imgs||[]).length>=5?'disabled':''}></div>
-    <div class="slot-grid" style="margin-top:6px">${(DRAFT.model_imgs||[]).length?(DRAFT.model_imgs||[]).map((u,i)=>`<div style="max-width:200px"><div class="wm-wrap"><img class="wm-base" src="${esc(imgSrc(u))}" data-id="${imgId(u)}" data-mark="1" onerror="imgFB(this)"><img class="wm-logo" src="logo.png" onerror="this.style.display='none'"></div><button type="button" class="btn sm grey" style="margin-top:4px" onclick="rmModelImg(${i})">ลบรูปที่ ${i+1}</button></div>`).join(""):'<div class="muted">ยังไม่มีรูป Model</div>'}</div>
+    <div class="slot-grid" style="margin-top:6px">${(DRAFT.model_imgs||[]).length?(DRAFT.model_imgs||[]).map((u,i)=>`<div style="max-width:200px"><div class="wm-wrap"><img class="wm-base" src="${esc(imgSrc(u))}" data-id="${imgId(u)}" data-mark="1" loading="lazy" onerror="imgFB(this)"><img class="wm-logo" src="logo.png" onerror="this.style.display='none'"></div><button type="button" class="btn sm grey" style="margin-top:4px" onclick="rmModelImg(${i})">ลบรูปที่ ${i+1}</button></div>`).join(""):'<div class="muted">ยังไม่มีรูป Model</div>'}</div>
     <label style="font-size:13px;font-weight:600;color:var(--ink-soft)">เงื่อนไขการวัดน้ำ / Conditions (เลือกได้หลายข้อ)</label><div class="cond-grid" style="margin-top:6px">${WATER_CONDITIONS.map(c=>`<label><input type="checkbox" class="f_cond" value="${esc(c)}" ${DRAFT.conditions.includes(c)?'checked':''}> ${esc(c)}</label>`).join("")}</div>
     <div class="grp">ผู้วัดน้ำ / Gauged by (1-2 คน)</div><div class="row"><div class="field"><label>ผู้วัดคนที่ 1</label><input id="f_gauger0" list="emp-list-g" placeholder="เลือกผู้วัดคนที่ 1" value="${esc((DRAFT.gaugers||[])[0]||'')}"></div><div class="field"><label>ผู้วัดคนที่ 2 (ถ้ามี)</label><input id="f_gauger1" list="emp-list-g" placeholder="เลือกผู้วัดคนที่ 2" value="${esc((DRAFT.gaugers||[])[1]||'')}"></div><datalist id="emp-list-g">${EMP_NAMES.map(n=>`<option value="${esc(n)}">`).join("")}</datalist></div>
   </div>`;
@@ -623,7 +624,7 @@ function slotHtml(target,a,b,label,url){
   else if(target==="chk") attr=`data-target="chk" data-idx="${b}"`;
   else if(target==="chk2") attr=`data-target="chk2" data-idx="${b}"`;
   else attr=`data-target="${target}" data-idx="${b}"`;
-  if(url) return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" onclick="viewPhoto('${esc(url)}')"><img src="${esc(imgSrc(url))}" data-id="${imgId(url)}" data-mark="1" onerror="imgFB(this)"></div><div class="slot-acts"><button class="sa-btn" onclick="viewPhoto('${esc(url)}')" type="button">👁 ดู</button><button class="sa-btn" ${attr} onclick="openCamera(this)" type="button">📷 ถ่ายใหม่</button><button class="sa-btn" ${attr} data-del="1" type="button">🗑</button></div></div>`;
+  if(url) return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" onclick="viewPhoto('${esc(url)}')"><img src="${esc(imgSrc(url))}" data-id="${imgId(url)}" data-mark="1" loading="lazy" onerror="imgFB(this)"></div><div class="slot-acts"><button class="sa-btn" onclick="viewPhoto('${esc(url)}')" type="button">👁 ดู</button><button class="sa-btn" ${attr} onclick="openCamera(this)" type="button">📷 ถ่ายใหม่</button><button class="sa-btn" ${attr} data-del="1" type="button">🗑</button></div></div>`;
   return `<div class="slot"><div class="lab">${esc(label)}</div><div class="ph" ${attr} onclick="openCamera(this)"><span class="add">📷</span></div></div>`;
 }
 function viewPhoto(u){ try{ window.open(u,'_blank'); }catch(e){ toast('เปิดรูปไม่ได้'); } }
@@ -726,6 +727,12 @@ async function captureCam(){
   if(!url){ return toast('⚠️ อัปโหลดไม่สำเร็จ (ไม่ได้ลิงก์รูป) — กรุณาถ่ายใหม่อีกครั้ง'); }
   storeSlot(ds,url); drawStep(); toast("เพิ่มรูปแล้ว ✓");
 }
+/* ===== Auto-save งานที่กำลังกรอก (กันข้อมูลหายตอนเว็บรีโหลด/แครช) ===== */
+function persistWip(){ try{ if(DRAFT) localStorage.setItem('sttqc_wip', JSON.stringify({d:DRAFT,cur:CUR,by:(USER&&USER.name)||'',ts:Date.now()})); }catch(e){} }
+function getWip(){ try{ return JSON.parse(localStorage.getItem('sttqc_wip')); }catch(e){ return null; } }
+function clearWip(){ try{ localStorage.removeItem('sttqc_wip'); }catch(e){} }
+function resumeWip(){ const w=getWip(); if(!w||!w.d){ return HomeView(); } DRAFT=w.d; CUR=w.cur||0; buildSteps(); go('new'); toast('กู้ข้อมูลที่กรอกค้างไว้แล้ว ✓'); }
+function discardWip(){ if(!confirm('ลบข้อมูลที่กรอกค้างไว้ทิ้ง?')) return; clearWip(); if(DRAFT){} HomeView(); }
 function collectStep(){
   const k=curKey();
   if(k==="job"){
@@ -744,6 +751,7 @@ function collectStep(){
     DRAFT.conditions=Array.from(document.querySelectorAll(".f_cond:checked")).map(x=>x.value);
   }
   if(k==="summary"){ DRAFT.remark=gv("f_remark"); const fails=DRAFT.checklist.filter(x=>x.st==='fail').length; DRAFT.conclusion=fails?'needs_fix':'pass'; }
+  persistWip();
 }
 function validateStep(){
   collectStep(); const k=curKey();
@@ -782,7 +790,7 @@ async function saveCore(isFinal){
     const fails=DRAFT.checklist.map((x,i)=>x.st==='fail'?(CHK_FM[i]&&CHK_FM[i].txt):null).filter(Boolean);
     if(fails.length || saved.status==='needs_fix' || saved.status==='fail') alertSale(saved,fails);
     alertApprove(saved);
-    DRAFT=null; toast("ส่งขอ Approve แล้ว: "+saved.doc_no); go("detail",saved.id);
+    DRAFT=null; clearWip(); toast("ส่งขอ Approve แล้ว: "+saved.doc_no); go("detail",saved.id);
   } else { toast(t('draftSaved')+": "+saved.doc_no); refreshDocBanner(); }
 }
 function alertApprove(rec){ const msg=`✅ มีงานรอ Approve\nเอกสาร: ${rec.doc_no}\nรถ: ${rec.plate_tank||'-'} • ลูกค้า: ${rec.customer||'-'}\nผู้จัดทำ: ${USER.name}\n** หัวหน้ากรุณาเข้าตรวจรูป+กระบวนการ แล้วกด Approve **`; share(msg,"แจ้งหัวหน้า Approve"); }
@@ -901,7 +909,7 @@ function drawReview(){
     <h1>🔎 ${t('reviewTitle')}</h1>
     <div class="guide-box">${t('reviewerLabel')}: <b>${esc(USER.name)}</b> • เอกสาร ${esc(REVIEW.r.doc_no)} — ติ๊ก OK/ไม่OK ทุกรูป หรือกด "Accept ทั้งหมด" • ถ้ามีรูปไม่ผ่าน ระบบจะแจ้งกลุ่ม Line QC ให้ถ่ายใหม่ทันที</div>
     <div style="margin-bottom:10px"><button class="btn sm" onclick="reviewAcceptAll()">${t('acceptAll')}</button></div>
-    ${secs.map(sec=>`<div class="card"><div class="row" style="align-items:center"><h2 style="flex:1;margin:0">${esc(sec)}</h2><button class="btn sm sec" onclick="reviewAcceptSec('${esc(sec)}')">${t('acceptSec')}</button></div><div class="rep-photos" style="margin-top:10px">${photos.filter(p=>p.sec===sec).map(p=>`<div class="rev-cell"><div class="lab">${esc(p.label)}</div><a href="${esc(p.url)}" target="_blank"><img src="${esc(imgSrc(p.url))}" data-id="${imgId(p.url)}" data-mark="1" onerror="imgFB(this)"></a><div class="seg" data-rk="${esc(p.key)}"><button data-v="ok" class="${REVIEW.map[p.key]==='ok'?'on-ok':''}">OK</button><button data-v="no" class="${REVIEW.map[p.key]==='no'?'on-bad':''}">ไม่ OK</button></div></div>`).join("")}</div></div>`).join("")}
+    ${secs.map(sec=>`<div class="card"><div class="row" style="align-items:center"><h2 style="flex:1;margin:0">${esc(sec)}</h2><button class="btn sm sec" onclick="reviewAcceptSec('${esc(sec)}')">${t('acceptSec')}</button></div><div class="rep-photos" style="margin-top:10px">${photos.filter(p=>p.sec===sec).map(p=>`<div class="rev-cell"><div class="lab">${esc(p.label)}</div><a href="${esc(p.url)}" target="_blank"><img src="${esc(imgSrc(p.url))}" data-id="${imgId(p.url)}" data-mark="1" loading="lazy" onerror="imgFB(this)"></a><div class="seg" data-rk="${esc(p.key)}"><button data-v="ok" class="${REVIEW.map[p.key]==='ok'?'on-ok':''}">OK</button><button data-v="no" class="${REVIEW.map[p.key]==='no'?'on-bad':''}">ไม่ OK</button></div></div>`).join("")}</div></div>`).join("")}
     <button class="btn block" onclick="saveReview()">${t('reviewSave')}</button>`;
   document.querySelectorAll(".seg[data-rk]").forEach(seg=>seg.querySelectorAll("button").forEach(b=>b.onclick=()=>{ REVIEW.map[seg.dataset.rk]=b.dataset.v; drawReview(); }));
 }
@@ -933,7 +941,7 @@ function buildReportPages(r){
   const maker= gaugersArr.length? esc(gaugersArr.join(", ")) : esc(r.created_by||"-");
   const mimgs=(d.model_imgs&&d.model_imgs.length)?d.model_imgs:(d.model_img?[d.model_img]:[]);
   const cal=d.cal||{};
-  const cell=(lab,u,land)=>`<div class="c ${land?'land':''}"><div class="lab">${esc(lab)}</div><a href="${esc(u)}" target="_blank"><img src="${esc(imgSrc(u))}" data-id="${imgId(u)}" onerror="imgFB(this)"></a></div>`;
+  const cell=(lab,u,land)=>`<div class="c ${land?'land':''}"><div class="lab">${esc(lab)}</div><a href="${esc(u)}" target="_blank"><img src="${esc(imgSrc(u))}" data-id="${imgId(u)}" loading="lazy" onerror="imgFB(this)"></a></div>`;
   let body='';
   // ===== หน้า 1: Calibration Report =====
   const ib=(l,v)=>`<div class="r2-ib"><div class="l">${l}</div><div class="v">${String(v==null?'':v).trim()?v:'-'}</div></div>`;
